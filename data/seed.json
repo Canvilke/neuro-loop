@@ -1,0 +1,1421 @@
+{
+  "subjects": [
+    {
+      "id": "chinese",
+      "name": "语文",
+      "glyph": "¶",
+      "hue": "#56d6b0",
+      "weight": 0.88,
+      "core": "论述类文本与写作",
+      "groups": [
+        {
+          "id": "g-modern",
+          "label": "现代文阅读",
+          "short": "现代文"
+        },
+        {
+          "id": "g-classical",
+          "label": "文言文阅读",
+          "short": "文言"
+        },
+        {
+          "id": "g-poem",
+          "label": "古代诗歌与默写",
+          "short": "诗歌"
+        },
+        {
+          "id": "g-lang",
+          "label": "语言运用与写作",
+          "short": "写作"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "chinese-modern",
+          "label": "现代文阅读",
+          "grp": "g-modern",
+          "attn": 0.92,
+          "stability": 0.55,
+          "core": "筛选整合信息、分析论证思路与论点论据",
+          "trap": "把选项中的部分偷换成全部，忽略范围与程度限定词",
+          "method": "回文定位→比对修饰语→判偷换概念或无中生有",
+          "hit": 0.85,
+          "acc": 0.5
+        },
+        {
+          "id": "chinese-literary",
+          "label": "文学类文本",
+          "grp": "g-modern",
+          "attn": 0.85,
+          "stability": 0.5,
+          "core": "小说散文的人物、情节、环境与主旨探究",
+          "trap": "答题只贴术语，不结合文本具体语句分析",
+          "method": "先判题型→套答题角度→每点必带原文依据",
+          "hit": 0.8,
+          "acc": 0.48
+        },
+        {
+          "id": "chinese-classical",
+          "label": "文言文阅读",
+          "grp": "g-classical",
+          "attn": 0.9,
+          "stability": 0.45,
+          "core": "实词虚词、断句、翻译与内容概括分析",
+          "trap": "翻译时漏掉省略成分与词类活用，句子不完整",
+          "method": "先断句→逐字对译→补省略→调语序",
+          "hit": 0.82,
+          "acc": 0.45
+        },
+        {
+          "id": "chinese-poem",
+          "label": "古代诗歌鉴赏",
+          "grp": "g-poem",
+          "attn": 0.75,
+          "stability": 0.4,
+          "core": "意象、手法、情感与炼字赏析",
+          "trap": "把手法答成效果，只写生动形象不给依据",
+          "method": "找意象→定手法→联情感→扣诗句作答",
+          "hit": 0.72,
+          "acc": 0.42
+        },
+        {
+          "id": "chinese-recitation",
+          "label": "名篇名句默写",
+          "grp": "g-poem",
+          "attn": 0.7,
+          "stability": 0.8,
+          "core": "课标篇目的情境式默写与易错字",
+          "trap": "同音字与形近字写错，如锲而不舍的锲写成契",
+          "method": "先想句→再辨字→写后回读检查易错字",
+          "hit": 0.9,
+          "acc": 0.75
+        },
+        {
+          "id": "chinese-languageuse",
+          "label": "语言文字运用",
+          "grp": "g-lang",
+          "attn": 0.8,
+          "stability": 0.6,
+          "core": "成语、病句、衔接连贯与修辞效果",
+          "trap": "成语望文生义，褒贬色彩与适用对象用错",
+          "method": "看语境→辨褒贬对象→代入读一遍",
+          "hit": 0.85,
+          "acc": 0.62
+        },
+        {
+          "id": "chinese-essay",
+          "label": "作文审题立意",
+          "grp": "g-lang",
+          "attn": 0.95,
+          "stability": 0.5,
+          "core": "材料作文的审题、立意与结构搭建",
+          "trap": "脱离材料核心词，写成套作或宿构",
+          "method": "抓关键词→明任务指令→立分论点→回扣材料",
+          "hit": 0.88,
+          "acc": 0.52
+        },
+        {
+          "id": "chinese-essaylang",
+          "label": "作文语言素材",
+          "grp": "g-lang",
+          "attn": 0.7,
+          "stability": 0.35,
+          "core": "论证方法、素材选用与语言表现力",
+          "trap": "堆砌名言素材，与论点无逻辑关联",
+          "method": "一论点一素材→析例→回扣分论点",
+          "hit": 0.7,
+          "acc": 0.42
+        },
+        {
+          "id": "chinese-classicallang",
+          "label": "文言实词积累",
+          "grp": "g-classical",
+          "attn": 0.72,
+          "stability": 0.3,
+          "core": "常见文言实词的一词多义与词类活用",
+          "trap": "以今义释古义，忽略语境中的活用",
+          "method": "据语境推断→代入验证→按义项积累",
+          "hit": 0.68,
+          "acc": 0.38
+        },
+        {
+          "id": "chinese-structure",
+          "label": "论述结构与论证",
+          "grp": "g-modern",
+          "attn": 0.78,
+          "stability": 0.58,
+          "core": "论证方法、论证结构与论证语言的分析",
+          "trap": "把举例论证与类比论证混为一谈，方法名称张冠李戴",
+          "method": "找论据类型→判论证方法→说论证效果",
+          "hit": 0.76,
+          "acc": 0.52
+        },
+        {
+          "id": "chinese-apply",
+          "label": "应用文写作",
+          "grp": "g-lang",
+          "attn": 0.6,
+          "stability": 0.65,
+          "core": "书信、演讲稿、倡议书的格式与情境",
+          "trap": "格式要素缺失，称呼与落款位置错",
+          "method": "定文体→列格式要素→扣情境与身份",
+          "hit": 0.75,
+          "acc": 0.6
+        }
+      ],
+      "edges": [
+        { "a": "chinese-classicallang", "b": "chinese-classical", "kind": "prereq", "w": 0.9 },
+        { "a": "chinese-classical", "b": "chinese-poem", "kind": "prereq", "w": 0.75 },
+        { "a": "chinese-modern", "b": "chinese-structure", "kind": "prereq", "w": 0.85 },
+        { "a": "chinese-modern", "b": "chinese-literary", "kind": "contrast", "w": 0.6 },
+        { "a": "chinese-languageuse", "b": "chinese-modern", "kind": "prereq", "w": 0.7 },
+        { "a": "chinese-languageuse", "b": "chinese-essaylang", "kind": "prereq", "w": 0.7 },
+        { "a": "chinese-essay", "b": "chinese-essaylang", "kind": "prereq", "w": 0.85 },
+        { "a": "chinese-literary", "b": "chinese-essay", "kind": "analogy", "w": 0.6 },
+        { "a": "chinese-poem", "b": "chinese-recitation", "kind": "prereq", "w": 0.6 },
+        { "a": "chinese-classical", "b": "chinese-essay", "kind": "analogy", "w": 0.5 },
+        { "a": "chinese-structure", "b": "chinese-essay", "kind": "prereq", "w": 0.8 },
+        { "a": "chinese-apply", "b": "chinese-essaylang", "kind": "contrast", "w": 0.5 },
+        { "a": "chinese-recitation", "b": "chinese-essay", "kind": "analogy", "w": 0.5 },
+        { "a": "chinese-poem", "b": "chinese-literary", "kind": "analogy", "w": 0.6 },
+        { "a": "chinese-classicallang", "b": "chinese-languageuse", "kind": "contrast", "w": 0.5 },
+        { "a": "chinese-apply", "b": "chinese-languageuse", "kind": "prereq", "w": 0.65 }
+      ]
+    },
+    {
+      "id": "math",
+      "name": "数学",
+      "glyph": "Σ",
+      "hue": "#6f8bff",
+      "weight": 0.95,
+      "core": "函数与导数综合",
+      "groups": [
+        {
+          "id": "g-func",
+          "label": "函数与导数",
+          "short": "函数"
+        },
+        {
+          "id": "g-trig",
+          "label": "三角与解三角形",
+          "short": "三角"
+        },
+        {
+          "id": "g-geom",
+          "label": "几何与向量",
+          "short": "几何"
+        },
+        {
+          "id": "g-seq",
+          "label": "数列与概率统计",
+          "short": "数列"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "math-func",
+          "label": "函数性质",
+          "grp": "g-func",
+          "attn": 0.95,
+          "stability": 0.62,
+          "core": "单调性、奇偶性、周期性的判定与相互推出",
+          "trap": "把周期性和对称性混为一谈，用 f(x+a)=-f(x) 直接当周期",
+          "method": "先定定义域→再判对称→最后用 f(x+T)=f(x) 反推 T",
+          "hit": 0.9,
+          "acc": 0.55
+        },
+        {
+          "id": "math-deriv",
+          "label": "导数与切线",
+          "grp": "g-func",
+          "attn": 0.95,
+          "stability": 0.58,
+          "core": "导数的几何意义与切线方程，含过点切线",
+          "trap": "过某点的切线条数按切点算，漏掉该点不是切点的情况",
+          "method": "设切点→写切线方程→代已知点→解个数并检验",
+          "hit": 0.92,
+          "acc": 0.5
+        },
+        {
+          "id": "math-derivapp",
+          "label": "导数及其应用",
+          "grp": "g-func",
+          "attn": 0.95,
+          "stability": 0.45,
+          "core": "用导数求单调区间、极值与最值",
+          "trap": "含参讨论时漏掉导数恒正恒负与定义域端点",
+          "method": "求导→因式分解定零点→列表判号→回代端点",
+          "hit": 0.88,
+          "acc": 0.48
+        },
+        {
+          "id": "math-trig",
+          "label": "三角恒等变换",
+          "grp": "g-trig",
+          "attn": 0.8,
+          "stability": 0.6,
+          "core": "和差角、二倍角与辅助角公式的变形",
+          "trap": "辅助角公式相位取错，合成后 φ 落在哪一象限",
+          "method": "化同名→提根号下 a 方加 b 方→用正切定相位",
+          "hit": 0.82,
+          "acc": 0.6
+        },
+        {
+          "id": "math-triangle",
+          "label": "解三角形",
+          "grp": "g-trig",
+          "attn": 0.78,
+          "stability": 0.66,
+          "core": "正余弦定理与面积公式的选用",
+          "trap": "已知两边及其中一边对角时忽略两解情形",
+          "method": "先判角型→正弦定理配大边对大角→余弦定理验解",
+          "hit": 0.8,
+          "acc": 0.62
+        },
+        {
+          "id": "math-seq",
+          "label": "数列通项与求和",
+          "grp": "g-seq",
+          "attn": 0.85,
+          "stability": 0.5,
+          "core": "等差等比通项与前 n 项和，及递推构造",
+          "trap": "错位相减时项数与原式没有对齐，漏掉首项",
+          "method": "定类型→写通项→错位相减→验首项",
+          "hit": 0.85,
+          "acc": 0.5
+        },
+        {
+          "id": "math-vector",
+          "label": "平面向量",
+          "grp": "g-geom",
+          "attn": 0.7,
+          "stability": 0.7,
+          "core": "数量积、夹角与共线垂直的坐标判定",
+          "trap": "把向量夹角与直线夹角混同，忽略钝角",
+          "method": "建坐标→算数量积→用余弦符号定锐钝",
+          "hit": 0.8,
+          "acc": 0.65
+        },
+        {
+          "id": "math-solid",
+          "label": "立体几何",
+          "grp": "g-geom",
+          "attn": 0.85,
+          "stability": 0.4,
+          "core": "线面平行垂直判定与空间角计算",
+          "trap": "用向量法求二面角时不判钝锐，直接取反余弦",
+          "method": "建系→求法向量→看图形定二面角锐钝",
+          "hit": 0.8,
+          "acc": 0.45
+        },
+        {
+          "id": "math-conic",
+          "label": "圆锥曲线",
+          "grp": "g-geom",
+          "attn": 0.9,
+          "stability": 0.3,
+          "core": "椭圆双曲线抛物线的定义与弦长中点",
+          "trap": "联立后忘记判别式与交点存在性，导致多解或漏解",
+          "method": "设线联立→韦达定理→验判别式大于零→代目标式",
+          "hit": 0.78,
+          "acc": 0.38
+        },
+        {
+          "id": "math-prob",
+          "label": "概率统计",
+          "grp": "g-seq",
+          "attn": 0.8,
+          "stability": 0.55,
+          "core": "条件概率、独立性与离散型分布列",
+          "trap": "把条件概率与积事件概率混用，公式套错",
+          "method": "先写样本空间→算条件概率→列分布验和为 1",
+          "hit": 0.82,
+          "acc": 0.52
+        },
+        {
+          "id": "math-ineq",
+          "label": "不等式",
+          "grp": "g-func",
+          "attn": 0.65,
+          "stability": 0.32,
+          "core": "基本不等式与含参恒成立问题",
+          "trap": "用基本不等式忘记验证等号成立条件",
+          "method": "分离参数→求最值→验等号能否取到",
+          "hit": 0.72,
+          "acc": 0.45
+        },
+        {
+          "id": "math-complex",
+          "label": "复数运算",
+          "grp": "g-geom",
+          "attn": 0.55,
+          "stability": 0.85,
+          "core": "复数的四则运算与模、共轭",
+          "trap": "除法漏乘共轭，i 平方的符号写错",
+          "method": "分母乘共轭→化简实虚部→再算模",
+          "hit": 0.85,
+          "acc": 0.8
+        }
+      ],
+      "edges": [
+        { "a": "math-func", "b": "math-deriv", "kind": "prereq", "w": 0.9 },
+        { "a": "math-func", "b": "math-derivapp", "kind": "prereq", "w": 0.85 },
+        { "a": "math-deriv", "b": "math-derivapp", "kind": "prereq", "w": 0.9 },
+        { "a": "math-func", "b": "math-ineq", "kind": "prereq", "w": 0.7 },
+        { "a": "math-derivapp", "b": "math-ineq", "kind": "derive", "w": 0.6 },
+        { "a": "math-func", "b": "math-trig", "kind": "analogy", "w": 0.6 },
+        { "a": "math-trig", "b": "math-triangle", "kind": "prereq", "w": 0.85 },
+        { "a": "math-trig", "b": "math-vector", "kind": "analogy", "w": 0.55 },
+        { "a": "math-vector", "b": "math-solid", "kind": "prereq", "w": 0.8 },
+        { "a": "math-vector", "b": "math-triangle", "kind": "derive", "w": 0.7 },
+        { "a": "math-derivapp", "b": "math-conic", "kind": "derive", "w": 0.55 },
+        { "a": "math-seq", "b": "math-derivapp", "kind": "analogy", "w": 0.55 },
+        { "a": "math-seq", "b": "math-prob", "kind": "analogy", "w": 0.5 },
+        { "a": "math-vector", "b": "math-complex", "kind": "analogy", "w": 0.7 },
+        { "a": "math-func", "b": "math-seq", "kind": "prereq", "w": 0.65 },
+        { "a": "math-triangle", "b": "math-conic", "kind": "analogy", "w": 0.5 }
+      ]
+    },
+    {
+      "id": "english",
+      "name": "英语",
+      "glyph": "Æ",
+      "hue": "#b58cff",
+      "weight": 0.9,
+      "core": "阅读理解与读后续写",
+      "groups": [
+        {
+          "id": "g-vocab",
+          "label": "词汇与语法",
+          "short": "词汇"
+        },
+        {
+          "id": "g-reading",
+          "label": "阅读理解",
+          "short": "阅读"
+        },
+        {
+          "id": "g-listening",
+          "label": "听力与完形",
+          "short": "听力"
+        },
+        {
+          "id": "g-writing",
+          "label": "写作",
+          "short": "写作"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "english-vocab",
+          "label": "词汇与构词",
+          "grp": "g-vocab",
+          "attn": 0.9,
+          "stability": 0.6,
+          "core": "高频词义辨析、熟词生义与构词法",
+          "trap": "只记第一义项，忽略熟词生义与词性变化",
+          "method": "按词块记忆→看搭配→回原文验证词义",
+          "hit": 0.85,
+          "acc": 0.58
+        },
+        {
+          "id": "english-grammar",
+          "label": "语法填空",
+          "grp": "g-vocab",
+          "attn": 0.85,
+          "stability": 0.5,
+          "core": "谓语与非谓语、时态语态、连词与词性转换",
+          "trap": "句中已有谓语仍填谓语动词，忽略非谓语",
+          "method": "先析句子主干→定所缺成分→再定时态语态",
+          "hit": 0.82,
+          "acc": 0.5
+        },
+        {
+          "id": "english-cloze",
+          "label": "完形填空",
+          "grp": "g-listening",
+          "attn": 0.8,
+          "stability": 0.48,
+          "core": "语境逻辑、词义辨析与复现线索",
+          "trap": "只看单句不看上下文，忽略原词与同义复现",
+          "method": "通读抓主线→找复现线索→回填通读验证",
+          "hit": 0.78,
+          "acc": 0.45
+        },
+        {
+          "id": "english-reading",
+          "label": "阅读理解",
+          "grp": "g-reading",
+          "attn": 0.95,
+          "stability": 0.6,
+          "core": "主旨大意、细节推断、词义猜测与作者态度",
+          "trap": "把细节题当成主旨题，用局部信息概括全文",
+          "method": "先题干定位→回原文找依据→排除绝对化选项",
+          "hit": 0.9,
+          "acc": 0.55
+        },
+        {
+          "id": "english-sevenfive",
+          "label": "七选五",
+          "grp": "g-reading",
+          "attn": 0.7,
+          "stability": 0.42,
+          "core": "语篇衔接、指代关系与逻辑关系",
+          "trap": "只看空格前后一句，忽略段落主题句位置",
+          "method": "看空格位置→找代词与逻辑词→验段落一致性",
+          "hit": 0.72,
+          "acc": 0.42
+        },
+        {
+          "id": "english-listening",
+          "label": "听力理解",
+          "grp": "g-listening",
+          "attn": 0.75,
+          "stability": 0.7,
+          "core": "数字时间、场景推断与观点态度",
+          "trap": "听到什么选什么，忽略转折与否定后的信息",
+          "method": "预读题干→抓转折词→记关键数字与场景词",
+          "hit": 0.8,
+          "acc": 0.65
+        },
+        {
+          "id": "english-writing1",
+          "label": "应用文写作",
+          "grp": "g-writing",
+          "attn": 0.85,
+          "stability": 0.45,
+          "core": "书信通知的要点覆盖与格式礼貌",
+          "trap": "漏要点、身份语气不合，堆砌高级词",
+          "method": "审题列要点→定人称时态→套框架→查格式",
+          "hit": 0.8,
+          "acc": 0.45
+        },
+        {
+          "id": "english-writing2",
+          "label": "读后续写",
+          "grp": "g-writing",
+          "attn": 0.85,
+          "stability": 0.35,
+          "core": "情节衔接、人物动作与情感描写",
+          "trap": "情节脱离原文线索，时态与人称错乱",
+          "method": "读原文找伏笔→定两段主线→加动作心理描写",
+          "hit": 0.75,
+          "acc": 0.35
+        },
+        {
+          "id": "english-grammarinf",
+          "label": "语法基础",
+          "grp": "g-vocab",
+          "attn": 0.8,
+          "stability": 0.55,
+          "core": "时态、被动、非谓语与主谓一致",
+          "trap": "非谓语逻辑主语与主句主语不一致",
+          "method": "找逻辑主语→判主动被动→选 doing 或 done",
+          "hit": 0.78,
+          "acc": 0.52
+        },
+        {
+          "id": "english-wordspelling",
+          "label": "词汇拼写",
+          "grp": "g-vocab",
+          "attn": 0.6,
+          "stability": 0.3,
+          "core": "派生词与词性转换在语法填空中的拼写",
+          "trap": "词性转换后拼写错误，如 truth 漏写字母",
+          "method": "定词性→加前后缀→查拼写与双写规则",
+          "hit": 0.65,
+          "acc": 0.4
+        },
+        {
+          "id": "english-sentence",
+          "label": "长难句分析",
+          "grp": "g-reading",
+          "attn": 0.7,
+          "stability": 0.4,
+          "core": "定语从句、状语从句与插入语的拆解",
+          "trap": "从句套从句时找错主句谓语，修饰关系理不清",
+          "method": "去修饰→找主谓宾→再逐个挂回从句",
+          "hit": 0.7,
+          "acc": 0.45
+        }
+      ],
+      "edges": [
+        { "a": "english-vocab", "b": "english-grammar", "kind": "prereq", "w": 0.8 },
+        { "a": "english-grammarinf", "b": "english-grammar", "kind": "prereq", "w": 0.9 },
+        { "a": "english-grammarinf", "b": "english-sentence", "kind": "prereq", "w": 0.85 },
+        { "a": "english-sentence", "b": "english-reading", "kind": "prereq", "w": 0.75 },
+        { "a": "english-vocab", "b": "english-cloze", "kind": "prereq", "w": 0.85 },
+        { "a": "english-vocab", "b": "english-reading", "kind": "prereq", "w": 0.9 },
+        { "a": "english-reading", "b": "english-sevenfive", "kind": "prereq", "w": 0.8 },
+        { "a": "english-reading", "b": "english-writing2", "kind": "prereq", "w": 0.85 },
+        { "a": "english-grammar", "b": "english-writing1", "kind": "prereq", "w": 0.7 },
+        { "a": "english-sentence", "b": "english-writing2", "kind": "prereq", "w": 0.65 },
+        { "a": "english-grammar", "b": "english-writing2", "kind": "prereq", "w": 0.7 },
+        { "a": "english-cloze", "b": "english-sevenfive", "kind": "analogy", "w": 0.6 },
+        { "a": "english-listening", "b": "english-cloze", "kind": "analogy", "w": 0.5 },
+        { "a": "english-wordspelling", "b": "english-grammar", "kind": "prereq", "w": 0.7 },
+        { "a": "english-writing1", "b": "english-writing2", "kind": "contrast", "w": 0.55 },
+        { "a": "english-vocab", "b": "english-writing2", "kind": "prereq", "w": 0.6 }
+      ]
+    },
+    {
+      "id": "physics",
+      "name": "物理",
+      "glyph": "φ",
+      "hue": "#61d5ff",
+      "weight": 0.92,
+      "core": "力与运动、电磁感应",
+      "groups": [
+        {
+          "id": "g-mech",
+          "label": "力学与运动",
+          "short": "力学"
+        },
+        {
+          "id": "g-energy",
+          "label": "功与能量",
+          "short": "功与能"
+        },
+        {
+          "id": "g-circuit",
+          "label": "电场与电路",
+          "short": "电场"
+        },
+        {
+          "id": "g-magnet",
+          "label": "磁场与电磁感应",
+          "short": "磁场"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "physics-kinematics",
+          "label": "运动学公式",
+          "grp": "g-mech",
+          "attn": 0.85,
+          "stability": 0.65,
+          "core": "匀变速直线运动的公式与图像",
+          "trap": "刹车问题不判停车时间，直接代公式",
+          "method": "判是否停下→分段→用速度时间图面积求解",
+          "hit": 0.85,
+          "acc": 0.6
+        },
+        {
+          "id": "physics-newton",
+          "label": "牛顿运动定律",
+          "grp": "g-mech",
+          "attn": 0.95,
+          "stability": 0.6,
+          "core": "受力分析与整体法隔离法的应用",
+          "trap": "漏画摩擦力或把作用力反作用力当成平衡力",
+          "method": "定研究对象→画受力图→建轴分解→列方程",
+          "hit": 0.9,
+          "acc": 0.55
+        },
+        {
+          "id": "physics-curvilinear",
+          "label": "曲线运动与平抛",
+          "grp": "g-mech",
+          "attn": 0.8,
+          "stability": 0.5,
+          "core": "运动的合成与分解、平抛规律",
+          "trap": "把平抛时间当成由水平位移决定，混淆分运动",
+          "method": "分解为水平匀速加竖直自由落体→联立求时间",
+          "hit": 0.82,
+          "acc": 0.52
+        },
+        {
+          "id": "physics-circular",
+          "label": "圆周运动",
+          "grp": "g-mech",
+          "attn": 0.8,
+          "stability": 0.45,
+          "core": "向心力来源分析与临界条件",
+          "trap": "把向心力当成额外受力画进受力图",
+          "method": "找圆心→沿半径列向心力方程→判临界条件",
+          "hit": 0.8,
+          "acc": 0.45
+        },
+        {
+          "id": "physics-gravity",
+          "label": "万有引力与航天",
+          "grp": "g-mech",
+          "attn": 0.82,
+          "stability": 0.55,
+          "core": "天体运动、卫星变轨与黄金代换",
+          "trap": "把卫星轨道半径当作地球半径直接代入",
+          "method": "写万有引力等于向心力→对应量→代换 GM 等于 gR 方",
+          "hit": 0.8,
+          "acc": 0.5
+        },
+        {
+          "id": "physics-work",
+          "label": "功和能",
+          "grp": "g-energy",
+          "attn": 0.9,
+          "stability": 0.5,
+          "core": "动能定理、机械能守恒与功能关系",
+          "trap": "有摩擦生热时仍用机械能守恒，漏算内能",
+          "method": "受力分析→判守恒→列动能定理→算能量转化",
+          "hit": 0.85,
+          "acc": 0.48
+        },
+        {
+          "id": "physics-momentum",
+          "label": "动量守恒",
+          "grp": "g-energy",
+          "attn": 0.85,
+          "stability": 0.4,
+          "core": "碰撞、反冲与动量定理的应用",
+          "trap": "碰撞后不验算动能不增与速度合理性",
+          "method": "定系统→判外力→列动量守恒→验能量与速度",
+          "hit": 0.8,
+          "acc": 0.42
+        },
+        {
+          "id": "physics-electric",
+          "label": "电场与电势",
+          "grp": "g-circuit",
+          "attn": 0.88,
+          "stability": 0.45,
+          "core": "场强电势、带电粒子在电场中的运动",
+          "trap": "认为场强为零处电势一定为零，概念混淆",
+          "method": "画电场线→比电势高低→分加速与偏转两类",
+          "hit": 0.78,
+          "acc": 0.42
+        },
+        {
+          "id": "physics-circuit",
+          "label": "恒定电流",
+          "grp": "g-circuit",
+          "attn": 0.78,
+          "stability": 0.5,
+          "core": "闭合电路欧姆定律与动态分析",
+          "trap": "动态分析时把电源内阻忽略，路端电压判断错",
+          "method": "判总电阻变化→求总电流→再看支路电压",
+          "hit": 0.75,
+          "acc": 0.45
+        },
+        {
+          "id": "physics-magnetic",
+          "label": "磁场与洛伦兹力",
+          "grp": "g-magnet",
+          "attn": 0.85,
+          "stability": 0.32,
+          "core": "安培力、洛伦兹力与带电粒子圆周运动",
+          "trap": "半径与周期公式中速度代错，忽略用几何找圆心",
+          "method": "定圆心→用几何求半径→用半径公式验证",
+          "hit": 0.75,
+          "acc": 0.35
+        },
+        {
+          "id": "physics-induction",
+          "label": "电磁感应",
+          "grp": "g-magnet",
+          "attn": 0.9,
+          "stability": 0.3,
+          "core": "楞次定律、法拉第定律与导体棒切割",
+          "trap": "判断感应电流方向时左右手定则混用",
+          "method": "判磁通量变化→楞次定方向→写电动势→电路分析",
+          "hit": 0.72,
+          "acc": 0.32
+        },
+        {
+          "id": "physics-experiment",
+          "label": "力电实验",
+          "grp": "g-circuit",
+          "attn": 0.8,
+          "stability": 0.38,
+          "core": "纸带与伏安法测电阻的数据处理",
+          "trap": "有效数字与单位处理不当，图像截距含义错",
+          "method": "看实验原理→列关系式→化线性→读斜率与截距",
+          "hit": 0.7,
+          "acc": 0.4
+        }
+      ],
+      "edges": [
+        { "a": "physics-kinematics", "b": "physics-newton", "kind": "prereq", "w": 0.9 },
+        { "a": "physics-newton", "b": "physics-curvilinear", "kind": "prereq", "w": 0.9 },
+        { "a": "physics-curvilinear", "b": "physics-circular", "kind": "prereq", "w": 0.85 },
+        { "a": "physics-newton", "b": "physics-gravity", "kind": "prereq", "w": 0.85 },
+        { "a": "physics-newton", "b": "physics-work", "kind": "prereq", "w": 0.9 },
+        { "a": "physics-newton", "b": "physics-momentum", "kind": "prereq", "w": 0.85 },
+        { "a": "physics-work", "b": "physics-momentum", "kind": "derive", "w": 0.7 },
+        { "a": "physics-electric", "b": "physics-circuit", "kind": "prereq", "w": 0.8 },
+        { "a": "physics-electric", "b": "physics-magnetic", "kind": "prereq", "w": 0.8 },
+        { "a": "physics-magnetic", "b": "physics-induction", "kind": "prereq", "w": 0.9 },
+        { "a": "physics-circuit", "b": "physics-induction", "kind": "prereq", "w": 0.65 },
+        { "a": "physics-work", "b": "physics-electric", "kind": "prereq", "w": 0.7 },
+        { "a": "physics-gravity", "b": "physics-work", "kind": "prereq", "w": 0.6 },
+        { "a": "physics-experiment", "b": "physics-kinematics", "kind": "prereq", "w": 0.7 },
+        { "a": "physics-experiment", "b": "physics-circuit", "kind": "prereq", "w": 0.65 },
+        { "a": "physics-circular", "b": "physics-gravity", "kind": "prereq", "w": 0.8 }
+      ]
+    },
+    {
+      "id": "chemistry",
+      "name": "化学",
+      "glyph": "⌬",
+      "hue": "#2fb6d8",
+      "weight": 0.88,
+      "core": "反应原理与电化学",
+      "groups": [
+        {
+          "id": "g-principle",
+          "label": "化学反应原理",
+          "short": "反应原理"
+        },
+        {
+          "id": "g-redox",
+          "label": "氧化还原与离子",
+          "short": "氧化还原"
+        },
+        {
+          "id": "g-element",
+          "label": "元素与实验",
+          "short": "元素"
+        },
+        {
+          "id": "g-organic",
+          "label": "物质结构与有机",
+          "short": "结构有机"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "chemistry-redox",
+          "label": "氧化还原",
+          "grp": "g-redox",
+          "attn": 0.9,
+          "stability": 0.6,
+          "core": "化合价升降、电子守恒与方程式配平",
+          "trap": "配平时只平原子不平电荷，忽略介质酸碱性",
+          "method": "标价态→算升降总数→用水与氢离子或氢氧根配平",
+          "hit": 0.88,
+          "acc": 0.58
+        },
+        {
+          "id": "chemistry-ion",
+          "label": "离子反应",
+          "grp": "g-redox",
+          "attn": 0.85,
+          "stability": 0.55,
+          "core": "离子共存、离子方程式正误判断",
+          "trap": "拆分不该拆的弱电解质与难溶物，拆写规则错",
+          "method": "写方程式→拆强电解质→删旁观离子→查守恒",
+          "hit": 0.85,
+          "acc": 0.5
+        },
+        {
+          "id": "chemistry-mole",
+          "label": "物质的量",
+          "grp": "g-redox",
+          "attn": 0.82,
+          "stability": 0.62,
+          "core": "以物质的量为中心的计算与阿伏加德罗常数",
+          "trap": "NA 判断题忽略标准状况与物质状态",
+          "method": "统一到摩尔→用质量或体积换算→再比数目",
+          "hit": 0.85,
+          "acc": 0.55
+        },
+        {
+          "id": "chemistry-equilibrium",
+          "label": "化学平衡",
+          "grp": "g-principle",
+          "attn": 0.9,
+          "stability": 0.4,
+          "core": "平衡移动、转化率与平衡常数计算",
+          "trap": "把浓度商与平衡常数混用，忽略温度影响 K",
+          "method": "写三段式→算浓度商并与 K 比较→判移动方向",
+          "hit": 0.8,
+          "acc": 0.42
+        },
+        {
+          "id": "chemistry-rate",
+          "label": "反应速率",
+          "grp": "g-principle",
+          "attn": 0.75,
+          "stability": 0.5,
+          "core": "速率计算与影响因素、活化能",
+          "trap": "把速率之比当系数比时漏看物质状态",
+          "method": "写速率表达式→比系数→看条件改变的影响",
+          "hit": 0.75,
+          "acc": 0.48
+        },
+        {
+          "id": "chemistry-electrochem",
+          "label": "电化学",
+          "grp": "g-principle",
+          "attn": 0.88,
+          "stability": 0.35,
+          "core": "原电池电解池的电极判断与电极反应式",
+          "trap": "原电池与电解池的阴阳极判断颠倒",
+          "method": "定池型→判正负极或阴阳极→写半反应→查守恒",
+          "hit": 0.78,
+          "acc": 0.4
+        },
+        {
+          "id": "chemistry-electrolyte",
+          "label": "电解质溶液",
+          "grp": "g-principle",
+          "attn": 0.85,
+          "stability": 0.3,
+          "core": "弱电解质电离、盐类水解与粒子浓度比较",
+          "trap": "粒子浓度比较忽略电荷守恒与水解程度",
+          "method": "列电荷、物料、质子三大守恒→定主次→比浓度",
+          "hit": 0.72,
+          "acc": 0.35
+        },
+        {
+          "id": "chemistry-organic",
+          "label": "有机化学基础",
+          "grp": "g-organic",
+          "attn": 0.85,
+          "stability": 0.45,
+          "core": "官能团性质、同分异构与合成路线",
+          "trap": "同分异构体漏写或重写，忽略位置与立体异构",
+          "method": "定碳架→定官能团位置→查对称性去重",
+          "hit": 0.78,
+          "acc": 0.45
+        },
+        {
+          "id": "chemistry-structure",
+          "label": "物质结构",
+          "grp": "g-organic",
+          "attn": 0.8,
+          "stability": 0.5,
+          "core": "电子排布、杂化轨道与晶体计算",
+          "trap": "杂化类型判断错，晶胞计算漏算共享原子",
+          "method": "写排布→数价层电子对→判杂化→算晶胞粒子数",
+          "hit": 0.75,
+          "acc": 0.45
+        },
+        {
+          "id": "chemistry-experiment",
+          "label": "化学实验",
+          "grp": "g-element",
+          "attn": 0.82,
+          "stability": 0.42,
+          "core": "气体制备、除杂顺序与定量实验误差",
+          "trap": "除杂与干燥顺序颠倒，尾气处理装置漏掉",
+          "method": "定目的→排装置顺序→查除杂尾气→析误差",
+          "hit": 0.75,
+          "acc": 0.45
+        },
+        {
+          "id": "chemistry-metal",
+          "label": "元素化合物",
+          "grp": "g-element",
+          "attn": 0.8,
+          "stability": 0.55,
+          "core": "钠铁铝硅氯硫氮的性质与转化",
+          "trap": "铝的两性与氢氧化铝溶于过量强碱判断错",
+          "method": "按价态和物质类别二维梳理→写转化方程式",
+          "hit": 0.8,
+          "acc": 0.5
+        },
+        {
+          "id": "chemistry-thermo",
+          "label": "反应热与盖斯定律",
+          "grp": "g-principle",
+          "attn": 0.78,
+          "stability": 0.4,
+          "core": "焓变计算、盖斯定律与键能估算",
+          "trap": "热化学方程式中状态与符号写错，焓变与计量数不匹配",
+          "method": "定目标式→拼合已知式→同步加减焓变",
+          "hit": 0.72,
+          "acc": 0.42
+        }
+      ],
+      "edges": [
+        { "a": "chemistry-mole", "b": "chemistry-redox", "kind": "prereq", "w": 0.7 },
+        { "a": "chemistry-redox", "b": "chemistry-ion", "kind": "prereq", "w": 0.8 },
+        { "a": "chemistry-redox", "b": "chemistry-electrochem", "kind": "prereq", "w": 0.9 },
+        { "a": "chemistry-redox", "b": "chemistry-metal", "kind": "prereq", "w": 0.85 },
+        { "a": "chemistry-ion", "b": "chemistry-electrolyte", "kind": "prereq", "w": 0.8 },
+        { "a": "chemistry-electrolyte", "b": "chemistry-electrochem", "kind": "prereq", "w": 0.8 },
+        { "a": "chemistry-rate", "b": "chemistry-equilibrium", "kind": "prereq", "w": 0.9 },
+        { "a": "chemistry-thermo", "b": "chemistry-equilibrium", "kind": "prereq", "w": 0.7 },
+        { "a": "chemistry-equilibrium", "b": "chemistry-electrolyte", "kind": "prereq", "w": 0.75 },
+        { "a": "chemistry-metal", "b": "chemistry-experiment", "kind": "prereq", "w": 0.7 },
+        { "a": "chemistry-structure", "b": "chemistry-organic", "kind": "prereq", "w": 0.8 },
+        { "a": "chemistry-mole", "b": "chemistry-equilibrium", "kind": "prereq", "w": 0.7 },
+        { "a": "chemistry-rate", "b": "chemistry-experiment", "kind": "prereq", "w": 0.6 },
+        { "a": "chemistry-organic", "b": "chemistry-experiment", "kind": "prereq", "w": 0.6 },
+        { "a": "chemistry-ion", "b": "chemistry-experiment", "kind": "prereq", "w": 0.6 },
+        { "a": "chemistry-electrolyte", "b": "chemistry-experiment", "kind": "prereq", "w": 0.55 }
+      ]
+    },
+    {
+      "id": "politics",
+      "name": "政治",
+      "glyph": "§",
+      "hue": "#ffb45c",
+      "weight": 0.85,
+      "core": "经济与社会、哲学",
+      "groups": [
+        {
+          "id": "g-econ",
+          "label": "经济与社会",
+          "short": "经济"
+        },
+        {
+          "id": "g-politics",
+          "label": "政治与法治",
+          "short": "政治"
+        },
+        {
+          "id": "g-philosophy",
+          "label": "哲学与文化",
+          "short": "哲学"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "politics-economy",
+          "label": "经济与社会",
+          "grp": "g-econ",
+          "attn": 0.9,
+          "stability": 0.55,
+          "core": "基本经济制度、市场调节与宏观调控",
+          "trap": "把市场决定作用与政府作用对立，答成二选一",
+          "method": "定主体→分市场与政府→扣材料→用规范术语",
+          "hit": 0.85,
+          "acc": 0.52
+        },
+        {
+          "id": "politics-ownership",
+          "label": "生产资料所有制",
+          "grp": "g-econ",
+          "attn": 0.78,
+          "stability": 0.6,
+          "core": "公有制主体与多种所有制共同发展",
+          "trap": "把公有制主体与国有经济主导混为一谈",
+          "method": "分公有制与非公有→主体看比重→主导看控制力",
+          "hit": 0.8,
+          "acc": 0.55
+        },
+        {
+          "id": "politics-market",
+          "label": "市场与价格",
+          "grp": "g-econ",
+          "attn": 0.75,
+          "stability": 0.5,
+          "core": "供求影响价格、价值决定价格",
+          "trap": "把供求决定价格错答成价值决定价格",
+          "method": "判供求变动→看价格方向→回到价值基础",
+          "hit": 0.75,
+          "acc": 0.5
+        },
+        {
+          "id": "politics-politics",
+          "label": "政治与法治",
+          "grp": "g-politics",
+          "attn": 0.88,
+          "stability": 0.48,
+          "core": "党的领导、人民当家作主与依法治国",
+          "trap": "混淆人大职权与人大代表职权，主体张冠李戴",
+          "method": "定主体→对应职权与义务→用法律术语表述",
+          "hit": 0.8,
+          "acc": 0.45
+        },
+        {
+          "id": "politics-culture",
+          "label": "文化传承与创新",
+          "grp": "g-philosophy",
+          "attn": 0.8,
+          "stability": 0.5,
+          "core": "文化的民族性与时代性、交流互鉴",
+          "trap": "把传统文化当成全盘继承，忽略批判继承",
+          "method": "定文化现象→分继承与创新与交流→扣材料",
+          "hit": 0.75,
+          "acc": 0.48
+        },
+        {
+          "id": "politics-philosophy",
+          "label": "唯物辩证法",
+          "grp": "g-philosophy",
+          "attn": 0.9,
+          "stability": 0.42,
+          "core": "物质与意识、矛盾分析法与联系发展",
+          "trap": "把矛盾普遍性与特殊性的关系答反",
+          "method": "找原理→述内容→写方法论→连材料",
+          "hit": 0.78,
+          "acc": 0.42
+        },
+        {
+          "id": "politics-value",
+          "label": "人生价值观",
+          "grp": "g-philosophy",
+          "attn": 0.7,
+          "stability": 0.45,
+          "core": "价值判断与价值选择、人生价值实现",
+          "trap": "只写价值观导向，不写劳动与奉献",
+          "method": "定原理→讲判断标准→落到实践路径",
+          "hit": 0.72,
+          "acc": 0.45
+        },
+        {
+          "id": "politics-law",
+          "label": "依法治国",
+          "grp": "g-politics",
+          "attn": 0.8,
+          "stability": 0.4,
+          "core": "法治国家、法治政府与法治社会",
+          "trap": "混淆依法行政与依法执政的主体，党政关系答错",
+          "method": "定主体是党或政府或公民→对应要求→扣材料",
+          "hit": 0.75,
+          "acc": 0.42
+        },
+        {
+          "id": "politics-international",
+          "label": "国际政治与经济",
+          "grp": "g-econ",
+          "attn": 0.72,
+          "stability": 0.35,
+          "core": "国家利益、国际关系与全球治理",
+          "trap": "把国家性质当成国际关系的决定因素",
+          "method": "抓国家利益→分合作与冲突→联时代主题",
+          "hit": 0.7,
+          "acc": 0.4
+        },
+        {
+          "id": "politics-newdev",
+          "label": "新发展理念",
+          "grp": "g-econ",
+          "attn": 0.8,
+          "stability": 0.35,
+          "core": "新发展理念、现代化经济体系与共同富裕",
+          "trap": "只背概念不结合材料里的具体举措",
+          "method": "定理念→找材料举措→写经济意义",
+          "hit": 0.72,
+          "acc": 0.42
+        },
+        {
+          "id": "politics-people",
+          "label": "人民民主",
+          "grp": "g-politics",
+          "attn": 0.78,
+          "stability": 0.45,
+          "core": "人民代表大会制度与协商民主",
+          "trap": "把协商民主等同于政协的全部职能",
+          "method": "定制度→说主体→讲运行→扣材料",
+          "hit": 0.75,
+          "acc": 0.45
+        }
+      ],
+      "edges": [
+        { "a": "politics-ownership", "b": "politics-economy", "kind": "prereq", "w": 0.85 },
+        { "a": "politics-market", "b": "politics-economy", "kind": "prereq", "w": 0.8 },
+        { "a": "politics-economy", "b": "politics-newdev", "kind": "prereq", "w": 0.85 },
+        { "a": "politics-politics", "b": "politics-law", "kind": "prereq", "w": 0.85 },
+        { "a": "politics-people", "b": "politics-law", "kind": "prereq", "w": 0.7 },
+        { "a": "politics-politics", "b": "politics-people", "kind": "prereq", "w": 0.85 },
+        { "a": "politics-economy", "b": "politics-international", "kind": "prereq", "w": 0.65 },
+        { "a": "politics-philosophy", "b": "politics-value", "kind": "prereq", "w": 0.85 },
+        { "a": "politics-philosophy", "b": "politics-culture", "kind": "prereq", "w": 0.7 },
+        { "a": "politics-politics", "b": "politics-culture", "kind": "prereq", "w": 0.7 },
+        { "a": "politics-value", "b": "politics-newdev", "kind": "analogy", "w": 0.5 },
+        { "a": "politics-philosophy", "b": "politics-politics", "kind": "prereq", "w": 0.65 },
+        { "a": "politics-culture", "b": "politics-international", "kind": "analogy", "w": 0.55 },
+        { "a": "politics-law", "b": "politics-economy", "kind": "prereq", "w": 0.55 }
+      ]
+    }
+  ],
+  "shards": [
+    {
+      "subject": "chinese",
+      "text": "下列对材料相关内容的理解和分析，不正确的一项是",
+      "hit": 0.85,
+      "acc": 0.35,
+      "state": "fp"
+    },
+    {
+      "subject": "chinese",
+      "text": "文中画横线的句子使用了哪种修辞手法？请简要分析其表达效果",
+      "hit": 0.8,
+      "acc": 0.4,
+      "state": "fp"
+    },
+    {
+      "subject": "chinese",
+      "text": "根据材料，概括我国数字经济发展面临的主要问题",
+      "hit": 0.75,
+      "acc": 0.45,
+      "state": "fp"
+    },
+    {
+      "subject": "chinese",
+      "text": "阅读下面的文言文，把画线句子翻译成现代汉语",
+      "hit": 0.45,
+      "acc": 0.3,
+      "state": "unknown"
+    },
+    {
+      "subject": "chinese",
+      "text": "结合全诗，分析诗人笔下的闲字蕴含的复杂情感",
+      "hit": 0.42,
+      "acc": 0.25,
+      "state": "unknown"
+    },
+    {
+      "subject": "chinese",
+      "text": "补写出下列句子中的空缺部分：故木受绳则直",
+      "hit": 0.9,
+      "acc": 0.85,
+      "state": "smooth"
+    },
+    {
+      "subject": "chinese",
+      "text": "下列各句中，加点的成语使用恰当的一项是",
+      "hit": 0.88,
+      "acc": 0.78,
+      "state": "smooth"
+    },
+    {
+      "subject": "math",
+      "text": "已知函数 f(x)=ln x - ax，讨论 f(x) 的单调性",
+      "hit": 0.9,
+      "acc": 0.45,
+      "state": "fp"
+    },
+    {
+      "subject": "math",
+      "text": "过抛物线 y 方等于 4x 焦点 F 的直线交抛物线于 A、B，求 AB 最小值",
+      "hit": 0.8,
+      "acc": 0.3,
+      "state": "fp"
+    },
+    {
+      "subject": "math",
+      "text": "在三角形 ABC 中，a=2，b=根号 3，A=60 度，求角 B",
+      "hit": 0.85,
+      "acc": 0.4,
+      "state": "fp"
+    },
+    {
+      "subject": "math",
+      "text": "已知 a1=1，a 下标 n+1=2a 下标 n+1，求数列通项公式",
+      "hit": 0.5,
+      "acc": 0.35,
+      "state": "unknown"
+    },
+    {
+      "subject": "math",
+      "text": "若复数 z 满足 z(1+i)=2i，求 z 的模",
+      "hit": 0.45,
+      "acc": 0.3,
+      "state": "unknown"
+    },
+    {
+      "subject": "math",
+      "text": "计算 (1+i) 除以 (1-i) 所得复数的共轭复数",
+      "hit": 0.9,
+      "acc": 0.85,
+      "state": "smooth"
+    },
+    {
+      "subject": "math",
+      "text": "已知向量 a=(1,2)，b=(m,-1)，若 a 垂直 b，求 m",
+      "hit": 0.88,
+      "acc": 0.8,
+      "state": "smooth"
+    },
+    {
+      "subject": "english",
+      "text": "What is the main idea of paragraph 2?",
+      "hit": 0.88,
+      "acc": 0.45,
+      "state": "fp"
+    },
+    {
+      "subject": "english",
+      "text": "语法填空：The bridge ___ (build) is in use.",
+      "hit": 0.85,
+      "acc": 0.4,
+      "state": "fp"
+    },
+    {
+      "subject": "english",
+      "text": "完形填空：She ___ her mother's hand tightly.",
+      "hit": 0.78,
+      "acc": 0.4,
+      "state": "fp"
+    },
+    {
+      "subject": "english",
+      "text": "读后续写：根据所给情节续写两段，使之构成完整故事",
+      "hit": 0.45,
+      "acc": 0.3,
+      "state": "unknown"
+    },
+    {
+      "subject": "english",
+      "text": "七选五：从选项中选出能填入空白处的最佳选项",
+      "hit": 0.5,
+      "acc": 0.35,
+      "state": "unknown"
+    },
+    {
+      "subject": "english",
+      "text": "词形转换：He is a ___ (success) writer.",
+      "hit": 0.9,
+      "acc": 0.82,
+      "state": "smooth"
+    },
+    {
+      "subject": "english",
+      "text": "听力：What time does the train leave?",
+      "hit": 0.92,
+      "acc": 0.8,
+      "state": "smooth"
+    },
+    {
+      "subject": "physics",
+      "text": "如图，导体棒在磁场中以速度 v 匀速切割磁感线，求感应电动势",
+      "hit": 0.85,
+      "acc": 0.35,
+      "state": "fp"
+    },
+    {
+      "subject": "physics",
+      "text": "小球从高 h 处自由下落，反弹高度为 h/2，求损失的机械能",
+      "hit": 0.8,
+      "acc": 0.4,
+      "state": "fp"
+    },
+    {
+      "subject": "physics",
+      "text": "卫星绕地球做匀速圆周运动，轨道半径增大后周期如何变化",
+      "hit": 0.78,
+      "acc": 0.45,
+      "state": "fp"
+    },
+    {
+      "subject": "physics",
+      "text": "带电粒子以速度 v 垂直进入匀强磁场，求其半径与周期",
+      "hit": 0.55,
+      "acc": 0.35,
+      "state": "unknown"
+    },
+    {
+      "subject": "physics",
+      "text": "用伏安法测电阻，画出实验电路图并写出测量表达式",
+      "hit": 0.5,
+      "acc": 0.3,
+      "state": "unknown"
+    },
+    {
+      "subject": "physics",
+      "text": "物体做匀速直线运动，速度 5 米每秒，10 秒内位移多大",
+      "hit": 0.92,
+      "acc": 0.85,
+      "state": "smooth"
+    },
+    {
+      "subject": "physics",
+      "text": "牛顿第二定律表达式 F=ma 中，F 的单位是什么",
+      "hit": 0.9,
+      "acc": 0.8,
+      "state": "smooth"
+    },
+    {
+      "subject": "chemistry",
+      "text": "写出铁与稀硝酸反应的离子方程式",
+      "hit": 0.85,
+      "acc": 0.4,
+      "state": "fp"
+    },
+    {
+      "subject": "chemistry",
+      "text": "对于反应氮气加氢气生成氨气，增大压强平衡如何移动",
+      "hit": 0.82,
+      "acc": 0.45,
+      "state": "fp"
+    },
+    {
+      "subject": "chemistry",
+      "text": "设计实验除去二氧化碳中混有的少量氯化氢气体",
+      "hit": 0.75,
+      "acc": 0.45,
+      "state": "fp"
+    },
+    {
+      "subject": "chemistry",
+      "text": "写出以乙烯为原料制备乙酸乙酯的合成路线",
+      "hit": 0.5,
+      "acc": 0.3,
+      "state": "unknown"
+    },
+    {
+      "subject": "chemistry",
+      "text": "某晶胞如图所示，其化学式为多少，配位数为多少",
+      "hit": 0.55,
+      "acc": 0.35,
+      "state": "unknown"
+    },
+    {
+      "subject": "chemistry",
+      "text": "计算 0.5 摩尔水的质量",
+      "hit": 0.92,
+      "acc": 0.85,
+      "state": "smooth"
+    },
+    {
+      "subject": "chemistry",
+      "text": "判断：氯化钠溶液能导电，所以氯化钠是电解质",
+      "hit": 0.88,
+      "acc": 0.8,
+      "state": "smooth"
+    },
+    {
+      "subject": "politics",
+      "text": "结合材料，运用经济与社会知识，说明该地发展数字经济的意义",
+      "hit": 0.85,
+      "acc": 0.45,
+      "state": "fp"
+    },
+    {
+      "subject": "politics",
+      "text": "运用矛盾分析法，分析材料中体现的哲学道理",
+      "hit": 0.82,
+      "acc": 0.42,
+      "state": "fp"
+    },
+    {
+      "subject": "politics",
+      "text": "结合材料，运用政治与法治知识，说明政府应如何依法行政",
+      "hit": 0.8,
+      "acc": 0.45,
+      "state": "fp"
+    },
+    {
+      "subject": "politics",
+      "text": "结合材料，运用逻辑与思维知识，说明该推理是否正确",
+      "hit": 0.5,
+      "acc": 0.3,
+      "state": "unknown"
+    },
+    {
+      "subject": "politics",
+      "text": "运用当代国际政治与经济知识，分析该国参与全球治理的原因",
+      "hit": 0.5,
+      "acc": 0.35,
+      "state": "unknown"
+    },
+    {
+      "subject": "politics",
+      "text": "我国的根本政治制度是什么",
+      "hit": 0.92,
+      "acc": 0.85,
+      "state": "smooth"
+    },
+    {
+      "subject": "politics",
+      "text": "简述新发展理念的内容",
+      "hit": 0.9,
+      "acc": 0.8,
+      "state": "smooth"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": "m.construct-aux",
+  "name": "构造函数",
+  "claim": "把待证不等式移项成一侧为零，构造新函数用单调性证明。",
+  "judge": "证明形如 f(x)>g(x) 或含 e^x、ln x 的不等式，直接比较困难时。",
+  "steps": [
+    "移项，令 h(x)=左-右",
+    "求 h'(x)，必要时再求导",
+    "找 h 的单调区间与最小值",
+    "由最小值符号得结论"
+  ],
+  "instances": [
+    "e^x ≥ x+1",
+    "ln x ≤ x-1",
+    "双变量不等式",
+    "数列不等式放缩"
+  ],
+  "traps": [
+    "构造后忘记定义域",
+    "二阶导符号判断失误",
+    "双变量问题忘记固定一个变量"
+  ],
+  "points": [
+    "math-deriv",
+    "math-ineq"
+  ],
+  "compression": 26,
+  "source": "ai",
+  "confidence": 0.72,
+  "verified": false,
+  "createdAt": "2026-11-09"
+}

@@ -1,0 +1,3 @@
+- insert:
+    - id: neuro-loop
+      name: '@local/neuro-loop'

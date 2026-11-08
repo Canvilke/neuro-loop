@@ -1,0 +1,115 @@
+{
+  "date": "2026-11-09",
+  "weekday": "一",
+  "title": "NEURO-LOOP 每日一页",
+  "subtitle": "只写不看答案 · 回来勾 Recon / Hint",
+  "reproduce": [
+    {
+      "id": "m.polar-dual",
+      "name": "配极原理",
+      "claim": "圆锥曲线的极点极线成对偶，切点弦与动点轨迹可由极线方程直写。",
+      "judge": "题目涉及过定点的弦、切点弦、中点弦或动点轨迹，且能用二次曲线方程表示时。",
+      "traps": [
+        "极线方向与点位置搞反",
+        "非标准位置（平移后）忘记先平移"
+      ],
+      "instances": [
+        "椭圆切点弦",
+        "过定点的弦中点轨迹"
+      ],
+      "points": [
+        "math-conic"
+      ]
+    },
+    {
+      "id": "m.centroid-fixed",
+      "name": "质心不变",
+      "claim": "合外力为零时，系统质心速度不变，位移关系可由质心守恒直接写出。",
+      "judge": "出现两个及以上物体相互作用，问各自位移或速度关系，且外界合力可忽略（光滑水平面、空中爆炸）。",
+      "traps": [
+        "把内力当外力（摩擦力若有则质心不守恒）",
+        "忘记地面不光滑时只用水平分量判断"
+      ],
+      "instances": [
+        "人船模型",
+        "子弹打木块"
+      ],
+      "points": [
+        "physics-momentum"
+      ]
+    },
+    {
+      "id": "m.deriv-monotonic",
+      "name": "导数看单调",
+      "claim": "单调性看导数符号，最值看端点与驻点，含参先讨论零点位置。",
+      "judge": "函数含参数、问单调区间、极值、恒成立或零点个数时。",
+      "traps": [
+        "忘记定义域（ln、根号、分母）",
+        "参数分类漏掉等号情形"
+      ],
+      "instances": [
+        "含参三次函数单调性",
+        "恒成立求参数范围"
+      ],
+      "points": [
+        "math-deriv",
+        "math-derivapp"
+      ]
+    }
+  ],
+  "yesterday": {
+    "text": "",
+    "node": ""
+  },
+  "subjects": [
+    {
+      "id": "chinese",
+      "name": "语文",
+      "total": 11,
+      "due": 0,
+      "hits": 0,
+      "misses": 0
+    },
+    {
+      "id": "math",
+      "name": "数学",
+      "total": 12,
+      "due": 0,
+      "hits": 0,
+      "misses": 0
+    },
+    {
+      "id": "english",
+      "name": "英语",
+      "total": 11,
+      "due": 0,
+      "hits": 0,
+      "misses": 0
+    },
+    {
+      "id": "physics",
+      "name": "物理",
+      "total": 12,
+      "due": 0,
+      "hits": 0,
+      "misses": 0
+    },
+    {
+      "id": "chemistry",
+      "name": "化学",
+      "total": 12,
+      "due": 0,
+      "hits": 0,
+      "misses": 0
+    },
+    {
+      "id": "politics",
+      "name": "政治",
+      "total": 11,
+      "due": 0,
+      "hits": 0,
+      "misses": 0
+    }
+  ],
+  "foot": "打印自 neuro-loop · 一页装三件事，不要贪多"
+}

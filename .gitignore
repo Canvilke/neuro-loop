@@ -1,0 +1,21 @@
+# 构建产物：由 build.py 生成，不入库
+client.js
+version.json
+
+# 原型快照与本地导出
+imports/
+
+# 日志与临时文件
+*.log
+*.tmp
+state.json.tmp
+
+# 每日一页的渲染产物：可由 json 重建，不入库（json 留档）
+daily/*.html
+daily/*.png
+daily/*.pdf
+daily/*.docx
+
+# Python 缓存
+__pycache__/
+*.pyc
