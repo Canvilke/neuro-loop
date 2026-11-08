@@ -8,7 +8,7 @@ import path from 'node:path'
 const HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'nl-host-'))
 process.env.NEUROLOOP_HOME = HOME
 
-const { apply, inject, resetCache, ROUTE_STATE, ROUTE_EVENT } = await import('../index.js')
+const { apply, inject, resetCache, ROUTE_STATE, ROUTE_EVENT, ROUTE_MAIL } = await import('../index.js')
 
 let pass = 0
 function ok(cond, msg) {
@@ -22,10 +22,11 @@ function ok(cond, msg) {
 }
 
 function makeReq(opts = {}) {
-  const { method = 'GET', headers = {}, body = '', remote = '127.0.0.1', host = '127.0.0.1:62401' } = opts
+  const { method = 'GET', headers = {}, body = '', remote = '127.0.0.1', host = '127.0.0.1:62401', url = '/' } = opts
   const listeners = {}
   const req = {
     method,
+    url,
     headers: Object.assign({ host }, headers),
     socket: { remoteAddress: remote },
     destroy() {},
@@ -108,12 +109,14 @@ apply(ctx)
  * 插件永远 pending，路由整块不存在（14:35 实际踩过）。 */
 ok(Array.isArray(inject) && inject.includes('webServer'), 'inject 以数组声明依赖 webServer')
 ok(!(inject && !Array.isArray(inject) && inject.optional), 'inject 不得使用 { optional } 写法（会永久 pending）')
-ok(routes.length === 2, '注册了 2 条路由（实际 ' + routes.length + '）')
+ok(routes.length === 3, '注册了 3 条路由（实际 ' + routes.length + '）')
 ok(routes.some((r) => r.path === ROUTE_STATE && r.kind === 'exact'), 'GET 路由 ' + ROUTE_STATE)
 ok(routes.some((r) => r.path === ROUTE_EVENT && r.kind === 'exact'), 'POST 路由 ' + ROUTE_EVENT)
+ok(routes.some((r) => r.path === ROUTE_MAIL && r.kind === 'exact'), 'POST 路由 ' + ROUTE_MAIL)
 
 const getState = routes.find((r) => r.path === ROUTE_STATE).handler
 const postEvent = routes.find((r) => r.path === ROUTE_EVENT).handler
+const onMail = routes.find((r) => r.path === ROUTE_MAIL).handler
 
 // 1. 空态
 {
@@ -220,5 +223,41 @@ const postEvent = routes.find((r) => r.path === ROUTE_EVENT).handler
   ok(r.json.state.nodes['math.deriv'].hits === 1, '坏行不影响好行')
 }
 
-console.log('\nhost ok — ' + pass + ' checks, routes 2, home ' + HOME)
+// 8. 信箱：寄 / 读 / 标已读 / 守卫
+{
+  const s = await call(onMail, makeReq({
+    method: 'POST', url: ROUTE_MAIL,
+    body: JSON.stringify({ to: 'lead', from: 'moya', subject: '转交', body: '用户想改英语页' }),
+  }))
+  ok(s.status === 200 && s.json.ok && s.json.letter.id, 'POST mail 200 且带回信 id')
+
+  const g = await call(onMail, makeReq({ url: ROUTE_MAIL + '?to=lead&unread=1' }))
+  ok(g.status === 200 && g.json.letters.length === 1, 'GET mail 读到 1 封未读')
+  ok(g.json.letters[0].unread === true && g.json.letters[0].from === 'moya', '未读标记与发件人正确')
+
+  const rid = g.json.letters[0].id
+  const m = await call(onMail, makeReq({
+    method: 'POST', url: ROUTE_MAIL + '?read=1', body: JSON.stringify({ to: 'lead', ids: [rid] }),
+  }))
+  ok(m.status === 200 && m.json.ok, 'POST ?read=1 标记已读')
+  const g2 = await call(onMail, makeReq({ url: ROUTE_MAIL + '?to=lead&unread=1' }))
+  ok(g2.json.letters.length === 0, '已读后未读列表为空')
+
+  const badTo = await call(onMail, makeReq({ url: ROUTE_MAIL + '?to=BAD NAME' }))
+  ok(badTo.status === 400 && badTo.json.error === 'bad-to', '信箱拒绝非法收件人名')
+
+  const badBody = await call(onMail, makeReq({
+    method: 'POST', url: ROUTE_MAIL, body: JSON.stringify({ to: 'lead', from: 'moya', body: '' }),
+  }))
+  ok(badBody.status === 400, '信箱拒绝空正文')
+
+  const cross = await call(onMail, makeReq({
+    method: 'POST', url: ROUTE_MAIL,
+    headers: { origin: 'http://evil.example' },
+    body: JSON.stringify({ to: 'lead', from: 'x', body: 'hi' }),
+  }))
+  ok(cross.status === 403, '信箱拒绝跨源写入')
+}
+
+console.log('\nhost ok — ' + pass + ' checks, routes 3, home ' + HOME)
 process.exit(process.exitCode || 0)

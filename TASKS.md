@@ -224,7 +224,7 @@
 | ID | 任务 | 状态 | 备注 |
 | --- | --- | --- | --- |
 | M8-1 | 方法卡 CRUD + 10 张真实卡（物理/数学各 5） | `DONE`（数据层） | `content/method/*.json` 10 张 + `tools/check_methods.py` 全绿；UI 版 CRUD 并到 M8-6 一起做 |
-| M8-2 | 每日一页生成 + 打印（扁平样式，无渐变） | `TODO` | 用户每天要带去学校；先闭环再深度 |
+| M8-2 | 每日一页生成 + 打印（扁平样式，无渐变） | `WIP`（政治 + 英语已闭环） | 政治 `daily/pol-2026-11-10b.docx`、英语 `daily/en-2026-11-10.docx` 各一页并已打印；英语 20 条/天 × 58 天 + 5 句翻译 |
 | M8-3 | 回来自评 Recon(0-3) / Hint(0-2) → 事件流 | `TODO` | 闭环第三段 |
 | M8-4 | 题目录入（拍照 + top2-4 考点 + top1-3 方法） | `TODO` | 稀疏连接是纪律，不是优化 |
 | M8-5 | `学习资料/` 解析（化学两份 docx + 数学配极原理 md 先行） | `TODO` | 真数据替换 scaffold |
@@ -254,3 +254,16 @@
 ### 7.4 新增（M8-8）
 
 | M8-8 | 每日一页回填（`daily` 事件 + `tools/record.py`） | DONE | 38 checks 全绿；live 路由返回 `daily` |
+
+## 8. M9 —— 信箱（跨会话通讯）
+
+| id | 事项 | 状态 | 证据 |
+| --- | --- | --- | --- |
+| M9-1 | `host/mail.js`：按收件人 append-only jsonl + 已读侧表 + 500 封截断 | DONE | — |
+| M9-2 | 路由 `GET/POST /neuroloop/mail`（取信/寄信/标已读；loopback + 同源守卫） | DONE | host 47 checks, routes 3 |
+| M9-3 | CLI `tools/mail.py`（send/check/read；宿主不在则直写文件） | DONE | 实测 http 与 file 两条路径 |
+| M9-4 | 客户端 MAIL 灯：`nlMailSync()` + HUD 右上未读计数（挂在帧循环，60s 一次） | DONE | `client.js 241823 B`；待 F5 看效果 |
+| M9-5 | 写进 `AGENTS.md` §2.1（IM 会话先寄信给 lead） | DONE | — |
+| M9-6 | 心跳 prompt 第 0 步改为查信箱 | DONE | `schedule-6478f707` |
+| M9-7 | 安装 GitHub CLI | DONE | `C:\Program Files\GitHub CLI\gh.exe` 2.103.3 |
+| M9-8 | `gh auth login` + `watch_start`（主理鱼 watcher） | **等用户** | 设备码需本人确认 |

@@ -1,0 +1,209 @@
+{
+ "date": "2026-11-10",
+ "day": 1,
+ "phrases": [
+  {
+   "n": 1,
+   "page": 1,
+   "en": "in short",
+   "pos": "idm.",
+   "zh": "简而言之,总之"
+  },
+  {
+   "n": 2,
+   "page": 1,
+   "en": "chat with sb",
+   "pos": "usage.",
+   "zh": "与某人聊天"
+  },
+  {
+   "n": 3,
+   "page": 1,
+   "en": "as far as",
+   "pos": "collocation.",
+   "zh": "(谈及程度时说) 直至； (谈及距离时说) 远至"
+  },
+  {
+   "n": 4,
+   "page": 1,
+   "en": "so far",
+   "pos": "idm.",
+   "zh": "到目前为止,迄今为止； 仅到一定程度,只在有限范围内"
+  },
+  {
+   "n": 5,
+   "page": 1,
+   "en": "hand in",
+   "pos": "phrv.",
+   "zh": "提交,呈交,上交"
+  },
+  {
+   "n": 6,
+   "page": 1,
+   "en": "hand out",
+   "pos": "phrv.",
+   "zh": "分发 (某物)"
+  },
+  {
+   "n": 7,
+   "page": 1,
+   "en": "by hand",
+   "pos": "idm.",
+   "zh": "手工地； (信件) 亲手交付,由专人递送"
+  },
+  {
+   "n": 8,
+   "page": 1,
+   "en": "on the other hand",
+   "pos": "idm.",
+   "zh": "另一方面..."
+  },
+  {
+   "n": 9,
+   "page": 1,
+   "en": "in debt",
+   "pos": "collocation.",
+   "zh": "处于负债状态"
+  },
+  {
+   "n": 10,
+   "page": 1,
+   "en": "by no means",
+   "pos": "idm.",
+   "zh": "决不,一点也不"
+  },
+  {
+   "n": 11,
+   "page": 1,
+   "en": "no wonder",
+   "pos": "idm.",
+   "zh": "难怪,怪不得,不足为奇"
+  },
+  {
+   "n": 12,
+   "page": 1,
+   "en": "be aware of",
+   "pos": "usage.",
+   "zh": "知道...的,意识到...的； 察觉到...的,注意到...的"
+  },
+  {
+   "n": 13,
+   "page": 1,
+   "en": "be sorry for",
+   "pos": "usage.",
+   "zh": "对...感到抱歉 (或愧疚)"
+  },
+  {
+   "n": 14,
+   "page": 1,
+   "en": "make money",
+   "pos": "idm.",
+   "zh": "赚钱,获利"
+  },
+  {
+   "n": 15,
+   "page": 1,
+   "en": "shake hands with sb",
+   "pos": "usage.",
+   "zh": "与某人握手"
+  },
+  {
+   "n": 16,
+   "page": 1,
+   "en": "such as",
+   "pos": "idm.",
+   "zh": "例如,比如"
+  },
+  {
+   "n": 17,
+   "page": 1,
+   "en": "what for",
+   "pos": "idm.",
+   "zh": "为什么"
+  },
+  {
+   "n": 18,
+   "page": 1,
+   "en": "every other",
+   "pos": "idm.",
+   "zh": "每隔一..."
+  },
+  {
+   "n": 19,
+   "page": 1,
+   "en": "read out",
+   "pos": "phrv.",
+   "zh": "读出,念出"
+  },
+  {
+   "n": 20,
+   "page": 1,
+   "en": "write down",
+   "pos": "phrv.",
+   "zh": "写下,记录下"
+  }
+ ],
+ "sentences": [
+  {
+   "id": "s.001",
+   "dir": "zh2en",
+   "syntax": [
+    "sp.onlywhen"
+   ],
+   "words": [
+    1
+   ],
+   "text": "只有把理论与实践结合起来，我们才能真正理解这句话。",
+   "answer": "Only when we combine theory with practice can we truly understand this sentence.",
+   "note": "Only when 置句首，主句用 can we 倒装。"
+  },
+  {
+   "id": "s.002",
+   "dir": "zh2en",
+   "syntax": [
+    "sp.nonfinite",
+    "sp.objclause"
+   ],
+   "words": [],
+   "text": "面对如此多的信息，学生很难判断哪些是可靠的。",
+   "answer": "Faced with so much information, students find it hard to judge which sources are reliable.",
+   "note": "Faced with 作状语，逻辑主语为 students；which 引导宾语从句。"
+  },
+  {
+   "id": "s.003",
+   "dir": "zh2en",
+   "syntax": [
+    "sp.cleft"
+   ],
+   "words": [],
+   "text": "正是那次失败让他意识到坚持的重要。",
+   "answer": "It was that failure that made him realise the importance of persistence.",
+   "note": "强调主语 that failure，用 It was ... that ...。"
+  },
+  {
+   "id": "s.007",
+   "dir": "en2zh",
+   "syntax": [
+    "sp.subjclause"
+   ],
+   "words": [
+    1
+   ],
+   "text": "What matters is not how much you memorise, but how well you can apply it.",
+   "answer": "重要的不是记住多少，而是能多好地运用它。",
+   "note": "What 从句作主语；not ... but ... 对比。"
+  },
+  {
+   "id": "s.008",
+   "dir": "en2zh",
+   "syntax": [
+    "sp.notuntil"
+   ],
+   "words": [],
+   "text": "Not until he lost the chance did he realise the value of practice.",
+   "answer": "直到失去机会，他才意识到练习的价值。",
+   "note": "Not until 句首引起部分倒装。"
+  }
+ ],
+ "tasks": null
+}

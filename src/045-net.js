@@ -10,7 +10,9 @@ var NL_NET = {
   rev: 0,
   state: null,
   online: null,   /* null=还没试过, true/false */
-  queue: []
+  queue: [],
+  mail: 0,        /* 信箱未读数 */
+  box: 'lead'
 };
 
 var NL_QUEUE_KEY = 'neuroloop.queue';
@@ -148,6 +150,26 @@ function nlSync(done) {
  */
 
 var NL_DUE_CAP = 5;
+
+/* ── 信箱 ────────────────────────────────────────────────────────────────────
+ * 别的会话把信寄到 lead 这个信箱；这里只数未读数，做成一枚小灯。
+ * 读不到就当 0——信箱是附加信号，不该影响主界面。
+ */
+function nlMailSync(done) {
+  var box = (NL_NET && NL_NET.box) || 'lead';
+  fetch('/neuroloop/mail?to=' + encodeURIComponent(box) + '&unread=1&limit=50', {
+    cache: 'no-store'
+  }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+    var n = j && j.ok && j.letters ? j.letters.length : 0;
+    if (NL_NET.mail !== n) {
+      NL_NET.mail = n;
+      NL_NET.mailRev = (NL_NET.mailRev || 0) + 1;
+    }
+    if (done) done(n);
+  }).catch(function () {
+    if (done) done(0);
+  });
+}
 
 function nlDueNodes(sid) {
   var sub = BY_SUBJECT[sid] || {};

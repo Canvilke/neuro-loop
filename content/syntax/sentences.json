@@ -1,0 +1,118 @@
+[
+ {
+  "id": "s.001",
+  "dir": "zh2en",
+  "syntax": [
+   "sp.onlywhen"
+  ],
+  "words": [
+   1
+  ],
+  "text": "只有把理论与实践结合起来，我们才能真正理解这句话。",
+  "answer": "Only when we combine theory with practice can we truly understand this sentence.",
+  "note": "Only when 置句首，主句用 can we 倒装。"
+ },
+ {
+  "id": "s.002",
+  "dir": "zh2en",
+  "syntax": [
+   "sp.nonfinite",
+   "sp.objclause"
+  ],
+  "words": [],
+  "text": "面对如此多的信息，学生很难判断哪些是可靠的。",
+  "answer": "Faced with so much information, students find it hard to judge which sources are reliable.",
+  "note": "Faced with 作状语，逻辑主语为 students；which 引导宾语从句。"
+ },
+ {
+  "id": "s.003",
+  "dir": "zh2en",
+  "syntax": [
+   "sp.cleft"
+  ],
+  "words": [],
+  "text": "正是那次失败让他意识到坚持的重要。",
+  "answer": "It was that failure that made him realise the importance of persistence.",
+  "note": "强调主语 that failure，用 It was ... that ...。"
+ },
+ {
+  "id": "s.004",
+  "dir": "zh2en",
+  "syntax": [
+   "sp.subjclause",
+   "sp.predclause"
+  ],
+  "words": [],
+  "text": "重要的不是记住多少，而是能运用多少。",
+  "answer": "What matters is not how much you memorise but how much you can apply.",
+  "note": "What 引导主语从句，is 后为表语从句。"
+ },
+ {
+  "id": "s.005",
+  "dir": "zh2en",
+  "syntax": [
+   "sp.notuntil"
+  ],
+  "words": [],
+  "text": "直到失去机会，他才意识到练习的价值。",
+  "answer": "Not until he lost the chance did he realise the value of practice.",
+  "note": "Not until 置句首，主句部分倒装。"
+ },
+ {
+  "id": "s.006",
+  "dir": "zh2en",
+  "syntax": [
+   "sp.attr"
+  ],
+  "words": [],
+  "text": "那些坚持每天复习的人，最终往往走得更远。",
+  "answer": "Those who keep reviewing every day tend to go further in the end.",
+  "note": "who 引导定语从句修饰 those。"
+ },
+ {
+  "id": "s.007",
+  "dir": "en2zh",
+  "syntax": [
+   "sp.subjclause"
+  ],
+  "words": [
+   1
+  ],
+  "text": "What matters is not how much you memorise, but how well you can apply it.",
+  "answer": "重要的不是记住多少，而是能多好地运用它。",
+  "note": "What 从句作主语；not ... but ... 对比。"
+ },
+ {
+  "id": "s.008",
+  "dir": "en2zh",
+  "syntax": [
+   "sp.notuntil"
+  ],
+  "words": [],
+  "text": "Not until he lost the chance did he realise the value of practice.",
+  "answer": "直到失去机会，他才意识到练习的价值。",
+  "note": "Not until 句首引起部分倒装。"
+ },
+ {
+  "id": "s.009",
+  "dir": "en2zh",
+  "syntax": [
+   "sp.nonfinite"
+  ],
+  "words": [],
+  "text": "Faced with so much information, students find it hard to judge which sources are reliable.",
+  "answer": "面对如此多的信息，学生很难判断哪些来源是可靠的。",
+  "note": "Faced with 为过去分词作状语。"
+ },
+ {
+  "id": "s.010",
+  "dir": "en2zh",
+  "syntax": [
+   "sp.attr"
+  ],
+  "words": [],
+  "text": "Those who keep reviewing every day tend to go further in the end.",
+  "answer": "那些每天坚持复习的人，最终往往走得更远。",
+  "note": "who 引导定语从句。"
+ }
+]

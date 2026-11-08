@@ -9,6 +9,7 @@
 import { appendEvent, derive, fold, loadState, saveState } from './host/store.js'
 import { isLoopback, isSameOrigin, readJsonBody, writeJson } from './host/http.js'
 import { normalizeEvent } from './host/event.js'
+import { inbox, markRead, send as postalSend, isValidName } from './host/mail.js'
 
 // 依赖 webServer：这个 profile 一定有它（页面就是它发的）。
 // 不用 { optional: [...] } 的写法——当前 loader 会把键名当成服务名去等，
@@ -17,6 +18,7 @@ export const inject = ['webServer']
 
 export const ROUTE_STATE = '/neuroloop/state'
 export const ROUTE_EVENT = '/neuroloop/event'
+export const ROUTE_MAIL = '/neuroloop/mail'
 
 let CACHE = null
 
@@ -71,6 +73,52 @@ async function onEvent(req, res) {
   }
 }
 
+// 信箱：跨会话投递。GET 取信、POST 寄信、POST ?read=1 标记已读。
+// 有意的限制：只接受本机同源请求——信件里可能写作业内容，不该被网页上的任意站点读走。
+async function onMail(req, res) {
+  const why = blocked(req)
+  if (why) return writeJson(res, 403, { ok: false, error: why })
+
+  const url = new URL(req.url, 'http://127.0.0.1')
+
+  if (req.method === 'GET') {
+    const box = url.searchParams.get('to') || ''
+    if (!isValidName(box)) return writeJson(res, 400, { ok: false, error: 'bad-to' })
+    const unreadOnly = url.searchParams.get('unread') === '1'
+    const limit = Math.min(Number(url.searchParams.get('limit')) || 20, 100)
+    try {
+      writeJson(res, 200, { ok: true, to: box, letters: inbox(box, { unreadOnly, limit }) })
+    } catch (err) {
+      writeJson(res, 500, { ok: false, error: 'read-failed', detail: String(err && err.message) })
+    }
+    return
+  }
+
+  if (req.method !== 'POST') return writeJson(res, 405, { ok: false, error: 'method-not-allowed' })
+
+  const body = await readJsonBody(req)
+  if (!body.ok) return writeJson(res, 400, { ok: false, error: body.code })
+  const v = body.value
+
+  try {
+    if (url.searchParams.get('read') === '1') {
+      const r = markRead(v.to, v.ids)
+      return writeJson(res, 200, { ok: true, ...r })
+    }
+    const letter = postalSend({
+      to: v.to,
+      from: v.from || 'anonymous',
+      subject: v.subject,
+      body: v.body,
+      replyTo: v.replyTo
+    })
+    writeJson(res, 200, { ok: true, letter })
+  } catch (err) {
+    const code = err && err.code ? err.code : 'send-failed'
+    writeJson(res, 400, { ok: false, error: code })
+  }
+}
+
 export function apply(ctx) {
   const ws = (ctx.get && ctx.get('webServer')) || ctx.webServer
   if (!ws || typeof ws.register !== 'function') {
@@ -82,6 +130,7 @@ export function apply(ctx) {
     try {
       disposers.push(ws.register({ kind: 'exact', path: ROUTE_STATE, handler: onState }))
       disposers.push(ws.register({ kind: 'exact', path: ROUTE_EVENT, handler: onEvent }))
+      disposers.push(ws.register({ kind: 'exact', path: ROUTE_MAIL, handler: onMail }))
     } catch (err) {
       for (const d of disposers) {
         try {

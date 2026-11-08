@@ -19,7 +19,7 @@ import re
 import sys
 
 from docx import Document
-from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING, WD_TAB_ALIGNMENT
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
@@ -89,6 +89,41 @@ def text(doc, s, size=10.5, bold=False, color=INK, **kw):
     return p
 
 
+# Usable text width of the A4 page: 21.0 - 2 x 2.0 cm, in points.
+BODY_W = 17.0 * 28.3465
+
+
+def tasks_block(doc, tasks):
+    """Compact list of the day's non-content tasks (math / physics / chemistry).
+
+    One row per task: box, fixed-width subject column, left-aligned task text,
+    right-aligned minutes. At most six rows; the block is skipped entirely when
+    the page JSON carries no `tasks` key, so older pages render unchanged.
+    """
+    rows = tasks[:6]
+    if not rows:
+        return
+    # Six rows still have to fit the same page as five: drop a notch of type.
+    n = len(rows)
+    size = 7.6 if n > 5 else 8.0
+    lsp = 0.92 if n > 5 else 0.98
+    text(doc, "今日任务（其他科目）", 8.2, True, INK,
+         space_before=2 if n > 5 else 3, space_after=0, line=1.0)
+    for t in rows:
+        p = para(doc, space_before=0, space_after=0, line=lsp)
+        ts = p.paragraph_format.tab_stops
+        ts.add_tab_stop(Pt(13), WD_TAB_ALIGNMENT.LEFT)    # subject column
+        ts.add_tab_stop(Pt(46), WD_TAB_ALIGNMENT.LEFT)    # task text
+        ts.add_tab_stop(Pt(BODY_W - 1.0), WD_TAB_ALIGNMENT.RIGHT)  # minutes
+        r = p.add_run("□\t%s\t" % t.get("subject", ""))
+        set_font(r, size, False, INK)
+        add_runs(p, t.get("text", ""), size, False, INK)
+        mins = t.get("min")
+        if mins not in (None, ""):
+            r = p.add_run("\t%s min" % mins)
+            set_font(r, 7.8, False, GREY)
+
+
 def rule(doc, dash=False, space_before=6, space_after=6):
     p = para(doc, space_before=space_before, space_after=space_after, line=1.0)
     ppr = p._element.get_or_add_pPr()
@@ -105,6 +140,10 @@ def rule(doc, dash=False, space_before=6, space_after=6):
 
 def build(data: dict) -> Document:
     doc = Document()
+    # Pages that also carry the other-subject task lines have less room, so the
+    # closing blocks (writing lines, self check, answers, footer) are set a
+    # little tighter. Without `tasks` every measurement below is unchanged.
+    dense = bool(data.get("tasks")) or bool(data.get("dense"))
 
     sec = doc.sections[0]
     sec.page_width = Cm(21.0)
@@ -128,12 +167,12 @@ def build(data: dict) -> Document:
     # ---- header ----
     text(doc, data["kicker"], 8, False, FAINT, space_after=2, line=1.2)
     text(doc, data["title"], 17, True, INK, space_after=2, line=1.2)
-    text(doc, data["meta"], 8.8, False, GREY, space_after=4, line=1.25)
-    rule(doc, space_before=2, space_after=8)
+    text(doc, data["meta"], 8.8, False, GREY, space_after=2 if dense else 4, line=1.25)
+    rule(doc, space_before=2, space_after=6 if dense else 8)
 
     # ---- 1. outline ----
     mode = data.get("outlineMode", "list")
-    text(doc, "一、" + ("背诵提纲" if mode == "list" else "知识结构"), 11, True, INK, space_before=2, space_after=4)
+    text(doc, "一、" + ("背诵提纲" if mode == "list" else "知识结构"), 11, True, INK, space_before=2, space_after=3 if dense else 4)
     items = data["outline"]
     last_branch = max((i for i, it in enumerate(items) if it.get("level", 0) == 0), default=-1)
     for i, item in enumerate(items):
@@ -142,34 +181,34 @@ def build(data: dict) -> Document:
         if mode == "tree":
             if lvl == 0:
                 lead = ("└─ " if i == last_branch else "├─ ")
-                p = para(doc, space_before=1, space_after=1, line=1.3, left=left)
+                p = para(doc, space_before=0 if dense else 1, space_after=1, line=1.24 if dense else 1.3, left=left)
                 add_runs(p, lead + item["text"], 9.2, True, INK)
             else:
                 lead = "   │  " if i < last_branch else "      "
-                p = para(doc, space_before=0, space_after=1, line=1.3, left=left + 14)
+                p = para(doc, space_before=0, space_after=1, line=1.24 if dense else 1.3, left=left + 14)
                 add_runs(p, item["text"], 8.9, False, GREY)
         else:
-            p = para(doc, space_before=0, space_after=1, line=1.3, left=left)
+            p = para(doc, space_before=0, space_after=1, line=1.24 if dense else 1.3, left=left)
             add_runs(p, item["text"], 9.2 if lvl == 0 else 8.9, lvl == 0,
                      INK if lvl == 0 else GREY)
 
-    rule(doc, space_before=6, space_after=5)
+    rule(doc, space_before=4 if dense else 6, space_after=3 if dense else 5)
 
     # ---- 2. cloze paragraph ----
     head = "二、概念填空" + ("（共 %d 空）" % data["cloze"]["count"] if data["cloze"].get("count") else "")
-    text(doc, head, 11, True, INK, space_before=2, space_after=5)
-    p = para(doc, space_after=3, line=1.5, first_indent=21)
+    text(doc, head, 11, True, INK, space_before=2, space_after=4 if dense else 5)
+    p = para(doc, space_after=3, line=1.4 if dense else 1.5, first_indent=21)
     for seg in data["cloze"]["runs"]:
         add_runs(p, seg["text"], 10.2, bool(seg.get("bold")), INK)
 
     # ---- 3. correction paragraph ----
-    text(doc, "三、辨析改错", 11, True, INK, space_before=10, space_after=4)
-    text(doc, data["errors"]["note"], 9, False, GREY, space_after=4, line=1.3)
-    p = para(doc, space_after=3, line=1.5, first_indent=21)
+    text(doc, "三、辨析改错", 11, True, INK, space_before=8 if dense else 10, space_after=4)
+    text(doc, data["errors"]["note"], 9, False, GREY, space_after=3 if dense else 4, line=1.2 if dense else 1.3)
+    p = para(doc, space_after=3, line=1.4 if dense else 1.5, first_indent=21)
     add_runs(p, data["errors"]["text"], 10.2, False, INK)
     # writing lines
     for _ in range(data["errors"].get("lines", 3)):
-        q = para(doc, space_before=0, space_after=6, line=1.2)
+        q = para(doc, space_before=0, space_after=2 if dense else 6, line=1.2)
         qpr = q._element.get_or_add_pPr()
         bdr = OxmlElement("w:pBdr")
         bottom = OxmlElement("w:bottom")
@@ -186,7 +225,7 @@ def build(data: dict) -> Document:
         for it in data.get("roll") or []:
             p = para(doc, space_after=4, line=1.6, left=14)
             r = p.add_run("〔%s〕" % it["tag"])
-            set_font(r, 8.2, False, GREY)
+            set_font(r, 7.8, False, GREY)
             add_runs(p, it["text"], 10, False, INK)
         if data.get("rollNote"):
             text(doc, data["rollNote"], 9.2, False, GREY,
@@ -195,18 +234,22 @@ def build(data: dict) -> Document:
 
     # ---- self check ----
     if data.get("selfcheck"):
-        p = para(doc, space_before=4, space_after=3, line=1.3)
+        p = para(doc, space_before=2 if dense else 4, space_after=3, line=1.3)
         r = p.add_run(data["selfcheck"])
         set_font(r, 9.6, False, INK)
 
+    # ---- today's other-subject tasks (optional) ----
+    if data.get("tasks"):
+        tasks_block(doc, data["tasks"])
+
     # ---- answers ----
-    rule(doc, dash=True, space_before=7, space_after=4)
-    text(doc, "参考答案", 8.6, True, GREY, space_after=3, line=1.2)
+    rule(doc, dash=True, space_before=4 if dense else 7, space_after=2 if dense else 4)
+    text(doc, "参考答案", 8.4 if dense else 8.6, True, GREY, space_after=2 if dense else 3, line=1.2)
     for line in data["answers"]:
-        text(doc, line, 7.6, False, GREY, space_before=0, space_after=0, line=1.22)
+        text(doc, line, 7.4 if dense else 7.6, False, GREY, space_before=0, space_after=0, line=1.0 if dense else 1.22)
 
     # ---- footer (kept inside the answer block so a stray line cannot spill) ----
-    text(doc, data["foot"], 7.0, False, FAINT, space_before=2, space_after=0, line=1.05)
+    text(doc, data["foot"], 7.0, False, FAINT, space_before=0 if dense else 2, space_after=0, line=1.05)
     return doc
 
 

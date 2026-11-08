@@ -188,7 +188,7 @@ function mountScene(root, cv) {
   var bloom = makeCanvas(2, 2), bctx = bloom.getContext('2d');
   var vig = null;
   var w = 0, h = 0, dpr = 1;
-  var bootT = 0, boot = 0, t = 0, last = 0, raf = 0, glitchT = 0;
+  var bootT = 0, boot = 0, t = 0, last = 0, raf = 0, glitchT = 0, mailAt = 0;
   var hover = null;
 
   /* the overlay calls this while it is still fading, so the ring re-assembles
@@ -433,6 +433,12 @@ function mountScene(root, cv) {
     boot = clamp(bootT / 2.6, 0, 1);
 
     if (glitchT > 0) glitchT = Math.max(0, glitchT - dt * 6.5);
+
+    /* 信箱：每 60 秒问一次，挂在帧循环里而不是定时器——页面切走就自然停。 */
+    if (ts - mailAt > 60) {
+      mailAt = ts;
+      nlMailSync();
+    }
 
     /* the knowledge field unfolds out of the core once the ring is up */
     WEB.reveal = approach(WEB.reveal, boot < 0.34 ? 0 : 1, 2.4, dt);
@@ -684,6 +690,17 @@ function drawHud(c, w, h, boot) {
     c.fillStyle = due > 0 ? 'rgba(255,186,104,1)' : 'rgba(150,180,214,1)';
     c.fillText('DUE ' + due + (due > 0 ? ' · 待复习' : ' · 已清空'), w - 34, 72);
     tracked(c, 0);
+
+    /* 信箱：别的会话寄来的信。0 封时不画——不当噪音。 */
+    var mail = (typeof NL_NET !== 'undefined' && NL_NET && NL_NET.mail) ? NL_NET.mail : 0;
+    if (mail > 0) {
+      c.globalAlpha = a0 * 0.94;
+      c.font = mono(8.6, 700);
+      tracked(c, 2.2);
+      c.fillStyle = 'rgba(120,232,200,1)';
+      c.fillText('\u2709 MAIL ' + mail + ' \u00b7 来信', w - 34, 88);
+      tracked(c, 0);
+    }
   }
 
   c.globalAlpha = a0 * 0.40;

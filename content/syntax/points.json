@@ -1,0 +1,58 @@
+[
+ {
+  "id": "sp.onlywhen",
+  "name": "only when 引起的部分倒装",
+  "pattern": "Only when + 从句, + 助动词 + 主语 + 谓语",
+  "judge": "句首 Only + 状语(从句) 时，主句倒装；主句不倒装则错。",
+  "note": "从句本身用陈述语序。"
+ },
+ {
+  "id": "sp.notuntil",
+  "name": "not until 的倒装与强调",
+  "pattern": "Not until + 时间/从句 + did/does + 主语 + 动词原形",
+  "judge": "Not until 置于句首，主句倒装；用 It was not until ... that ... 时为强调句，不倒装。",
+  "note": "两种结构不要混用。"
+ },
+ {
+  "id": "sp.cleft",
+  "name": "强调句 It is/was ... that ...",
+  "pattern": "It is/was + 被强调部分 + that/who + 其余部分",
+  "judge": "去掉 It is/was 与 that 后句子仍完整，才是强调句。",
+  "note": "强调人时可用 who。"
+ },
+ {
+  "id": "sp.nonfinite",
+  "name": "非谓语作状语",
+  "pattern": "Doing/Done/To do ..., 主句",
+  "judge": "逻辑主语与主句主语一致；主动用 doing，被动用 done。",
+  "note": "先找主句主语再选形式。"
+ },
+ {
+  "id": "sp.subjclause",
+  "name": "主语从句",
+  "pattern": "What/That/Whether + 从句 + 谓语",
+  "judge": "从句在句中作主语；what 在从句中充当成分，that 不作成分。",
+  "note": "常用 It 作形式主语。"
+ },
+ {
+  "id": "sp.predclause",
+  "name": "表语从句",
+  "pattern": "主语 + be + that/what/whether + 从句",
+  "judge": "从句位于系动词后，说明主语内容。",
+  "note": "reason 后接 that，不用 because。"
+ },
+ {
+  "id": "sp.attr",
+  "name": "定语从句",
+  "pattern": "先行词 + who/which/that/whose/where + 从句",
+  "judge": "从句修饰先行词，关系词在从句中充当成分。",
+  "note": "介词后只用 which/whom。"
+ },
+ {
+  "id": "sp.objclause",
+  "name": "宾语从句",
+  "pattern": "动词/介词 + that/whether/疑问词 + 从句",
+  "judge": "从句作宾语，用陈述语序。",
+  "note": "whether 不与 or not 分离时可换 if。"
+ }
+]
