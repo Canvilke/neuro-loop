@@ -1,0 +1,52 @@
+# STATUS —— 我们现在到底有什么（2026-11-10 01:20 盘点）
+
+> 一页看清：**能跑的东西**、**只是壳的东西**、**卡住的东西**。
+> 每次大改后更新这里；细节仍在 `TASKS.md`（进度真源）。
+
+## 1. 能跑、且验证过
+
+| 块 | 状态 | 证据 |
+|---|---|---|
+| 客户端插件（星环 / 知识场 / 启动七拍 / 编程台） | 可用 | `client.js` 由 13 个 `src/` 模块拼成，`smoke 652 帧 5 注册`、`levels 4 块`、`boot 7 阶段` |
+| 宿主路由 | 可用 | `/neuroloop/state`、`/neuroloop/event`、`/neuroloop/mail`；`host 47 checks` |
+| 事件流 + 投影 | 可用 | `~/.dsh/neuro-loop/events-YYYY-MM.jsonl` → `state.json`；删投影可重建 |
+| 信箱 | 可用（半被动） | `tools/mail.py send/check/read`；HUD 显示未读；无"唤醒会话"接口 |
+| 政治每日页 | 可用 | `tools/make_docx.py` + JSON；1 页验证；`FORMAT-politics.md` |
+| 英语每日页 | 可用 | `tools/en_page.py`；20 条/天、58 天排程；1 页验证；`FORMAT-english.md` |
+| 其他科目任务行 | 可用 | `tools/tasks.py <date> --inject`，政治页底部 |
+| 数据底表 | 可用 | 词组 1157 条、词 759 条、政治 47 天排程、方法卡 10 张（未审） |
+| 测试 | 可用 | `check_all.ps1` 7 项；`activate.py --test` |
+
+## 2. 只是壳 / 占位
+
+- **星图数据是脚手架**：69 个考点是我按教材目录编的，不是从 `学习资料/` 抽的真内容。
+- **编程台的读数**（TOOLS/REPO/SESSION/TASK）是静态占位。
+- **方法卡**全部 `source:"ai"`、`verified:false`，界面没有"待审"标记。
+- **语文**：材料为空，任何页面都不生成。
+- **前端没有"今天"视图**：`state.daily` 里有记录，但星图上不显示。
+
+## 3. 卡住
+
+| 卡点 | 原因 | 绕法 |
+|---|---|---|
+| 打印 | 打印机 USB 设备不在（`CM_PROB_PHANTOM`），物理层断 | PDF 已放桌面；驱动就绪后一条命令可打 |
+| 主理鱼 watcher | `api.github.com` 被改写为 `github.com`（301），gh 无法校验 | 换网络 / 改走 Gitee |
+| 令牌 | 曾贴在对话里，建议作废重发 | 新令牌放文件，我读 |
+| 微信 → 主会话 | 走独立会话，主会话看不到 | `AGENTS.md` 约定写信箱；待实机验证 |
+| 热重载提示 | `version.json` 有了，客户端未接 | 低优先 |
+
+## 4. 风险（"慢性死亡"的四个入口）
+
+1. **成本**：每轮都要模型 + 工具调用。对策：每日出纸是唯一硬指标，其余为可选；心跳已停，只留 07:00 一轮。
+2. **单点**：这台机器 + 这个仓库 + 一个会话。对策：仓库托管（已有）、事件流 append-only（已有）、文档可重建。
+3. **验证缺口**：视觉只能靠人看（L3），我做不了截图回归。对策：把"看起来对不对"降级为用户每天扫一眼，不追求像素级。
+4. **范围膨胀**：前端、库、打印、superagent 四条线同时开。对策：一周只推一条主线（见 `WEEK-01.md`）。
+
+## 5. 目录约定
+
+- `src/` 客户端模块（拼接顺序见 `build.py` 的 `ORDER`）
+- `host/` 宿主侧（store / http / event / mail）
+- `tools/` 生成、打印、体检脚本；`tools/legacy/` 已被替代的旧渲染器
+- `data/seed.json` 走查脚手架；`content/` 方法卡与句型库；`plan/` 排程与底表
+- `daily/` 每日产物（JSON/docx/PDF，可重生成，不入 git 之外的敏感内容）
+- 文档：`DESIGN.md`（设计案）`ENGINE.md`（四层库）`FORMAT-*.md`（版面契约）`TASKS.md`（进度）`NEXT.md`（当下）`ROADMAP.md`（大范围）`WEEK-01.md`（本周）

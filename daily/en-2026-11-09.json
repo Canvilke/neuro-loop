@@ -1,0 +1,184 @@
+{
+ "date": "2026-11-09",
+ "day": 0,
+ "phrases": [
+  {
+   "n": 1141,
+   "page": 58,
+   "en": "catch sight of",
+   "pos": "collocation.",
+   "zh": "察觉,瞥见"
+  },
+  {
+   "n": 1142,
+   "page": 58,
+   "en": "go well",
+   "pos": "collocation.",
+   "zh": "(事情) 进展顺利"
+  },
+  {
+   "n": 1143,
+   "page": 58,
+   "en": "as follows",
+   "pos": "collocation.",
+   "zh": "如下"
+  },
+  {
+   "n": 1144,
+   "page": 58,
+   "en": "feel free to do",
+   "pos": "collocation.",
+   "zh": "请随意做某事"
+  },
+  {
+   "n": 1145,
+   "page": 58,
+   "en": "make a fortune",
+   "pos": "collocation.",
+   "zh": "发财,挣一大笔钱"
+  },
+  {
+   "n": 1146,
+   "page": 58,
+   "en": "have a picnic",
+   "pos": "collocation.",
+   "zh": "去野餐"
+  },
+  {
+   "n": 1147,
+   "page": 58,
+   "en": "up until",
+   "pos": "collocation.",
+   "zh": "到...时,直到...为止"
+  },
+  {
+   "n": 1148,
+   "page": 58,
+   "en": "at the foot of sth",
+   "pos": "collocation.",
+   "zh": "在...的底部,在...的脚下"
+  },
+  {
+   "n": 1149,
+   "page": 58,
+   "en": "much too",
+   "pos": "collocation.",
+   "zh": "太,过于"
+  },
+  {
+   "n": 1150,
+   "page": 58,
+   "en": "make a profit",
+   "pos": "collocation.",
+   "zh": "盈利,获利"
+  },
+  {
+   "n": 1151,
+   "page": 58,
+   "en": "in the heart of sth",
+   "pos": "collocation.",
+   "zh": "在...中心,在...中央"
+  },
+  {
+   "n": 1152,
+   "page": 58,
+   "en": "for ever",
+   "pos": "collocation.",
+   "zh": "永远"
+  },
+  {
+   "n": 1153,
+   "page": 58,
+   "en": "give sb a lift",
+   "pos": "collocation.",
+   "zh": "让某人搭便车； 让某人振奋起来"
+  },
+  {
+   "n": 1154,
+   "page": 58,
+   "en": "talk show",
+   "pos": "usage.",
+   "zh": "访谈节目,脱口秀"
+  },
+  {
+   "n": 1155,
+   "page": 58,
+   "en": "up to date",
+   "pos": "usage.",
+   "zh": "现代的,最新的,时髦的； 拥有 (或包含) 最新信息的"
+  },
+  {
+   "n": 1156,
+   "page": 58,
+   "en": "out of date",
+   "pos": "usage.",
+   "zh": "过时的,缺乏新信息的； 失效的,过期的"
+  },
+  {
+   "n": 1157,
+   "page": 58,
+   "en": "upside down",
+   "pos": "usage.",
+   "zh": "颠倒地 (的),翻转地 (的)"
+  }
+ ],
+ "sentences": [
+  {
+   "id": "s.004",
+   "dir": "zh2en",
+   "syntax": [
+    "sp.subjclause",
+    "sp.predclause"
+   ],
+   "words": [],
+   "text": "重要的不是记住多少，而是能运用多少。",
+   "answer": "What matters is not how much you memorise but how much you can apply.",
+   "note": "What 引导主语从句，is 后为表语从句。"
+  },
+  {
+   "id": "s.005",
+   "dir": "zh2en",
+   "syntax": [
+    "sp.notuntil"
+   ],
+   "words": [],
+   "text": "直到失去机会，他才意识到练习的价值。",
+   "answer": "Not until he lost the chance did he realise the value of practice.",
+   "note": "Not until 置句首，主句部分倒装。"
+  },
+  {
+   "id": "s.006",
+   "dir": "zh2en",
+   "syntax": [
+    "sp.attr"
+   ],
+   "words": [],
+   "text": "那些坚持每天复习的人，最终往往走得更远。",
+   "answer": "Those who keep reviewing every day tend to go further in the end.",
+   "note": "who 引导定语从句修饰 those。"
+  },
+  {
+   "id": "s.009",
+   "dir": "en2zh",
+   "syntax": [
+    "sp.nonfinite"
+   ],
+   "words": [],
+   "text": "Faced with so much information, students find it hard to judge which sources are reliable.",
+   "answer": "面对如此多的信息，学生很难判断哪些来源是可靠的。",
+   "note": "Faced with 为过去分词作状语。"
+  },
+  {
+   "id": "s.010",
+   "dir": "en2zh",
+   "syntax": [
+    "sp.attr"
+   ],
+   "words": [],
+   "text": "Those who keep reviewing every day tend to go further in the end.",
+   "answer": "那些每天坚持复习的人，最终往往走得更远。",
+   "note": "who 引导定语从句。"
+  }
+ ],
+ "tasks": null
+}

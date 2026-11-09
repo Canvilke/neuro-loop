@@ -317,7 +317,7 @@ POST /neuroloop/event   追加一条事件，返回新 rev
 内容固定为四项：今天复现的 3 条方法（含判据与常错点）、昨天错因 1 条、提示阶梯（L1 方法名 / L2 第一步 / L3 关键词）、六科当日额度。
 页面不打印答案，只给出逐级提示；作答与勾选在纸上完成。
 
-实现：`tools/daily_page.py` 生成 JSON 与 HTML；`tools/print_page.ps1` 用 GDI+ 绘制并打印。
+实现：现行链路是 `tools/make_docx.py`（政治）/ `tools/en_page.py`（英语）→ Word 转 PDF → 打印；早期 GDI+ 渲染器已归档到 `tools/legacy/`（`daily_page.py` / `print_page.ps1`），仅作参考。
 预览与打印使用同一张位图，保证所见即所得。
 
 ### 8.2 打印限制（实测）

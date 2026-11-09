@@ -6,6 +6,18 @@
 
 设计来源：`../设计文档.doc`（场景描述 + LLM/人脑同构性理论）。
 
+## 0. 从这里开始（先读这四份，按顺序）
+
+| 想知道 | 打开 |
+|---|---|
+| 现在到底有什么、什么还只是壳、什么卡住了 | [`STATUS.md`](STATUS.md) |
+| 今天该干什么 | [`NEXT.md`](NEXT.md) 顶部三行 |
+| 这周的安排与验收 | [`WEEK-01.md`](WEEK-01.md) |
+| 全部任务与进度（唯一真源） | [`TASKS.md`](TASKS.md) |
+
+接手规则（不手改产物、五套测试全绿、提交纪律）写在 [`AGENTS.md`](AGENTS.md)；
+设计案在 [`DESIGN.md`](DESIGN.md)，四层库在 [`ENGINE.md`](ENGINE.md)，每日一页的版面与语言契约在 [`FORMAT-politics.md`](FORMAT-politics.md)、[`FORMAT-english.md`](FORMAT-english.md)。
+
 ---
 
 ## 1. 它现在能做什么

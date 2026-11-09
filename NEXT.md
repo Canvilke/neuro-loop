@@ -1,11 +1,10 @@
 # NEXT —— 换一个会话、或换一天回来，先读这一页
 
 ## 现在做什么（三行）
-0. **先查信箱**：`python tools/mail.py check --to lead`（IM 会话的信都落在这里）。
-1. **再读 `ENGINE.md`**——2026-11-08 23:47 用户推翻了方向：前端只是皮，缺的是四层库（材料/题目/知识点/方法）+ 方法卡 + 每日一页闭环。
-1. 跑 `python tools/activate.py --test`，全绿就直接往下做；有 FAIL 先按它说的修。
-2. 打开 `TASKS.md` 的 M8 段，做第一个 `NEXT`（当前是 M8-2 每日一页生成 + 扁平打印）。
-3. 改完必须 `python build.py --check` + 五个测试全绿 + `python tools/check_methods.py`，才能说"做完了"。
+0. **2026-11-09 04:20 · 早上出纸**：`daily/pol-2026-11-09.docx` 与 `daily/en-2026-11-09.docx` 已经做好并转成 1 页 PDF（`pol-2026-11-09.pdf` / `en-2026-11-09.pdf`），07:00 那一轮**只需要打印**，不要重新生成、不要改内容。
+1. **再查信箱**：`python tools/mail.py check --to lead`（IM 会话的信都落在这里）。
+2. 跑 `python tools/activate.py --test`，全绿再往下；有 FAIL 先按它说的修。改完必须 `python build.py --check` + 五个测试全绿 + `python tools/check_methods.py`。
+3. 之后的排期：11-10 政治 4.2（P.67–68）已备、11-11 起交给每日 07:00 那一轮（政治按 `plan/politics-schedule.json` 顺延，英语按 `plan/en-schedule.json` 20 条/天）。
 
 ## 这个系统是什么
 `neuro-loop/` 是一个 DSH 客户端插件：把「高三的认知状态」画成一片可以旋转、可以点、可以判定的星图。

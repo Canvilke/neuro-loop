@@ -73,7 +73,7 @@ PS 5.1 读**无 BOM** 的脚本时按系统 ANSI（本机 GBK）解码。`.ps1` 
 - 含中文的 `.ps1`：必须存成 **UTF-8 with BOM**（或用 `utf-8-sig` 写）。
 - 更稳的做法：`.ps1` **纯 ASCII**，中文只放在 JSON 里，脚本用
   `[System.IO.File]::ReadAllText($path, [System.Text.Encoding]::UTF8)` 读取
-  （`tools/print_page.ps1` 就是这么做的）。
+  （现行实现见 `tools/make_docx.py`；早期 GDI+ 版本在 `tools/legacy/`）。
 - `tools/check_all.ps1` 是纯 ASCII，往里面加中文前先想清楚上面两条。
 
 ### 3.2 Canvas 的非有限值
