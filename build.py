@@ -21,7 +21,7 @@ SEED = os.path.join(HERE, 'data', 'seed.json')
 OUT = os.path.join(HERE, 'client.js')
 
 ORDER = ['01-util.js', '015-type.js', '02-data.js', '03-space.js', '04-web.js', '045-net.js', '05-app.js',
-         '06-bg.js', '07-fx.js', '09-instrument.js', '10-boot-core.js', '11-boot-view.js', '12-code.js']
+         '06-bg.js', '07-fx.js', '09-instrument.js', '10-boot-core.js', '11-boot-view.js', '12-code.js', '13-today.js']
 
 
 def read(path):

@@ -10,6 +10,12 @@ import { appendEvent, derive, fold, loadState, saveState } from './host/store.js
 import { isLoopback, isSameOrigin, readJsonBody, writeJson } from './host/http.js'
 import { normalizeEvent } from './host/event.js'
 import { inbox, markRead, send as postalSend, isValidName } from './host/mail.js'
+import { buildToday, isValidDate } from './host/today.js'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+// 仓库根目录：plan/ 与 daily/ 都在这下面。
+const ROOT = path.dirname(fileURLToPath(import.meta.url))
 
 // 依赖 webServer：这个 profile 一定有它（页面就是它发的）。
 // 不用 { optional: [...] } 的写法——当前 loader 会把键名当成服务名去等，
@@ -19,6 +25,7 @@ export const inject = ['webServer']
 export const ROUTE_STATE = '/neuroloop/state'
 export const ROUTE_EVENT = '/neuroloop/event'
 export const ROUTE_MAIL = '/neuroloop/mail'
+export const ROUTE_TODAY = '/neuroloop/today'
 
 let CACHE = null
 
@@ -119,6 +126,24 @@ async function onMail(req, res) {
   }
 }
 
+// 「今天」：只读一屏数据。date 缺省取本地日期（带 +08:00 的当天）。
+function onToday(req, res) {
+  if (req.method !== 'GET') return writeJson(res, 405, { ok: false, error: 'method-not-allowed' })
+  const why = blocked(req)
+  if (why) return writeJson(res, 403, { ok: false, error: why })
+
+  const url = new URL(req.url, 'http://127.0.0.1')
+  const q = url.searchParams.get('date') || ''
+  const date = q || new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10)
+  if (!isValidDate(date)) return writeJson(res, 400, { ok: false, error: 'bad-date' })
+
+  try {
+    writeJson(res, 200, { ok: true, today: buildToday(ROOT, state(), date) })
+  } catch (err) {
+    writeJson(res, 500, { ok: false, error: 'today-failed', detail: String(err && err.message) })
+  }
+}
+
 export function apply(ctx) {
   const ws = (ctx.get && ctx.get('webServer')) || ctx.webServer
   if (!ws || typeof ws.register !== 'function') {
@@ -131,6 +156,7 @@ export function apply(ctx) {
       disposers.push(ws.register({ kind: 'exact', path: ROUTE_STATE, handler: onState }))
       disposers.push(ws.register({ kind: 'exact', path: ROUTE_EVENT, handler: onEvent }))
       disposers.push(ws.register({ kind: 'exact', path: ROUTE_MAIL, handler: onMail }))
+      disposers.push(ws.register({ kind: 'exact', path: ROUTE_TODAY, handler: onToday }))
     } catch (err) {
       for (const d of disposers) {
         try {

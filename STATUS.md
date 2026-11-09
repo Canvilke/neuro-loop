@@ -7,8 +7,9 @@
 
 | 块 | 状态 | 证据 |
 |---|---|---|
-| 客户端插件（星环 / 知识场 / 启动七拍 / 编程台） | 可用 | `client.js` 由 13 个 `src/` 模块拼成，`smoke 652 帧 5 注册`、`levels 4 块`、`boot 7 阶段` |
-| 宿主路由 | 可用 | `/neuroloop/state`、`/neuroloop/event`、`/neuroloop/mail`；`host 47 checks` |
+| 客户端插件（星环 / 知识场 / 启动七拍 / 编程台 / 今天） | 可用 | `client.js` 由 14 个 `src/` 模块拼成，`smoke 652 帧 7 注册`、`levels 4 块`、`boot 7 阶段` |
+| 宿主路由 | 可用 | `/neuroloop/state`、`/event`、`/mail`、`/today`；`host 48 checks`，live 返回真实排程 |
+| **「今天」视图** | 可用 | 宿主按 `plan/*.json` 算出今天两份资料、数理化任务、到期、两张纸状态；侧栏「今天」面板可读可勾（写 `daily` 事件） |
 | 事件流 + 投影 | 可用 | `~/.dsh/neuro-loop/events-YYYY-MM.jsonl` → `state.json`；删投影可重建 |
 | 信箱 | 可用（半被动） | `tools/mail.py send/check/read`；HUD 显示未读；无"唤醒会话"接口 |
 | 政治每日页 | 可用 | `tools/make_docx.py` + JSON；1 页验证；`FORMAT-politics.md` |
@@ -23,7 +24,7 @@
 - **编程台的读数**（TOOLS/REPO/SESSION/TASK）是静态占位。
 - **方法卡**全部 `source:"ai"`、`verified:false`，界面没有"待审"标记。
 - **语文**：材料为空，任何页面都不生成。
-- **前端没有"今天"视图**：`state.daily` 里有记录，但星图上不显示。
+- **屏上自评还没做**：「今天」面板能勾完成度，但到期复习仍需回星图点 `1`/`2`（本周三补）。
 
 ## 3. 卡住
 

@@ -8,7 +8,7 @@ import path from 'node:path'
 const HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'nl-host-'))
 process.env.NEUROLOOP_HOME = HOME
 
-const { apply, inject, resetCache, ROUTE_STATE, ROUTE_EVENT, ROUTE_MAIL } = await import('../index.js')
+const { apply, inject, resetCache, ROUTE_STATE, ROUTE_EVENT, ROUTE_MAIL, ROUTE_TODAY } = await import('../index.js')
 
 let pass = 0
 function ok(cond, msg) {
@@ -109,14 +109,16 @@ apply(ctx)
  * 插件永远 pending，路由整块不存在（14:35 实际踩过）。 */
 ok(Array.isArray(inject) && inject.includes('webServer'), 'inject 以数组声明依赖 webServer')
 ok(!(inject && !Array.isArray(inject) && inject.optional), 'inject 不得使用 { optional } 写法（会永久 pending）')
-ok(routes.length === 3, '注册了 3 条路由（实际 ' + routes.length + '）')
+ok(routes.length === 4, '注册了 4 条路由（实际 ' + routes.length + '）')
 ok(routes.some((r) => r.path === ROUTE_STATE && r.kind === 'exact'), 'GET 路由 ' + ROUTE_STATE)
 ok(routes.some((r) => r.path === ROUTE_EVENT && r.kind === 'exact'), 'POST 路由 ' + ROUTE_EVENT)
 ok(routes.some((r) => r.path === ROUTE_MAIL && r.kind === 'exact'), 'POST 路由 ' + ROUTE_MAIL)
+ok(routes.some((r) => r.path === ROUTE_TODAY && r.kind === 'exact'), 'GET 路由 ' + ROUTE_TODAY)
 
 const getState = routes.find((r) => r.path === ROUTE_STATE).handler
 const postEvent = routes.find((r) => r.path === ROUTE_EVENT).handler
 const onMail = routes.find((r) => r.path === ROUTE_MAIL).handler
+const onToday = routes.find((r) => r.path === ROUTE_TODAY).handler
 
 // 1. 空态
 {
@@ -259,5 +261,25 @@ const onMail = routes.find((r) => r.path === ROUTE_MAIL).handler
   ok(cross.status === 403, '信箱拒绝跨源写入')
 }
 
-console.log('\nhost ok — ' + pass + ' checks, routes 3, home ' + HOME)
+console.log('\nhost ok — ' + pass + ' checks, routes 4, home ' + HOME)
+/* ---------- 今天（/neuroloop/today） ---------- */
+{
+  const day = await call(onToday, makeReq({ url: ROUTE_TODAY + '?date=2026-11-10' }))
+  ok(day.status === 200 && day.json.ok, '今天：200')
+  const t = day.json.today || {}
+  ok(t.date === '2026-11-10', '今天：日期回显')
+  ok(t.dayNo === 2, '今天：排程第 2 天（实际 ' + t.dayNo + '）')
+  ok(t.politics && t.politics.book === '必修四' && t.politics.from === 67, '今天：政治取到 4.2 的页范围')
+  ok(t.english && t.english.from === 21 && t.english.count === 20, '今天：英语第 2 天 21–40')
+  ok(Array.isArray(t.tasks) && t.tasks.length === 3, '今天：数理化各一行任务（实际 ' + (t.tasks || []).length + '）')
+  ok(t.papers && t.papers.politics && 'pdf' in t.papers.politics, '今天：带两张纸的状态')
+  ok(t.progress && typeof t.progress.dueTotal === 'number', '今天：带到期统计')
+
+  const badDay = await call(onToday, makeReq({ url: ROUTE_TODAY + '?date=11-10' }))
+  ok(badDay.status === 400 && badDay.json.error === 'bad-date', '今天：拒绝非法日期')
+
+  const wrongMethod = await call(onToday, makeReq({ method: 'POST', url: ROUTE_TODAY }))
+  ok(wrongMethod.status === 405, '今天：只接受 GET')
+}
+
 process.exit(process.exitCode || 0)

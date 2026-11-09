@@ -1,10 +1,9 @@
 # NEXT —— 换一个会话、或换一天回来，先读这一页
 
 ## 现在做什么（三行）
-0. **2026-11-09 04:20 · 早上出纸**：`daily/pol-2026-11-09.docx` 与 `daily/en-2026-11-09.docx` 已经做好并转成 1 页 PDF（`pol-2026-11-09.pdf` / `en-2026-11-09.pdf`），07:00 那一轮**只需要打印**，不要重新生成、不要改内容。
-1. **再查信箱**：`python tools/mail.py check --to lead`（IM 会话的信都落在这里）。
-2. 跑 `python tools/activate.py --test`，全绿再往下；有 FAIL 先按它说的修。改完必须 `python build.py --check` + 五个测试全绿 + `python tools/check_methods.py`。
-3. 之后的排期：11-10 政治 4.2（P.67–68）已备、11-11 起交给每日 07:00 那一轮（政治按 `plan/politics-schedule.json` 顺延，英语按 `plan/en-schedule.json` 20 条/天）。
+0. **2026-11-10 01:35 · 「今天」视图已上线（本地已提交）**：宿主 `GET /neuroloop/today` 按 `plan/*.json` 算出今天两份资料、数理化任务行、到期与两张纸状态；侧栏新增「今天」面板，可勾「完/半/未」并写 `daily` 事件。**需 F5 刷新**；推送仍等网络。
+1. **本周主线见 [WEEK-01.md](WEEK-01.md)，本周不出纸质页**：周三做「屏上自评闭环」（到期逐条对/错），周四方法卡审核入口。
+2. **先跑体检**：`powershell -File tools/check_all.ps1`（7 项，当前全绿）；改完必须 L1+L2 全绿才算完。
 
 ## 这个系统是什么
 `neuro-loop/` 是一个 DSH 客户端插件：把「高三的认知状态」画成一片可以旋转、可以点、可以判定的星图。
