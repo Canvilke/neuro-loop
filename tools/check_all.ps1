@@ -1,4 +1,4 @@
-# check_all.ps1 -- one-shot gate for the Neuro-Loop repo.
+﻿# check_all.ps1 -- one-shot gate for the Neuro-Loop repo.
 #
 # Runs, from the repo root:
 #   1) python build.py --check
@@ -7,7 +7,9 @@
 #   4) node test/boot.cjs
 #   5) node test/net.cjs
 #   6) node test/host.mjs
-#   7) python tools/activate.py
+#   7) node --test test/core.test.mjs
+#   8) node --test test/legacy.test.mjs
+#   9) python tools/activate.py
 #
 # Prints a PASS/FAIL summary and exits non-zero if any step fails.
 # ASCII ONLY: PowerShell 5.1 reads BOM-less files as ANSI, so do not add
@@ -57,6 +59,8 @@ Invoke-Step -Name 'test/levels.cjs'   -Exe 'node'   -Arguments @('test/levels.cj
 Invoke-Step -Name 'test/boot.cjs'     -Exe 'node'   -Arguments @('test/boot.cjs')
 Invoke-Step -Name 'test/net.cjs'      -Exe 'node'   -Arguments @('test/net.cjs')
 Invoke-Step -Name 'test/host.mjs'     -Exe 'node'   -Arguments @('test/host.mjs')
+Invoke-Step -Name 'test/core.test.mjs' -Exe 'node'  -Arguments @('--test','test/core.test.mjs')
+Invoke-Step -Name 'test/legacy.test.mjs' -Exe 'node' -Arguments @('--test','test/legacy.test.mjs')
 Invoke-Step -Name 'tools/activate.py' -Exe 'python' -Arguments @('tools/activate.py')
 
 $failed = @($results | Where-Object { $_.Code -ne 0 })

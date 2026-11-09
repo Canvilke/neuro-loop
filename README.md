@@ -1,3 +1,22 @@
+
+## 工程结构（v3 起）
+
+```
+core/       纯函数领域层（无 IO）：contract / events / metrics / state
+storage/    读写与迁移：legacy 适配（v1 事件 → v2）
+host/       路由薄层：state / event / today / mail
+src/        客户端渲染（Canvas）
+test/       node:test（core / legacy）+ 无头渲染（smoke / levels / boot / net / host）
+docs/       ADR、ROADMAP v3、研究报告
+```
+
+新增命令：
+
+- `node --test test/core.test.mjs` —— 领域层契约测试（24 条）
+- `node --test test/legacy.test.mjs` —— v1 与 core 的交叉验证（4 条）
+- `node tools/core_verify.mjs` —— 用磁盘事件重放，与 `state.json` 对账
+- `powershell tools/check_all.ps1` —— 9 项门禁（build + 5 套 UI/host 测试 + core + legacy + activate）
+
 # Neuro-Loop · 认知巡检
 
 一个跑在 DeepSeek Harness 里的**个人认知系统**：左侧一圈银色星环代表六门学科，

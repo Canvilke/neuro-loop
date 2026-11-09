@@ -272,3 +272,12 @@
 - [x] M9-1 调研教育测量/间隔重复/LLM 机制/智能体记忆四类先例，引用逐条核对。
 - [x] M9-2 产出 `docs/RESEARCH-PLAN.pdf`（8 页）：CNS v2 五实体六不变量、稀疏检索、缓存与假阳性、指标、S1–S6 路线、四问。
 - [ ] M9-3 等用户拍板后开工 S1（schema + 迁移脚本）。
+
+### M10 —— core 领域层（2026-11-10，DONE）
+- [x] M10-1 `core/contract.js`：事件白名单、id 正则、上限、`DomainError`。
+- [x] M10-2 `core/events.js`：九种事件规范化；v1 的 `recall/review` 自动映射为 `attempt`。
+- [x] M10-3 `core/metrics.js`：间隔（1/2/4/…/45 天）、到期、命中率、准确率（空样本为 null）、假阳性、缓存三态。
+- [x] M10-4 `core/state.js`：`emptyState/applyEvent/rebuild/dueList/subjectStats`。
+- [x] M10-5 `test/core.test.mjs`（24 条）+ `test/legacy.test.mjs`（4 条，拿 v1 当 oracle 交叉验证）。
+- [x] M10-6 `storage/legacy.js` + `tools/core_verify.mjs`：用磁盘上的真实事件重放，与 `state.json` 比对一致。
+- 说明：`host/store.js` 暂未切到 core——切换与状态格式升级一起做（M11），避免同一周内两套投影并存。

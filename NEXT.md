@@ -1,4 +1,10 @@
 
+## 2026-11-10 02:25 M10 完成
+- 新增 `core/`（4 个文件）+ `storage/legacy.js`，28 条测试 + 真实事件对账，`check_all.ps1` 9/9 通过。
+- 下一步 M11：`storage/projection.js`（node:sqlite）与 v2 事件切换，host 一并改，保持 48 checks。
+- 本周主线不变：软件可用；打印仍等硬件。
+
+
 ## 2026-11-10 02:00 数据模型 v2 研究
 - 交付 `docs/RESEARCH-PLAN.pdf`（8 页，HTML→Edge headless 出 PDF）。
 - 等用户对报告第 8 节四个问题拍板：先做哪层 / 方法是否必填 / 缓存命中口径 / 录入成本上限。
