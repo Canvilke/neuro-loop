@@ -267,3 +267,8 @@
 | M9-6 | 心跳 prompt 第 0 步改为查信箱 | DONE | `schedule-6478f707` |
 | M9-7 | 安装 GitHub CLI | DONE | `C:\Program Files\GitHub CLI\gh.exe` 2.103.3 |
 | M9-8 | `gh auth login` + `watch_start`（主理鱼 watcher） | **等用户** | 设备码需本人确认 |
+
+### M9 —— 数据模型 v2 研究与提案（2026-11-10）
+- [x] M9-1 调研教育测量/间隔重复/LLM 机制/智能体记忆四类先例，引用逐条核对。
+- [x] M9-2 产出 `docs/RESEARCH-PLAN.pdf`（8 页）：CNS v2 五实体六不变量、稀疏检索、缓存与假阳性、指标、S1–S6 路线、四问。
+- [ ] M9-3 等用户拍板后开工 S1（schema + 迁移脚本）。

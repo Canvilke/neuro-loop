@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Neuro-Loop 数据模型 v2 · 参考研究与实施计划</title>
+<style>
+  @page { size: A4; margin: 17mm 15mm 15mm; }
+  body{
+    font-family:"Microsoft YaHei","Source Han Sans SC","Segoe UI",sans-serif;
+    font-size:10.2pt; line-height:1.62; color:#161616; margin:0;
+  }
+  h1{font-size:19pt;line-height:1.3;margin:0 0 2mm;letter-spacing:.3px}
+  h2{font-size:13.2pt;margin:7mm 0 2.2mm;padding-bottom:1.2mm;border-bottom:1.2px solid #333}
+  h3{font-size:11pt;margin:4.5mm 0 1.5mm}
+  p{margin:0 0 2.2mm}
+  .sub{color:#555;font-size:9.4pt;line-height:1.7}
+  .meta{color:#666;font-size:8.8pt;border-top:1px solid #ddd;border-bottom:1px solid #ddd;padding:2mm 0;margin:3mm 0 5mm}
+  table{border-collapse:collapse;width:100%;font-size:8.9pt;line-height:1.45;margin:2mm 0 3.5mm;page-break-inside:avoid}
+  th,td{border:.8px solid #9a9a9a;padding:1.5mm 2mm;vertical-align:top;text-align:left}
+  th{background:#f1f1f1;font-weight:600}
+  code,pre{font-family:Consolas,"Cascadia Mono",monospace;font-size:8.4pt}
+  code{background:#f4f4f4;padding:0 .8mm;border-radius:1px}
+  pre{background:#f6f6f6;border:.8px solid #ddd;padding:2.4mm 3mm;line-height:1.5;
+      white-space:pre-wrap;word-break:break-word;margin:2mm 0 3mm;page-break-inside:avoid}
+  ul,ol{margin:0 0 2.4mm;padding-left:5.5mm}
+  li{margin-bottom:1.1mm}
+  .box{border-left:2.4px solid #333;background:#fafafa;padding:2.4mm 3mm;margin:2.5mm 0 3.5mm}
+  .note{font-size:8.8pt;color:#555}
+  .ref{font-size:8.6pt;line-height:1.55}
+  .ref li{margin-bottom:1.2mm}
+  .pb{page-break-before:always}
+  table.plan{font-size:8.7pt}
+  .tag{display:inline-block;border:1px solid #666;padding:0 1.2mm;font-size:8pt;margin-right:1.5mm}
+  @media screen{body{max-width:175mm;margin:14mm auto;padding:0 6mm}}
+</style>
+</head>
+<body>
+
+<h1>Neuro-Loop 数据模型 v2<br>参考研究、取舍与实施计划</h1>
+<div class="sub">把"一个人怎样从看懂到想起、再到考场里做得出来"拆成可以存储、可以测量、可以重建的结构。</div>
+<div class="meta">
+版本 v2.0 · 2026-11-10 · 面向：项目负责人审阅 · 依据：现有 `neuro-loop` 代码与 `%USERPROFILE%\.dsh\neuro-loop\` 的真实事件流<br>
+性质：研究综述 + 结构提案。文中"借鉴"与"创新"分别标注，不把已有一切说成原创。
+</div>
+
+<h2>0. 摘要</h2>
+<p>现有系统（v1）解决了"看得见"：星图、分层、启动序列、事件流、跨会话信箱。但它回答不了三个问题：
+一道题<strong>为什么</strong>被判为会、<strong>多快</strong>能想起来、以及<strong>明天</strong>该复习哪一条。
+v1 的数据结构只有"考点 → 命中/失误计数"，缺少题目、方法、时间三个维度，因此再好看也只是仪表盘。</p>
+<p>本提案给出四层、五实体、六个不变量与四个算法。核心是三条判断：</p>
+<ol>
+  <li><strong>原子是"一次判定"，不是一道题。</strong>同题在不同模式（认出 / 重推 / 实做）下是不同的证据。</li>
+  <li><strong>方法（method）必须是一等公民。</strong>它是跨章节的可迁移程序，也是我们所说"记忆向量"的可操作定义：
+      方法 = 在考点空间上的稀疏权重 + 可复述的判据。</li>
+  <li><strong>"KV cache"应当被真的实现成一层带衰减的缓存，</strong>而不是比喻。命中走缓存（快、易假阳性），未命中走重推（慢、更可靠），两者都记时间。</li>
+</ol>
+<p>与已有系统的关系：教育测量（BKT、IRT、知识空间）提供<em>掌握度与判分</em>；间隔重复（SM-2、FSRS）提供<em>调度</em>；
+LLM 训练与推理（MLA、KV cache、稀疏注意力、MoE、RLHF）提供<em>压缩、命中、稀疏与遗忘</em>的工程隐喻；
+智能体记忆（MemGPT、Zep/Graphiti、Mem0、HippoRAG）提供<em>分层存储与多跳检索</em>的实现先例。
+本方案的创新点在于<strong>把四者拼在一个可被单人承受的数据量上</strong>，而不是发明新算法。</p>
+
+<h2>1. 原构想的形式化</h2>
+<h3>1.1 四层与一次考试的过程</h3>
+<p>原文章把学习过程映射为大模型的训练与推理。落到数据上，一次"考试"其实是：</p>
+<pre>题目文本 ──编码──▶ 考点集合（稀疏 top-k） ──检索──▶ 方法集合（top-m）
+                                        │
+                    命中缓存 ◀───────────┴──────────▶ 现场重推
+                       │                                  │
+                    步骤输出（快）                     步骤输出（慢）
+                       └────────── 判定（对/半/错/假阳性）──────────┘</pre>
+<p>四个可测量的量由此产生：<strong>命中率</strong>（考点是否被想起）、<strong>准确率</strong>（想起后是否做对）、
+<strong>还原时间</strong>（从想起到写出步骤耗时）、<strong>压缩率</strong>（方法判据字数 / 完整步骤字数）。</p>
+
+<h3>1.2 v1 缺什么</h3>
+<table>
+<tr><th>能力</th><th>v1 现状</th><th>后果</th></tr>
+<tr><td>题目作为实体</td><td>不存在；只有考点计数</td><td>无法回答"这类题我做过几道、错在同一处吗"</td></tr>
+<tr><td>方法作为实体</td><td>有 10 张卡，但未接入判定与调度</td><td>方法无法被复习，也无法解释"为什么这题该用这个"</td></tr>
+<tr><td>时间维度</td><td>只有 <code>dueAt</code>，无耗时</td><td>"想得起来但很慢"无法与"想不起来"区分</td></tr>
+<tr><td>缓存层</td><td>无</td><td>"熟题秒出"与"现场推导"没有分别记录，假阳性无法被识别</td></tr>
+<tr><td>稀疏性</td><td>考点图接近全连接（每科 16 条边 / 11 节点）</td><td>检索没有取舍，等于没有注意力</td></tr>
+</table>
+
+<h2>2. 先例地图</h2>
+<p>下列条目只保留对"单人、无标注数据、需要可解释"这一约束真正有用的部分。表中"借鉴"一栏写我们打算拿什么。</p>
+
+<h3>2.1 教育测量与知识追踪</h3>
+<table>
+<tr><th>先例</th><th>年份</th><th>机制（一句）</th><th>借鉴</th><th>局限</th></tr>
+<tr><td>BKT（Bayesian Knowledge Tracing）</td><td>1995</td><td>每个知识点四个参数（已会/学会/失误/猜对），贝叶斯更新掌握概率</td><td>掌握度可解释、参数少</td><td>假设知识点独立，忽略方法层</td></tr>
+<tr><td>知识空间理论 / ALEKS</td><td>1985–</td><td>用"会 A 才能学 B"的前置关系定义可达知识状态</td><td>前置边与"外 frontier"概念</td><td>建图成本高，需专家</td></tr>
+<tr><td>IRT</td><td>1960s–</td><td>能力 θ 与题目难度/区分度建模答对概率</td><td>难度可分、可做冷启动</td><td>需大量作答标定题目参数</td></tr>
+<tr><td>Elo / Duolingo 用法</td><td>2010s</td><td>能力与题目同尺度，在线更新</td><td>单人也可更新（无群体数据）</td><td>只给单一数值，无遗忘</td></tr>
+<tr><td>DKT / DKVMN / SAKT / AKT</td><td>2015–2020</td><td>用序列模型预测下一次作答</td><td>序列即证据、可迁移</td><td>需千级学生数据；不可解释</td></tr>
+<tr><td>Q-matrix</td><td>1990s–</td><td>题目 × 知识点的 0/1 关联矩阵</td><td>题目-考点稀疏关联</td><td>多标签时矩阵病态</td></tr>
+<tr><td>pyKT</td><td>2022</td><td>知识追踪开源工具箱（多模型统一评测）</td><td>评测口径与基线</td><td>面向数据集，不面向个人</td></tr>
+</table>
+
+<h3>2.2 间隔重复与记忆模型</h3>
+<table>
+<tr><th>先例</th><th>年份</th><th>机制</th><th>借鉴</th><th>局限</th></tr>
+<tr><td>SM-2（SuperMemo）</td><td>1987</td><td>按回忆质量 0–5 调整间隔（EF 因子）</td><td>极简、可手算</td><td>参数固定，不分难度</td></tr>
+<tr><td>Anki / FSRS</td><td>2022–</td><td>每卡 (stability, difficulty)，用记忆曲线拟合真实复习日志</td><td>单人可拟合、可解释</td><td>需要足够日志才有意义</td></tr>
+<tr><td>Half-Life Regression（Duolingo）</td><td>2016</td><td>用半衰期回归预测遗忘概率</td><td>半衰期作为字段</td><td>需群体数据训练</td></tr>
+<tr><td>Ebisu</td><td>2017</td><td>贝叶斯式记忆强度估计</td><td>小样本下的不确定性</td><td>实现复杂</td></tr>
+</table>
+
+<h3>2.3 大模型：训练与推理里可迁移的机制</h3>
+<table>
+<tr><th>机制</th><th>出处</th><th>可迁移点</th><th>误用风险</th></tr>
+<tr><td>MLA（多头潜在注意力）</td><td>DeepSeek-V2</td><td>热层只存语义潜码：每 token 每层 576 维，MHA 需 32768 维（KV −93.3%，吞吐 ×5.76）；方法卡即压缩表示</td><td>压缩过度会丢判据，只剩口号；潜码不可当证据</td></tr>
+<tr><td>KV cache</td><td>vLLM PagedAttention 2023</td><td>块表寻址 + 前缀共享：碎片 60–80%→&lt;4%，吞吐 ×2–4；命中=读现成状态，未命中=整段重算</td><td>缓存不失效＝拿旧结论答新题；失效要按块</td></tr>
+<tr><td>稀疏注意力（NSA / Longformer / BigBird）</td><td>2025 / 2020</td><td>每个题目只连少量考点与方法（top-k）</td><td>连太少会漏掉跨章迁移</td></tr>
+<tr><td>MoE 稀疏激活</td><td>DeepSeek-V3 2024</td><td>671B 总参 / 37B 激活，256 专家取 8；按学科路由，但每科设最低配额</td><td>路由塌缩（永远激活同一批）＝没分科</td></tr>
+<tr><td>RLHF / DPO</td><td>InstructGPT / DPO</td><td>用偏好信号（对/半/错）而非正确答案调权重</td><td>偏好噪声会被放大</td></tr>
+<tr><td>EWC / 灾难性遗忘</td><td>PNAS 2017</td><td>旧知识不能被新章节冲掉：复习调度兼作正则</td><td>过度保护会学不动新章</td></tr>
+</table>
+
+<h3>2.4 智能体记忆与检索架构</h3>
+<table>
+<tr><th>系统</th><th>机制</th><th>可取之处</th><th>局限</th></tr>
+<tr><td>MemGPT / Letta</td><td>core / recall / archival 三层，主动换页</td><td>分层与"上下文预算"意识</td><td>依赖 LLM 运行时，离线不可用</td></tr>
+<tr><td>Zep / Graphiti</td><td>时序知识图谱，边带有效区间（双时间轴）</td><td>事实有有效期，可回看"当时"</td><td>图数据库重，个人项目过度</td></tr>
+<tr><td>Mem0</td><td>抽取→合并→更新的记忆层</td><td>去重与冲突合并策略</td><td>黑箱抽取，难解释</td></tr>
+<tr><td>HippoRAG</td><td>实体索引 + Personalized PageRank 多跳</td><td>"由一个点想到另一个点"的检索</td><td>需要较完整的图</td></tr>
+<tr><td>GraphRAG (2024)</td><td>Leiden 层次社区 + 每社区 LLM 摘要，map-reduce 答全局问题</td><td>先粗后细；适合"这学期学了什么"</td><td>索引成本按 chunk×LLM 计</td></tr>
+<tr><td>A-MEM (2025)</td><td>Zettelkasten 卡片 + 写入即建链 + 新卡片回改邻居</td><td>写入即建立关联，不靠事后整理</td><td>无全局一致性，会漂移</td></tr>
+</table>
+
+<h2>3. 取舍：借鉴什么，明确不做什么</h2>
+<table>
+<tr><th>取</th><th>理由</th><th>舍</th><th>理由</th></tr>
+<tr><td>BKT 式掌握概率 + FSRS 式 (stability, difficulty)</td><td>参数少、可解释、单人可跑</td><td>DKT 类深度模型</td><td>需要千级学生数据，且不可解释</td></tr>
+<tr><td>Q-matrix 的稀疏关联（每题 2–4 考点）</td><td>强制取舍，才谈得上注意力</td><td>全连接知识图谱</td><td>"漂亮但没用"：任何两点都有边等于没有边</td></tr>
+<tr><td>KV cache 的真实实现（命中/未命中/淘汰）</td><td>把"熟"与"会推"分开测量</td><td>把缓存当装饰性比喻</td><td>无法验证，也无法产生假阳性信号</td></tr>
+<tr><td>双时间轴（记录何时学、何时有效）</td><td>回看"当时会不会"</td><td>独立图数据库</td><td>单人数据量用 JSONL 足够</td></tr>
+<tr><td>事件溯源 + 可重建投影</td><td>已有实现、可审计、可回滚</td><td>直接以投影为真源</td><td>投影损坏即数据丢失</td></tr>
+</table>
+
+<h2>4. 提案：CNS v2（Cognitive Node Schema）</h2>
+<div class="box"><strong>一句话：</strong>把"会一道题"拆成四个可分别记录的事实——<em>哪些考点（稀疏 2–4 个）、用了哪个方法（1–3 个）、是想起还是重推（mode）、花了多久（durationMs）</em>；掌握度、到期、缓存全部由这些事实算出，不单独存。</div>
+<h3>4.1 五个实体</h3>
+<pre>concept   考点：学科内的最小可判定单位
+  { id, subject, block, name, prereq[], core, traps[], methodHint[] }
+
+method    方法：跨章节的可迁移程序（本项目称"记忆向量"）
+  { id, claim(≤40字), judge(何时用), steps[], instances[], traps[],
+    concepts{conceptId: weight 0..1}, signature[], stability, difficulty,
+    source: self|ai, verified: bool, compression }
+
+problem   题目：一次具体任务
+  { id, source, ref(文本/照片路径), concepts[{id,w}], methods[{id,w}],
+    difficulty, answerRef }
+
+attempt   一次判定（事件，append-only）
+  { id, at, problem, mode: recall|recon|solve, outcome: hit|partial|miss|fp,
+    durationMs, hintLevel 0..2, note }
+
+cache    缓存项（派生，可重建）
+  { key(problem指纹), problem, stepsRef, hits, lastHitAt, ttlSec, state: fresh|stale }</pre>
+
+<h3>4.2 六个不变量</h3>
+<ol>
+  <li><strong>单一真源</strong>：只有 <code>attempt</code>（及少量内容写操作）是事实；掌握度、缓存、到期全是投影，删掉必须能重建。</li>
+  <li><strong>稀疏上限</strong>：任一 problem 的 <code>concepts</code> ≤ 4、<code>methods</code> ≤ 3；超出即视为"这题该拆"。</li>
+  <li><strong>方法必须有判据</strong>：<code>claim</code> 与 <code>judge</code> 不得为空；只有名字的方法不算方法。</li>
+  <li><strong>命中与准确分离</strong>：任何聚合指标不得把 <code>recall</code> 与 <code>solve</code> 混算为一个"掌握度"。</li>
+  <li><strong>假阳性是查询</strong>：不落字段。定义为"该考点/方法 hit 率高、但 solve 准确率低且错因重复"。</li>
+  <li><strong>时间可解释</strong>：<code>durationMs</code> 必须记；没有时间的"会"等于没有测。</li>
+</ol>
+
+<h3>4.3 稀疏检索与打分</h3>
+<pre>score(problem, concept) = w(problem→concept) × mastery(concept)
+mastery(c) = σ( (hits - λ·misses) / (hits + misses + 1) ) × decay(Δt; stability(c))
+decode(problem):  top-k concepts (k≤4) → top-m methods (m≤3)
+若 cache[fp(problem)] 为 fresh → 走缓存，记 mode=recall, durationMs=命中耗时
+否则 → 重推，记 mode=recon, durationMs=完整耗时；完成后回写 cache</pre>
+<p class="note">λ 是"错误惩罚"，初始取 1.5；它直接对应 RLHF 里的负样本权重思想，但我们不用梯度，只用可解释的计数衰减。</p>
+
+<h3>4.4 缓存淘汰与假阳性</h3>
+<pre>ttl(fp) = base × stability(method*)        base≈3 天
+命中且 solve 判对  → hits+1, stability×1.35 (上限 60 天)
+命中但 solve 判错  → 记 fp；stability×0.6；cache 立即置 stale（下次强制重推）
+连续两次 stale     → 从缓存移除，转回 recon</pre>
+<p>这一条把"我以为我会"变成结构上可检测的事件：<strong>缓存命中 + 实做失败 = 假阳性</strong>，而不是靠自评。</p>
+
+<h3>4.5 写入管线与分层上下文（形态照抄，判据自定）</h3>
+<p><strong>写入四步</strong>（每次录入一道判定都走同一条路，保证可审计）：</p>
+<ol>
+<li><strong>抽候选</strong>：从一次录入里抽出考点 id（2–4）、方法 id（1–3）、模式、耗时、结果。</li>
+<li><strong>近邻比对</strong>：取同考点最近 k 条判定与当前缓存项，判断这次是<em>重复命中</em>、<em>推翻旧结论</em>还是<em>首次出现</em>。</li>
+<li><strong>写事件</strong>：追加一行 jsonl（只追加，不改历史）；若是"推翻"，旧缓存项标 <code>state:"stale"</code> 并指向新事件，不物理删除。</li>
+<li><strong>更新投影</strong>：重算该考点/该方法的掌握、到期、缓存三组派生值，写回 <code>state.json</code>。</li>
+</ol>
+<p><strong>分层上下文</strong>（借 MemGPT 的三层形状，但检索由系统触发、不交给模型自觉）：</p>
+<table><tr><th>层</th><th>内容</th><th>容量/触发</th></tr>
+<tr><td>core</td><td>本周单元、当前方法卡、今日两张纸的元信息</td><td>硬上限 ~2k 字，直接进提示</td></tr>
+<tr><td>recall</td><td>全部判定的全文索引（可按考点/方法/日期过滤）</td><td>检索时取 top-k，带 as-of 时间</td></tr>
+<tr><td>archival</td><td>已折叠的旧判定、历史错题原文</td><td>只按 id 取，不参与默认检索</td></tr>
+</table>
+<p><strong>三个"防蠢"约束</strong>：① 公式、定义、教材原文标 <code>protected</code>，改动需显式确认并留旧值；② 摘要按块失效——某考点变了，它的摘要与所属单元摘要是脏的；③ 反馈记三元组 <code>(原答, 改后答, 理由)</code>，只记对错会把"蒙对"当成会。</p>
+<h3>4.6 与 v1 的映射</h3>
+<table>
+<tr><th>v1 字段</th><th>v2 归属</th><th>说明</th></tr>
+<tr><td><code>state.nodes[id].hits/misses</code></td><td>attempt 的聚合投影</td><td>保留，但改由 attempt 计算，不再单独写</td></tr>
+<tr><td><code>state.nodes[id].dueAt</code></td><td>review(concept) 的派生值</td><td>算法换为 (stability, difficulty)</td></tr>
+<tr><td><code>state.daily[date][subject]</code></td><td>attempt 的日聚合</td><td>用于"今天做了什么"，不参与掌握度</td></tr>
+<tr><td><code>state.flattened[]</code></td><td>problem 的处置状态</td><td>"磨平"改为 attempt.outcome=hit 的连续计数</td></tr>
+<tr><td><code>content/method/*.json</code></td><td>method 实体</td><td>补 <code>concepts{}</code> 权重与 <code>stability</code></td></tr>
+</table>
+
+<h2>5. 指标与实验设计</h2>
+<table>
+<tr><th>指标</th><th>定义</th><th>用途</th><th>目标（首月）</th></tr>
+<tr><td>Hit Rate</td><td>recall 模式 hit / 该考点 recall 次数</td><td>是否"想得起来"</td><td>≥ 0.65</td></tr>
+<tr><td>Acc Rate</td><td>solve 判对 / solve 次数</td><td>是否"做得对"</td><td>≥ 0.55</td></tr>
+<tr><td>FP Rate</td><td>(hit 且 solve 错) / hit</td><td>假阳性比例</td><td>逐月下降</td></tr>
+<tr><td>Recon P50/P90</td><td>重推耗时中位数 / 90 分位</td><td>还原速度</td><td>同章下降 20%</td></tr>
+<tr><td>Compression</td><td>claim 字数 / steps 字数</td><td>是否真的压过</td><td>≤ 0.25</td></tr>
+<tr><td>Due Adherence</td><td>当天完成 due / 当天 due</td><td>调度是否可执行</td><td>≥ 0.7</td></tr>
+</table>
+<h3>5.1 三段式验证（不需要新数据）</h3>
+<ol>
+  <li><strong>回放</strong>：用已有 <code>events-*.jsonl</code> 重建，比较 v1 与 v2 对同一天的"该复习什么"的差异；差异必须能解释。</li>
+  <li><strong>消融</strong>：去掉缓存层 / 去掉方法层 / 改 top-k=全部，看 FP Rate 与 Recon 时间的变化。</li>
+  <li><strong>前瞻</strong>：连续 7 天按新调度执行，记录 Due Adherence 与 FP；不达标就回退参数，不改结构。</li>
+</ol>
+<p class="note">不做：A/B 分班、题库规模扩张、以刷题量作为指标。单用户系统里这些只会制造噪声。</p>
+
+<h2>6. 实施路线</h2>
+<table class="plan">
+<colgroup><col style="width:6%"><col style="width:44%"><col style="width:32%"><col style="width:18%"></colgroup>
+<tr><th>步</th><th>交付</th><th>验证</th><th>依赖</th></tr>
+<tr><td>S1</td><td>schema + 迁移脚本（v1 事件 → v2 实体）</td><td>回放 100% 可重建；删投影可恢复</td><td>无</td></tr>
+<tr><td>S2</td><td><code>POST /neuroloop/attempt</code>（写 attempt）与 <code>GET /neuroloop/decode?problem=</code>（top-k 检索）</td><td>host 测试新增 ≥ 10 条；错误码齐全</td><td>S1</td></tr>
+<tr><td>S3</td><td>缓存层：ttl、stale、fp 检测；界面显示"缓存命中/重推"</td><td>构造一次"命中但错"→ 自动标 fp</td><td>S2</td></tr>
+<tr><td>S4</td><td>调度换 FSRS 式；due 列表接进「今天」面板</td><td>Due Adherence 可算</td><td>S3</td></tr>
+<tr><td>S5</td><td>方法层接入：录入方法卡时给出 concepts 权重，判分时可选方法</td><td>10 张卡全部有 concepts 与 stability</td><td>S2</td></tr>
+<tr><td>S6</td><td>星图读 v2 投影（方法星层）</td><td>视觉验收（用户截图）</td><td>S5</td></tr>
+</table>
+<p>排序理由：先让数据可信（S1–S3），再让调度有用（S4），最后才是视觉（S6）。反过来做等于给不可信的数据化妆。</p>
+
+<h2>7. 风险与反面清单</h2>
+<ul>
+  <li><strong>过度建模</strong>：五个实体已接近单人系统的上限。再加"情绪/环境"只会让录入停摆。</li>
+  <li><strong>假阳性定义过窄</strong>：若长期没有 fp，先怀疑录入太少，而不是庆祝。</li>
+  <li><strong>参数不可信</strong>：FSRS 类参数需要足够日志；首月一律标 <code>calibrated:false</code>，用保守默认值。</li>
+  <li><strong>方法卡膨胀</strong>：10 张够用；每加一张必须能说出"它挡掉了哪类错"。</li>
+  <li><strong>视觉先行</strong>：星图是读投影的，不是真源。任何"看起来对"都不能替代 attempt 记录。</li>
+  <li><strong>不可回退</strong>：每次结构变更必须留下回放脚本，否则半年后无法解释历史数据。</li>
+</ul>
+
+<h2>8. 需要你拍板的四件事</h2>
+<table class="plan">
+<colgroup><col style="width:17%"><col style="width:45%"><col style="width:38%"></colgroup><tr><th>问题</th><th>选项</th><th>我的建议</th></tr>
+<tr><td>先做哪层</td><td>A 先结构（S1–S3）· B 先界面（S6）· C 先内容（补方法卡）</td><td>A：数据不可信时，界面越好看越误导</td></tr>
+<tr><td>是否引入"方法"评分</td><td>A 每题必须选一个方法 · B 可选 · C 不记</td><td>B：强制会让人敷衍选择，不记则失去迁移证据</td></tr>
+<tr><td>缓存命中怎么算对</td><td>A 只要 recall=hit 就算 · B 需 solve 也正确才计入 stable</td><td>B：这正是假阳性的定义来源</td></tr>
+<tr><td>录入成本上限</td><td>A 每题 ≤60 秒 · B ≤30 秒 · C 不限</td><td>B：超过 30 秒的录入，三天后必然停摆</td></tr>
+</table>
+<h2>9. 参考文献</h2>
+<ol class="ref" id="refs">
+
+<li>Corbett, A. T., &amp; Anderson, J. R. (1995). Knowledge tracing: Modeling the acquisition of procedural knowledge. <em>User Modeling and User-Adapted Interaction</em>, 4, 253–278. <span class="note">doi:10.1007/BF01099821</span></li>
+<li>Doignon, J.-P., &amp; Falmagne, J.-C. (1985). Spaces for the assessment of knowledge. <em>International Journal of Man-Machine Studies</em>, 23(2), 175–196. <span class="note">doi:10.1016/S0020-7373(85)80031-6</span></li>
+<li>Falmagne, J.-C., Cosyn, E., Doignon, J.-P., &amp; Thiery, N. (2006). The assessment of knowledge, in theory and in practice. <em>Formal Concept Analysis (ICFCA)</em>. <span class="note">doi:10.1007/11671404_4</span></li>
+<li>Tatsuoka, K. K. (1983). Rule space: An approach for dealing with misconceptions based on item response theory. <em>Journal of Educational Measurement</em>, 20(4), 345–354. <span class="note">doi:10.1111/j.1745-3984.1983.tb00212.x</span></li>
+<li>de la Torre, J. (2011). The generalized DINA model framework. <em>Psychometrika</em>, 76, 179–199. <span class="note">doi:10.1007/s11336-011-9207-7</span></li>
+<li>Pelánek, R. (2016). Applications of the Elo rating system in adaptive educational systems. <em>Computers &amp; Education</em>, 98, 169–179. <span class="note">doi:10.1016/j.compedu.2016.03.017</span></li>
+<li>Piech, C., et al. (2015). Deep knowledge tracing. <em>NeurIPS</em>. <span class="note">arXiv:1506.02636</span></li>
+<li>Zhang, J., Shi, X., King, I., &amp; Yeung, D.-Y. (2017). Dynamic key-value memory networks for knowledge tracing. <em>WWW</em>. <span class="note">arXiv:1611.08108</span></li>
+<li>Pandey, S., &amp; Karypis, G. (2019). A self-attentive model for knowledge tracing. <em>EDM</em>. <span class="note">arXiv:1907.06837</span></li>
+<li>Ghosh, A., Heffernan, N., &amp; Lan, A. (2020). Context-aware attentive knowledge tracing. <em>KDD</em>. <span class="note">arXiv:2007.12324</span></li>
+<li>Liu, Z., et al. (2022). pyKT: A Python library to benchmark deep learning based knowledge tracing models. <em>NeurIPS Datasets &amp; Benchmarks</em>. <span class="note">arXiv:2206.11460 · github.com/pykt-team/pykt-toolkit</span></li>
+<li>Anderson, J. R., Corbett, A. T., Koedinger, K. R., &amp; Pelletier, R. (1995). Cognitive tutors: Lessons learned. <em>Journal of the Learning Sciences</em>, 4(2), 167–207. <span class="note">doi:10.1207/s15327809jls0402_2</span></li>
+<li>Koedinger, K. R., Corbett, A. T., &amp; Perfetti, C. (2012). The Knowledge-Learning-Instruction framework. <em>Cognitive Science</em>, 36(5), 757–798. <span class="note">doi:10.1111/j.1551-6709.2012.01245.x</span></li>
+<li>Wozniak, P. A. (1987). Optimization of learning (Master's thesis, Poznań University of Technology). SM-2 算法原文：<span class="note">super-memory.com/english/ol/sm2.htm</span></li>
+<li>Ye, J., Su, J., &amp; Cao, Y. (2022). A stochastic shortest path algorithm for optimizing spaced repetition scheduling. <em>KDD</em>. <span class="note">doi:10.1145/3534678.3539081 · github.com/open-spaced-repetition/fsrs4anki</span></li>
+<li>Settles, B., &amp; Meeder, B. (2016). A trainable spaced repetition model for language learning. <em>ACL</em>, 1848–1858. <span class="note">aclanthology.org/P16-1174</span></li>
+<li>Ebisu: Bayesian spaced repetition（实现与文档，未找到同行评议论文）<span class="note">github.com/fasiha/ebisu</span></li>
+<li>DeepSeek-AI (2024). DeepSeek-V2: A strong, economical, and efficient mixture-of-experts language model. <span class="note">arXiv:2405.04434（MLA）</span></li>
+<li>Kwon, W., et al. (2023). Efficient memory management for large language model serving with PagedAttention. <em>SOSP</em>. <span class="note">arXiv:2309.06180（KV cache 分页）</span></li>
+<li>DeepSeek-AI (2025). Native Sparse Attention: Hardware-aligned and natively trainable sparse attention. <span class="note">arXiv:2502.11089</span></li>
+<li>DeepSeek-AI (2024). DeepSeek-V3 technical report. <span class="note">arXiv:2412.19437（MoE 稀疏激活）</span></li>
+<li>Ouyang, L., et al. (2022). Training language models to follow instructions with human feedback. <span class="note">arXiv:2203.02155（RLHF）</span></li>
+<li>Rafailov, R., et al. (2023). Direct preference optimization: Your language model is secretly a reward model. <span class="note">arXiv:2305.18290</span></li>
+<li>Kirkpatrick, J., et al. (2017). Overcoming catastrophic forgetting in neural networks. <em>PNAS</em>, 114(13), 3521–3526. <span class="note">arXiv:1612.00796 · doi:10.1073/pnas.1611835114（EWC）</span></li>
+<li>Packer, C., et al. (2023). MemGPT: Towards LLMs as operating systems. <span class="note">arXiv:2310.08560</span></li>
+<li>Rasmussen, P., et al. (2025). Zep: A temporal knowledge graph architecture for agent memory. <span class="note">arXiv:2501.13956</span></li>
+<li>Chhikara, P., et al. (2025). Mem0: Building production-ready AI agents with scalable long-term memory. <span class="note">arXiv:2504.19413</span></li>
+<li>Beltagy, I., Peters, M. E., &amp; Cohan, A. (2020). Longformer: The long-document transformer. <span class="note">arXiv:2004.05150</span></li>
+<li>Zaheer, M., et al. (2020). Big Bird: Transformers for longer sequences. <em>NeurIPS</em>. <span class="note">arXiv:2007.14062</span></li>
+<li>Zhang, Z., et al. (2023). H2O: Heavy-hitter oracle for efficient generative inference of LLMs. <span class="note">arXiv:2306.14048（KV 淘汰）</span></li>
+<li>Xiao, G., et al. (2023). Efficient streaming language models with attention sinks. <span class="note">arXiv:2309.17453（StreamingLLM，保开头高频）</span></li>
+<li>Xu, W., et al. (2025). A-MEM: Agentic memory for LLM agents. <span class="note">arXiv:2502.12110</span></li>
+<li>Gutiérrez, B. J., et al. (2025). From RAG to memory: Non-parametric continual learning (HippoRAG 2). <span class="note">arXiv:2502.14802</span></li>
+<li>HippoRAG: Neurobiologically inspired long-term memory for large language models (2024). <span class="note">arXiv:2405.14831</span></li>
+<li>Edge, D., et al. (2024). From local to global: A graph RAG approach to query-focused summarization. <span class="note">arXiv:2404.16130（GraphRAG）</span></li>
+
+</ol>
+
+</body>
+</html>
