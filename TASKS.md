@@ -303,12 +303,14 @@
 - [x] M12-7 `test/dispatch.test.mjs`（25 checks）：空台账拒绝开工、依赖未完成拒领、重复领拒、block 必须写理由、brief 内容契约。
 - [x] M12-8 `docs/TEAM-PROTOCOL.md`：Lead 视角与子代理视角的两套循环、并发写域、恢复现场三步。
 - [x] M12-9 `check_all.ps1` 扩到 11 项（新增 storage、dispatch）。
-- [ ] M12-10 端到端演练：真实派一张票给子代理，走完 claim → 施工 → 复核 → done（本轮进行中）。
+- [x] M12-10 端到端演练：真实派票给子代理，走完 claim → 施工 → 门禁 → 复核 → done（T-0003 已闭环，T-0001 进行中）。
 - [x] M12-11 `ticket.mjs` 的写域冲突提示：`scopeOverlap` / `conflictsOf`，`new` 时前缀相交就告警；dispatch 测试扩到 32 checks。
 
 ### M12 续（三条通道）
 - M12-12 总线 v1：`bus/bus.jsonl` 只追加，四条 lane（sub/repo/wx/note），追加前补行边界 —— DONE
 - M12-13 两套读写：`tools/bus.mjs`（CLI）与 `host/bus.js`（HTTP `/neuroloop/bus`），`test/bus.test.mjs` 19 条双向校验 —— DONE
 - M12-14 微信段能力边界写进 `docs/BUS.md`：异步双工（无推送接口），AGENTS §2 同步 —— DONE
-- M12-15 控制台显示总线未读（bus pending 进 TeamPanel 头部）—— TODO
+- M12-15 控制台显示总线未读（bus pending 进 TeamPanel 头部，`src/14-team.js` 的 `busFetch` + 三枚 chip）—— DONE
 - M12-16 子代理派票时把 bus id 写进 brief（派单即可回信）—— TODO
+- M12-17 入口工具 `tools/intake.mjs`：外部请求开成票、标题去重、验收必填、写 bus repo 行；`test/intake.test.mjs` 12 checks，门禁 12→13 项 —— DONE
+- M12-18 `docs/END-TO-END.md`：一句话→票→派工→门禁→验收的五步与失忆恢复三步 —— DONE

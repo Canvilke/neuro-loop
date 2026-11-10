@@ -9,10 +9,10 @@
 import { addEvent, getState, reset as resetService } from './host/service.js'
 import { isLoopback, isSameOrigin, readJsonBody, writeJson } from './host/http.js'
 import { normalizeEvent } from './host/event.js'
-import { inbox, markRead, send as postalSend, isValidName } from './host/mail.js'
+import { inbox, markRead, readAll, send as postalSend, isValidName } from './host/mail.js'
 import { buildToday, isValidDate } from './host/today.js'
-import { board as teamBoard, create as createTicket, update as updateTicket } from './host/team.js'
-import { post as busPost, pending as busPending, recent as busRecent } from './host/bus.js'
+import { board as teamBoard, create as createTicket, readLedger, update as updateTicket } from './host/team.js'
+import { post as busPost, pending as busPending, read as busRead, recent as busRecent } from './host/bus.js'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -49,12 +49,34 @@ function blocked(req) {
   return null
 }
 
+// 成功响应统一外壳：{ ok:true, data, rev }。
+// 旧客户端按顶层字段读（state / msgs / tickets / today ...），所以原载荷也平铺保留一份。
+function envelope(payload, rev) {
+  return { ok: true, rev, ...payload, data: payload }
+}
+
+const LIMIT_MAX = 200
+
+/**
+ * 解析列表端点的 limit：缺省 → 不裁剪（null）；非法 → { ok:false, error:'bad-limit' }。
+ * 只认 1..200 的十进制整数，避免 Number('') / '5.0' / '1e3' 这类含糊值过关。
+ */
+function parseLimit(url) {
+  if (!url.searchParams.has('limit')) return { ok: true, limit: null }
+  const text = url.searchParams.get('limit')
+  if (!/^\d+$/.test(text)) return { ok: false, error: 'bad-limit' }
+  const n = Number(text)
+  if (!Number.isInteger(n) || n < 1 || n > LIMIT_MAX) return { ok: false, error: 'bad-limit' }
+  return { ok: true, limit: n }
+}
+
 function onState(req, res) {
   if (req.method !== 'GET') return writeJson(res, 405, { ok: false, error: 'method-not-allowed' })
   const why = blocked(req)
   if (why) return writeJson(res, 403, { ok: false, error: why })
   try {
-    writeJson(res, 200, { ok: true, state: state() })
+    const s = state()
+    writeJson(res, 200, envelope({ state: s }, s.rev))
   } catch (err) {
     writeJson(res, 500, { ok: false, error: 'state-failed', detail: String(err && err.message) })
   }
@@ -74,7 +96,7 @@ async function onEvent(req, res) {
   try {
     // 顺序要紧：先落 L1（真源），再改投影，再原子覆盖 state.json。
     const { state: s, event: stored } = addEvent(norm.event)
-    writeJson(res, 200, { ok: true, rev: s.rev, event: stored, state: s })
+    writeJson(res, 200, envelope({ event: stored, state: s }, s.rev))
   } catch (err) {
     writeJson(res, 500, { ok: false, error: 'write-failed', detail: String(err && err.message) })
   }
@@ -94,7 +116,8 @@ async function onMail(req, res) {
     const unreadOnly = url.searchParams.get('unread') === '1'
     const limit = Math.min(Number(url.searchParams.get('limit')) || 20, 100)
     try {
-      writeJson(res, 200, { ok: true, to: box, letters: inbox(box, { unreadOnly, limit }) })
+      const letters = inbox(box, { unreadOnly, limit })
+      writeJson(res, 200, envelope({ to: box, letters }, readAll(box).length))
     } catch (err) {
       writeJson(res, 500, { ok: false, error: 'read-failed', detail: String(err && err.message) })
     }
@@ -110,7 +133,7 @@ async function onMail(req, res) {
   try {
     if (url.searchParams.get('read') === '1') {
       const r = markRead(v.to, v.ids)
-      return writeJson(res, 200, { ok: true, ...r })
+      return writeJson(res, 200, envelope({ ...r }, readAll(v.to).length))
     }
     const letter = postalSend({
       to: v.to,
@@ -119,7 +142,7 @@ async function onMail(req, res) {
       body: v.body,
       replyTo: v.replyTo
     })
-    writeJson(res, 200, { ok: true, letter })
+    writeJson(res, 200, envelope({ letter }, readAll(letter.to).length))
   } catch (err) {
     const code = err && err.code ? err.code : 'send-failed'
     writeJson(res, 400, { ok: false, error: code })
@@ -138,7 +161,8 @@ function onToday(req, res) {
   if (!isValidDate(date)) return writeJson(res, 400, { ok: false, error: 'bad-date' })
 
   try {
-    writeJson(res, 200, { ok: true, today: buildToday(ROOT, state(), date) })
+    const s = state()
+    writeJson(res, 200, envelope({ today: buildToday(ROOT, s, date) }, s.rev))
   } catch (err) {
     writeJson(res, 500, { ok: false, error: 'today-failed', detail: String(err && err.message) })
   }
@@ -152,8 +176,13 @@ async function onTeam(req, res) {
   if (why) return writeJson(res, 403, { ok: false, error: why })
 
   if (req.method === 'GET') {
+    const lim = parseLimit(new URL(req.url, 'http://127.0.0.1'))
+    if (!lim.ok) return writeJson(res, 400, { ok: false, error: lim.error })
     try {
-      return writeJson(res, 200, { ok: true, ...teamBoard(TEAM_ROOT) })
+      const board = teamBoard(TEAM_ROOT)
+      // limit 只裁剪列表；counts / stale 仍按全量算，免得控制台统计跟着变小。
+      if (lim.limit !== null) board.tickets = board.tickets.slice(0, lim.limit)
+      return writeJson(res, 200, envelope(board, readLedger(TEAM_ROOT).length))
     } catch (err) {
       return writeJson(res, 500, { ok: false, error: 'board-failed', detail: String(err && err.message) })
     }
@@ -165,15 +194,15 @@ async function onTeam(req, res) {
   const v = body.value || {}
 
   try {
-    if (v.action) return writeJson(res, 200, { ok: true, ticket: updateTicket(TEAM_ROOT, v) })
-    return writeJson(res, 200, { ok: true, ticket: createTicket(TEAM_ROOT, v) })
+    const ticket = v.action ? updateTicket(TEAM_ROOT, v) : createTicket(TEAM_ROOT, v)
+    return writeJson(res, 200, envelope({ ticket }, readLedger(TEAM_ROOT).length))
   } catch (err) {
     writeJson(res, 400, { ok: false, error: (err && err.code) || 'ticket-failed' })
   }
 }
 
 // 总线：三个投递通道（sub / repo / wx）共用一条 append-only 日志。
-// GET  ?to=lead&limit=20 → {pending, msgs}；POST {lane,from,to,text,ref} → 追加一条。
+// GET  ?to=lead&limit=20 → {pending, msgs}（缺省不裁剪）；POST {lane,from,to,text,ref} → 追加一条。
 async function onBus(req, res) {
   const why = blocked(req)
   if (why) return writeJson(res, 403, { ok: false, error: why })
@@ -181,13 +210,15 @@ async function onBus(req, res) {
   if (req.method === 'GET') {
     const url = new URL(req.url, 'http://127.0.0.1')
     const to = url.searchParams.get('to') || 'lead'
-    const limit = Number(url.searchParams.get('limit') || 20)
+    const lim = parseLimit(url)
+    if (!lim.ok) return writeJson(res, 400, { ok: false, error: lim.error })
     try {
-      return writeJson(res, 200, {
-        ok: true,
-        pending: busPending(BUS_ROOT, to),
-        msgs: busRecent(BUS_ROOT, { to: url.searchParams.get('all') ? undefined : to, limit }),
+      // limit 缺省不裁剪；传了就取最近 N 条（recent 的语义）。
+      const msgs = busRecent(BUS_ROOT, {
+        to: url.searchParams.get('all') ? undefined : to,
+        limit: lim.limit === null ? 0 : lim.limit,
       })
+      return writeJson(res, 200, envelope({ pending: busPending(BUS_ROOT, to), msgs }, busRead(BUS_ROOT).lines))
     } catch (err) {
       return writeJson(res, 500, { ok: false, error: 'bus-failed', detail: String(err && err.message) })
     }
@@ -197,7 +228,8 @@ async function onBus(req, res) {
   const body = await readJsonBody(req)
   if (!body.ok) return writeJson(res, 400, { ok: false, error: body.code })
   try {
-    return writeJson(res, 200, { ok: true, msg: busPost(body.value || {}, BUS_ROOT) })
+    const msg = busPost(body.value || {}, BUS_ROOT)
+    return writeJson(res, 200, envelope({ msg }, busRead(BUS_ROOT).lines))
   } catch (err) {
     writeJson(res, 400, { ok: false, error: (err && err.message) || 'bus-failed' })
   }

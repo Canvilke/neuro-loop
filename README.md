@@ -34,6 +34,7 @@ docs/       ADR、ROADMAP v3、研究报告
 | 这周的安排与验收 | [`WEEK-01.md`](WEEK-01.md) |
 | 全部任务与进度（唯一真源） | [`TASKS.md`](TASKS.md) |
 | 谁负责哪块、票单怎么流转 | [`docs/TEAM-PROTOCOL.md`](docs/TEAM-PROTOCOL.md) |
+| 一句话怎么变成验收过的票 | [`docs/END-TO-END.md`](docs/END-TO-END.md) |
 | 为什么这样分层、被否过什么 | [`docs/ADR-0001-architecture.md`](docs/ADR-0001-architecture.md) · [`docs/ADR-0002-persistent-team.md`](docs/ADR-0002-persistent-team.md) |
 | 数据模型 v2 的研究与取舍 | [`docs/RESEARCH-PLAN.pdf`](docs/RESEARCH-PLAN.pdf) |
 

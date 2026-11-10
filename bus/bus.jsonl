@@ -1,1 +1,6 @@
 {"id":"597f5d423u4l","at":"2026-11-10T17:09:52.581Z","lane":"repo","from":"lead","to":"lead","text":"总线 v1 落地：bus.mjs + /neuroloop/bus + 12 项门禁全绿","ref":"T-0006"}
+{"id":"1b05639c9dv1","at":"2026-11-10T17:14:11.437Z","lane":"repo","from":"intake","to":"lead","text":"开票 T-0006：控制台头部显示总线未读（ui-dev）","ref":"T-0006"}
+{"id":"2ce58eef9dwv","at":"2026-11-10T17:14:11.503Z","lane":"repo","from":"intake","to":"lead","text":"开票 T-0007：派票 brief 带总线指令（host-dev）","ref":"T-0007"}
+{"id":"58cfdff2lr82","at":"2026-11-10T17:23:48.626Z","lane":"sub","from":"lead","to":"lead","text":"T-0006 交付：控制台头部 SUB/REPO/WX 三枚未读，读 /neuroloop/bus 的 pending","ref":"T-0006"}
+{"id":"b8e4716bmew8","at":"2026-11-10T17:24:19.304Z","ack":["597f5d423u4l","1b05639c9dv1","2ce58eef9dwv","58cfdff2lr82"],"by":"lead"}
+{"id":"5f9c1760rouw","at":"2026-11-10T17:28:25.496Z","lane":"sub","from":"host-agent","to":"lead","text":"T-0001 交付：/neuroloop/* GET 统一 {ok,data,rev} 并保留顶层旧字段；bus/team 支持 limit(1..200，非法 400 bad-limit)；test/host.mjs 新增 11 断言；门禁 13 passed, 0 failed（net 首跑偶发，复跑全绿）","ref":"T-0001"}

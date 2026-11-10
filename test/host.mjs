@@ -128,6 +128,8 @@ const onToday = routes.find((r) => r.path === ROUTE_TODAY).handler
   ok(r.status === 200, 'GET state 200')
   ok(r.json && r.json.ok === true && r.json.state.version === 2, 'state 带 version=2')
   ok(Object.keys(r.json.state.nodes).length === 0, '空库 nodes 为空')
+  ok(r.json.data && r.json.data.state && r.json.data.state.version === 2, '成功外壳：data.state 携带投影')
+  ok(Number.isInteger(r.json.rev) && r.json.rev === r.json.state.rev, '成功外壳：rev = 州事件条数')
 }
 
 // 2. 写一条 recall
@@ -320,6 +322,12 @@ console.log('\nhost ok — ' + pass + ' checks, routes 5, home ' + HOME)
 
   const after = await call(g, makeReq({ url: ROUTE_TEAM }))
   ok(after.json.counts.done === 1 && after.json.counts.total === 2, '团队：看板统计正确')
+  ok(after.json.data && after.json.data.tickets.length === 2 && typeof after.json.rev === 'number', '团队：成功外壳 data/rev')
+  const limited = await call(g, makeReq({ url: ROUTE_TEAM + '?limit=1' }))
+  ok(limited.status === 200 && limited.json.tickets.length === 1, '团队：limit=1 裁剪 tickets')
+  ok(limited.json.counts.total === 2 && limited.json.data.tickets.length === 1, '团队：裁剪只作用于列表，统计仍按全量')
+  const badLimit = await call(g, makeReq({ url: ROUTE_TEAM + '?limit=0' }))
+  ok(badLimit.status === 400 && badLimit.json.error === 'bad-limit', '团队：非法 limit → 400 bad-limit')
   const unlocked = after.json.tickets.find((t) => t.id === b.json.ticket.id)
   ok(unlocked.claimable === true, '团队：依赖完成后自动可领')
 
@@ -343,9 +351,24 @@ console.log('\nhost ok — ' + pass + ' checks, routes 5, home ' + HOME)
   const got = await call(g, makeReq({ url: ROUTE_BUS + '?to=lead&limit=5' }))
   ok(got.json.msgs.length === 1 && got.json.msgs[0].text === 'T-0003 已交付', '总线：按收件人读回')
   ok(got.json.pending.sub === 1, '总线：未读 +1')
+  ok(got.json.data && got.json.data.msgs.length === 1 && typeof got.json.rev === 'number', '总线：成功外壳 data/rev')
 
   const other = await call(g, makeReq({ url: ROUTE_BUS + '?to=nobody' }))
   ok(other.json.msgs.length === 0, '总线：收件人过滤生效')
+
+  await call(g, makeReq({ method: 'POST', url: ROUTE_BUS, body: JSON.stringify({ lane: 'sub', from: 'ui-agent', to: 'lead', text: '第二条' }) }))
+  await call(g, makeReq({ method: 'POST', url: ROUTE_BUS, body: JSON.stringify({ lane: 'note', from: 'lead', to: 'lead', text: '第三条' }) }))
+
+  const all = await call(g, makeReq({ url: ROUTE_BUS + '?to=lead' }))
+  ok(all.status === 200 && all.json.msgs.length === 3, '总线：缺省不裁剪（3 条全给）')
+
+  const cut = await call(g, makeReq({ url: ROUTE_BUS + '?to=lead&limit=2' }))
+  ok(cut.status === 200 && cut.json.msgs.length === 2 && cut.json.data.msgs.length === 2, '总线：limit=2 裁剪 msgs')
+
+  const badLimit = await call(g, makeReq({ url: ROUTE_BUS + '?to=lead&limit=abc' }))
+  ok(badLimit.status === 400 && badLimit.json.error === 'bad-limit', '总线：非法 limit → 400 bad-limit')
+  const overLimit = await call(g, makeReq({ url: ROUTE_BUS + '?to=lead&limit=201' }))
+  ok(overLimit.status === 400 && overLimit.json.error === 'bad-limit', '总线：limit 超上限 → 400 bad-limit')
 
   const badLane = await call(g, makeReq({ method: 'POST', url: ROUTE_BUS, body: JSON.stringify({ lane: 'nope', text: 'x' }) }))
   ok(badLane.status === 400 && badLane.json.error === 'bad-lane', '总线：拒绝未知 lane')

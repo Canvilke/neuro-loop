@@ -105,10 +105,12 @@ export function briefOf(t, roleDef) {
   L.push('2. 写代码 / 文档，只动上面列出的范围；');
   L.push('3. 跑验证：`powershell -File tools/check_all.ps1`（必须全绿）；');
   L.push('4. 交付时在回复里写三行：**改了什么 / 证据（测试输出行）/ 没做什么**；');
-  L.push('5. 由 Lead 复核后 `node tools/ticket.mjs done ' + t.id + ' --by <名字> --note "..."`，你不要自己标完成。');
+  L.push('5. 发一条总线行（回到 Lead 的收件箱，持久留痕）：');
+  L.push('   `node tools/bus.mjs post --lane sub --from <你的名字> --to lead --text "' + t.id + ' 交付：<一句话>" --ref ' + t.id + '`');
+  L.push('6. 由 Lead 复核后 `node tools/ticket.mjs done ' + t.id + ' --by <名字> --note "..."`，你不要自己标完成。');
   L.push('');
   L.push('## 背景');
-  L.push('先读 `AGENTS.md`、`docs/ADR-0002-persistent-team.md`、`NEXT.md` 顶部三行。');
+  L.push('先读 `AGENTS.md`、`docs/END-TO-END.md`、`docs/ADR-0002-persistent-team.md`、`NEXT.md` 顶部三行。');
   L.push('不要重写未涉及的文件；不要为了让测试通过而改断言。');
   return L.join('\n');
 }

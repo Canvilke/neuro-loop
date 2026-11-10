@@ -102,10 +102,11 @@ export function pending(root, to = 'lead') {
 
 export function recent(root, { to, limit = 20 } = {}) {
   const { msgs, acked } = view(root)
-  const rows = msgs
-    .filter((m) => !to || m.to === to)
-    .slice(-Math.max(1, Math.min(200, limit)))
+  const rows = msgs.filter((m) => !to || m.to === to)
+  // limit <= 0 / 非有限值 = 不裁剪：HTTP GET 缺省要拿全量；直接调用仍默认 20。
+  const capped = Number.isFinite(limit) && limit > 0 ? Math.min(200, Math.floor(limit)) : null
+  const kept = capped === null ? rows : rows.slice(-capped)
+  return kept
     .reverse()
     .map((m) => ({ ...m, read: acked.has(m.id) }))
-  return rows
 }

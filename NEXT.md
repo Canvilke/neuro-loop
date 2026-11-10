@@ -1,9 +1,9 @@
 # NEXT
 
-## 现在做什么（2026-11-10 07:22，白天暂停）
-1. **白天不跑**（用户 11-10 07:22）：目标已 `pause`，两个定时任务已 `paused`（07:00 出纸、40min 心跳）。晚上回来再继续。
-2. 恢复时先做 M11 收尾：`powershell tools/check_all.ps1`（应 9 项全绿）→ 更新 TASKS/README 记 ADR-0002 与 M11 → commit + push（当前未提交：`core/ team/ host/ storage/ src/14-team.js docs/ADR-0002* test/*`）。
-3. 之后接 ADR-0002 的执行侧：定时任务按票派发子代理（没有票单不开工）。
+## 现在做什么（2026-11-11 01:20，端到端维护）
+1. **主线**：把"一句话 → 票 → 子代理 → 门禁 → 验收"跑成日常（`docs/END-TO-END.md`）。门禁已 13 项全绿。
+2. **在飞**：`host-agent` 在做 T-0001（路由统一外壳 `{ok,data,rev}`）；我这边刚做完 T-0006（控制台三条未读）与 `tools/intake.mjs`。
+3. **下一步**：T-0001 回来复核 → 标 done；再派 T-0002（批量导入）与 T-0007（brief 带 bus 指令）；GH watcher 等网络（`api.github.com` 仍 301）。
 
 ## 2026-11-10 02:00 数据模型 v2 研究
 - 交付 `docs/RESEARCH-PLAN.pdf`（8 页，HTML→Edge headless 出 PDF）。

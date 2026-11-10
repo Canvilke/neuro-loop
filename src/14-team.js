@@ -61,6 +61,11 @@ var TEAM_CSS = [
   '  color:rgba(200,222,244,0.86);font-size:9.5px;padding:3px 9px;letter-spacing:1.4px;',
   '  font-family:"JetBrains Mono",Consolas,monospace;transition:all .16s}',
   '.nl-team button:hover{border-color:rgba(111,210,255,0.6);color:#a9e6ff}',
+  '.nl-team .bus{display:flex;gap:10px;margin-top:9px}',
+  '.nl-team .bus i{font-style:normal;font-family:"JetBrains Mono",Consolas,monospace;font-size:8.6px;',
+  '  letter-spacing:1.2px;padding:2px 6px;border:1px solid rgba(120,160,210,0.18);color:rgba(160,192,222,0.5)}',
+  '.nl-team .bus i.on{border-color:rgba(120,232,200,0.5);color:#78e8c8}',
+  '.nl-team .bus i.warn{border-color:rgba(255,186,104,0.5);color:#ffc57e}',
   '.nl-team .hint{margin-top:12px;font-size:9.6px;line-height:1.8;color:rgba(150,182,214,0.46)}'
 ].join('\n');
 
@@ -69,6 +74,18 @@ function teamFetch(cb) {
     fetch('/neuroloop/team', { credentials: 'same-origin' })
       .then(function (r) { return r.json(); })
       .then(function (j) { cb(j && j.ok ? j : null); })
+      .catch(function () { cb(null); });
+  } catch (e) {
+    cb(null);
+  }
+}
+
+/* 读总线未读：三条通道各自的待处理数。GET /neuroloop/bus?to=lead 的 pending 就是这三个数。 */
+function busFetch(cb) {
+  try {
+    fetch('/neuroloop/bus?to=lead&limit=1', { credentials: 'same-origin' })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { cb(j && j.ok ? (j.pending || null) : null); })
       .catch(function () { cb(null); });
   } catch (e) {
     cb(null);
@@ -94,12 +111,18 @@ function teamPost(id, action, note, cb) {
 }
 
 function TeamPanel() {
-  var st = React.useState({ data: null, err: false, actionErr: null, busy: null });
+  var st = React.useState({ data: null, bus: null, err: false, actionErr: null, busy: null });
   var s = st[0];
   var set = st[1];
 
+  // 两个来源一起拉：票单是必须的，总线未读是锦上添花（拉不到就不显示），
+  // 所以不以总线失败判定整屏失败。
   function load() {
-    teamFetch(function (j) { set({ data: j, err: !j, actionErr: null, busy: null }); });
+    teamFetch(function (j) {
+      busFetch(function (b) {
+        set({ data: j, bus: b, err: !j, actionErr: null, busy: null });
+      });
+    });
   }
 
   // 面板上的动作。note 用 prompt 取：取消就中止；complete 不接受空 note。
@@ -117,10 +140,10 @@ function TeamPanel() {
     if (note === null || note === undefined) return;
     if (action === 'complete' && !String(note).trim()) return;
 
-    set({ data: s.data, err: s.err, actionErr: null, busy: t.id });
+    set({ data: s.data, bus: s.bus, err: s.err, actionErr: null, busy: t.id });
     teamPost(t.id, action, String(note), function (code) {
       if (!code) { load(); return; }
-      set({ data: s.data, err: s.err, actionErr: code, busy: null });
+      set({ data: s.data, bus: s.bus, err: s.err, actionErr: code, busy: null });
     });
   }
 
@@ -177,6 +200,17 @@ function TeamPanel() {
         h('div', { className: 'acts' }, acts));
     })
     : [h('div', { className: 'empty', key: 'e' }, '台账为空。开工前先开票：POST /neuroloop/team {title, role}。')];
+
+  // 三条通道的未读：有未读就点亮。note 是旁注，不进这里。
+  var busChips = (function () {
+    if (!s.bus) return null;
+    var lanes = [['SUB', 'sub'], ['REPO', 'repo'], ['WX', 'wx']];
+    return h('div', { className: 'bus' }, lanes.map(function (l) {
+      var n = s.bus[l[1]] || 0;
+      return h('i', { key: l[1], className: n > 0 ? (l[1] === 'wx' ? 'on' : 'warn') : '' },
+        l[0] + ' ' + n);
+    }));
+  })();
 
   return h('div', { className: 'nl-team' },
     h('style', null, TEAM_CSS),

@@ -6,3 +6,11 @@
 {"t":"2026-11-10T16:37:22.248Z","ev":"create","id":"T-0005","title":"重叠测试票","role":"content","scope":["tools/"],"deps":[],"accept":[]}
 {"t":"2026-11-10T16:37:56.777Z","ev":"block","id":"T-0005","by":"lead","note":"演示用票，被 T-0004 覆盖，不再施工"}
 {"t":"2026-11-10T17:10:50.630Z","ev":"complete","id":"T-0003","by":"lead","note":"复核通过：只改 src/14-team.js；check_all 12/12；无 setInterval；CLAIM/DONE 与 POST body 均符合票面"}
+{"t":"2026-11-10T17:14:11.429Z","ev":"create","id":"T-0006","title":"控制台头部显示总线未读","role":"ui-dev","scope":["src/14-team.js"],"deps":[],"accept":["TeamPanel 头部显示 sub/repo/wx 三条未读；数据来自 /neuroloop/bus?to=lead；无 setInterval"]}
+{"t":"2026-11-10T17:14:11.494Z","ev":"create","id":"T-0007","title":"派票 brief 带总线指令","role":"host-dev","scope":["tools/ticket.mjs"],"deps":[],"accept":["ticket.mjs brief 输出含 bus post 命令模板与票号；dispatch.test 断言它存在"]}
+{"t":"2026-11-10T17:15:17.567Z","ev":"claim","id":"T-0001","by":"host-agent"}
+{"t":"2026-11-10T17:23:48.488Z","ev":"claim","id":"T-0006","by":"lead"}
+{"t":"2026-11-10T17:23:48.553Z","ev":"complete","id":"T-0006","by":"lead","note":"TeamPanel 头部三枚 chip 读 /neuroloop/bus?to=lead 的 pending；无 setInterval；13 项门禁全绿"}
+{"t":"2026-11-10T17:30:45.323Z","ev":"claim","id":"T-0007","by":"lead"}
+{"t":"2026-11-10T17:30:45.369Z","ev":"complete","id":"T-0007","by":"lead","note":"brief 增加第 5 步 bus 命令（带票号 ref）；dispatch 测试 +2 断言；gate 13/13"}
+{"t":"2026-11-10T17:30:45.428Z","ev":"complete","id":"T-0001","by":"lead","note":"复核：envelope 保留旧字段并加 data/rev；limit 1..200，非法 bad-limit；旧错误码未改；新增 11 断言；gate 13/13（首次 net.cjs flake，复跑全绿）"}
