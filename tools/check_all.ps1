@@ -23,6 +23,35 @@ $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent $PSScriptRoot
 Set-Location $repo
 
+# --- gate lock -------------------------------------------------------------
+# Two agents running this gate at the same time will rebuild client.js twice and
+# read each other's half-written output. Observed as a flaky test/net.cjs.
+# Serialize with a directory lock; steal it only when it is clearly abandoned.
+$lockDir = Join-Path $PSScriptRoot '.gate.lock'
+$gotLock = $false
+for ($i = 0; $i -lt 150; $i++) {
+    try {
+        New-Item -ItemType Directory -Path $lockDir -ErrorAction Stop | Out-Null
+        $gotLock = $true
+        break
+    } catch {
+        if (Test-Path $lockDir) {
+            $age = ((Get-Date) - (Get-Item $lockDir).LastWriteTime).TotalSeconds
+            if ($age -gt 900) { Remove-Item $lockDir -Recurse -Force -ErrorAction SilentlyContinue; continue }
+            Start-Sleep -Seconds 2
+        } else {
+            Start-Sleep -Milliseconds 200
+        }
+    }
+}
+if (-not $gotLock) {
+    Write-Host 'FAIL  another gate is running (lock .gate.lock) -- try again later'
+    exit 2
+}
+function Release-GateLock {
+    Remove-Item $lockDir -Recurse -Force -ErrorAction SilentlyContinue
+}
+
 $results = New-Object System.Collections.ArrayList
 
 function Invoke-Step {
@@ -81,6 +110,7 @@ foreach ($r in $results) {
 Write-Host '-----------------------------------------'
 Write-Host ('{0} passed, {1} failed' -f ($results.Count - $failed.Count), $failed.Count)
 
+Release-GateLock
 if ($failed.Count -gt 0) {
     exit 1
 }
