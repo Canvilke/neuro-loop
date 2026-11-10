@@ -314,3 +314,6 @@
 - M12-16 子代理派票时把 bus id 写进 brief（派单即可回信）—— TODO
 - M12-17 入口工具 `tools/intake.mjs`：外部请求开成票、标题去重、验收必填、写 bus repo 行；`test/intake.test.mjs` 12 checks，门禁 12→13 项 —— DONE
 - M12-18 `docs/END-TO-END.md`：一句话→票→派工→门禁→验收的五步与失忆恢复三步 —— DONE
+- M12-19 `POST /neuroloop/events` 批量导入（≤200、逐条校验、部分成功，T-0002）—— DONE
+- M12-20 门禁目录锁：两个 agent 同时 `check_all` 会互相重建 client.js（net.cjs 偶发失败的根因）—— DONE
+- M12-21 v1 行 `ok` 的 0/'false' 兼容（T-0008，`storage/legacy.js` 的 `isFalse`）—— DONE

@@ -10,7 +10,7 @@ process.env.NEUROLOOP_HOME = HOME
 process.env.NEUROLOOP_TEAM_ROOT = HOME
 process.env.NEUROLOOP_BUS_ROOT = HOME  // 台账也写到临时目录，别污染仓库
 
-const { apply, inject, resetCache, ROUTE_STATE, ROUTE_EVENT, ROUTE_MAIL, ROUTE_TODAY, ROUTE_TEAM, ROUTE_BUS } = await import('../index.js')
+const { apply, inject, resetCache, ROUTE_STATE, ROUTE_EVENT, ROUTE_EVENTS, ROUTE_MAIL, ROUTE_TODAY, ROUTE_TEAM, ROUTE_BUS } = await import('../index.js')
 
 let pass = 0
 function ok(cond, msg) {
@@ -111,14 +111,16 @@ apply(ctx)
  * 插件永远 pending，路由整块不存在（14:35 实际踩过）。 */
 ok(Array.isArray(inject) && inject.includes('webServer'), 'inject 以数组声明依赖 webServer')
 ok(!(inject && !Array.isArray(inject) && inject.optional), 'inject 不得使用 { optional } 写法（会永久 pending）')
-ok(routes.length === 6, '注册了 6 条路由（实际 ' + routes.length + '）')
+ok(routes.length === 7, '注册了 7 条路由（实际 ' + routes.length + '）')
 ok(routes.some((r) => r.path === ROUTE_STATE && r.kind === 'exact'), 'GET 路由 ' + ROUTE_STATE)
 ok(routes.some((r) => r.path === ROUTE_EVENT && r.kind === 'exact'), 'POST 路由 ' + ROUTE_EVENT)
+ok(routes.some((r) => r.path === ROUTE_EVENTS && r.kind === 'exact'), 'POST 路由 ' + ROUTE_EVENTS)
 ok(routes.some((r) => r.path === ROUTE_MAIL && r.kind === 'exact'), 'POST 路由 ' + ROUTE_MAIL)
 ok(routes.some((r) => r.path === ROUTE_TODAY && r.kind === 'exact'), 'GET 路由 ' + ROUTE_TODAY)
 
 const getState = routes.find((r) => r.path === ROUTE_STATE).handler
 const postEvent = routes.find((r) => r.path === ROUTE_EVENT).handler
+const postEvents = routes.find((r) => r.path === ROUTE_EVENTS).handler
 const onMail = routes.find((r) => r.path === ROUTE_MAIL).handler
 const onToday = routes.find((r) => r.path === ROUTE_TODAY).handler
 
@@ -378,6 +380,123 @@ console.log('\nhost ok — ' + pass + ' checks, routes 5, home ' + HOME)
 
   const wrong = await call(g, makeReq({ method: 'PUT', url: ROUTE_BUS }))
   ok(wrong.status === 405, '总线：只接受 GET/POST')
+}
+
+/* ---------- 批量导入（/neuroloop/events） ---------- */
+{
+  // 200 条全部合法：accepted=200，ids 与 rev 都对得上。
+  const batch = []
+  for (let i = 0; i < 200; i += 1) batch.push({ kind: 'recall', node: 'math.batch' + i, ok: 1 })
+  const before = await call(getState, makeReq())
+  const r = await call(postEvents, makeReq({
+    method: 'POST', url: ROUTE_EVENTS, body: JSON.stringify({ events: batch }),
+  }))
+  ok(r.status === 200 && r.json.ok === true, '批量：200 条 → 200')
+  ok(r.json.accepted === 200 && r.json.rejected.length === 0, '批量：200 条全部接受（rejected 为空）')
+  ok(Array.isArray(r.json.ids) && r.json.ids.length === 200, '批量：返回 200 个 eventId')
+  ok(r.json.ids.every((id) => /^[0-9a-f]{12}$/.test(id)), '批量：id 是 core 派生的 12 位短 id')
+  ok(r.json.rev === before.json.rev + 200, '批量：rev = 原 rev + 200（' + r.json.rev + '）')
+  ok((await call(getState, makeReq())).json.state.nodes['math.batch199'].hits === 1, '批量：第 200 条也进了投影')
+
+  // 201 条：整批 400，一条都不写。
+  const over = batch.concat([{ kind: 'recall', node: 'math.overflow', ok: 1 }])
+  const beforeOver = await call(getState, makeReq())
+  const big = await call(postEvents, makeReq({
+    method: 'POST', url: ROUTE_EVENTS, body: JSON.stringify({ events: over }),
+  }))
+  ok(big.status === 400 && big.json.error === 'batch-too-large', '批量：201 条 → 400 batch-too-large')
+  const afterOver = await call(getState, makeReq())
+  ok(afterOver.json.rev === beforeOver.json.rev && !afterOver.json.state.nodes['math.overflow'],
+    '批量：超上限一条都没写入')
+
+  // 3 条里 1 条非法（下标 1）：部分成功，rejected 带原始下标与 core 的错误码。
+  const mixed = [
+    { kind: 'recall', node: 'math.mix0', ok: 1 },
+    { kind: 'recall', node: 'Bad Node', ok: 1 },
+    { kind: 'daily', date: '2026-11-11', subject: 'math', minutes: 30 },
+  ]
+  const m = await call(postEvents, makeReq({
+    method: 'POST', url: ROUTE_EVENTS, body: JSON.stringify({ events: mixed }),
+  }))
+  ok(m.status === 200 && m.json.accepted === 2, '批量：3 条里 1 条非法 → accepted:2')
+  ok(m.json.rejected.length === 1 && m.json.rejected[0].index === 1, '批量：rejected[0].index === 1')
+  ok(m.json.rejected[0].error === 'bad-node', '批量：rejected 用 core 的错误码 bad-node')
+  ok(m.json.ids.length === 2, '批量：ids 只含被接受的两条')
+  const afterMixed = await call(getState, makeReq())
+  ok(afterMixed.json.state.nodes['math.mix0'].hits === 1
+    && afterMixed.json.state.daily['2026-11-11'].math.minutes === 30, '批量：合法两条都写入')
+
+  // 裸数组也收。
+  const bare = await call(postEvents, makeReq({
+    method: 'POST', url: ROUTE_EVENTS, body: JSON.stringify([{ kind: 'recall', node: 'math.bare', ok: 0 }]),
+  }))
+  ok(bare.status === 200 && bare.json.accepted === 1 && bare.json.ids.length === 1, '批量：裸数组也收')
+  // 只断言"进了投影"：v1 的 ok:0 → hit/miss 由 storage/legacy.js 决定，不在这条测试的语义里。
+  ok((await call(getState, makeReq())).json.state.nodes['math.bare'].attempts === 1, '批量：裸数组那条进了投影')
+
+  // 全部被拒：仍是 200，accepted:0，三条各回自己的错误码。
+  const badAll = [
+    { kind: 'recall', node: 'Bad Node', ok: 1 },
+    { kind: 'daily', date: '11-10', subject: 'politics' },
+    { kind: 'drop-database' },
+  ]
+  const all = await call(postEvents, makeReq({
+    method: 'POST', url: ROUTE_EVENTS, body: JSON.stringify({ events: badAll }),
+  }))
+  ok(all.status === 200 && all.json.accepted === 0 && all.json.ids.length === 0, '批量：全部非法仍 200（accepted:0）')
+  ok(all.json.rejected.map((x) => x.error).join(',') === 'bad-node,bad-date,bad-kind',
+    '批量：三条各回自己的错误码（' + all.json.rejected.map((x) => x.error).join(',') + '）')
+  ok(all.json.rejected.map((x) => x.index).join(',') === '0,1,2', '批量：rejected 下标逐条对应')
+  ok(typeof all.json.rev === 'number', '批量：全拒时仍回报 rev')
+
+  // 非对象条目：逐条拒，不连累整批，也不会 500。
+  const nonObj = await call(postEvents, makeReq({
+    method: 'POST', url: ROUTE_EVENTS, body: JSON.stringify([1, 'x', null]),
+  }))
+  ok(nonObj.status === 200 && nonObj.json.accepted === 0 && nonObj.json.rejected.length === 3,
+    '批量：非对象条目逐条进 rejected')
+
+  // 空批：200 且什么都不写。
+  const emptyBatch = await call(postEvents, makeReq({
+    method: 'POST', url: ROUTE_EVENTS, body: JSON.stringify({ events: [] }),
+  }))
+  ok(emptyBatch.status === 200 && emptyBatch.json.accepted === 0 && emptyBatch.json.rejected.length === 0,
+    '批量：空数组 → 200 accepted:0')
+
+  // 只有"请求体形状不对"才 400。
+  const badJson = await call(postEvents, makeReq({ method: 'POST', url: ROUTE_EVENTS, body: '{oops' }))
+  ok(badJson.status === 400 && badJson.json.error === 'bad-json', '批量：坏 JSON → 400 bad-json')
+  const noList = await call(postEvents, makeReq({
+    method: 'POST', url: ROUTE_EVENTS, body: JSON.stringify({ kind: 'recall', node: 'math.x', ok: 1 }),
+  }))
+  ok(noList.status === 400 && noList.json.error === 'bad-shape', '批量：既非数组也没有 events → 400 bad-shape')
+  const notArray = await call(postEvents, makeReq({
+    method: 'POST', url: ROUTE_EVENTS, body: JSON.stringify({ events: 'nope' }),
+  }))
+  ok(notArray.status === 400 && notArray.json.error === 'bad-shape', '批量：events 不是数组 → 400 bad-shape')
+  const scalar = await call(postEvents, makeReq({ method: 'POST', url: ROUTE_EVENTS, body: '42' }))
+  ok(scalar.status === 400 && scalar.json.error === 'bad-shape', '批量：裸标量 → 400 bad-shape')
+
+  // 守卫与单条路由一致。
+  const method = await call(postEvents, makeReq({ method: 'GET', url: ROUTE_EVENTS }))
+  ok(method.status === 405, '批量：只接受 POST')
+  const cross = await call(postEvents, makeReq({
+    method: 'POST', url: ROUTE_EVENTS,
+    headers: { origin: 'https://evil.example' },
+    body: JSON.stringify([{ kind: 'recall', node: 'math.x', ok: 1 }]),
+  }))
+  ok(cross.status === 403 && cross.json.error === 'origin-mismatch', '批量：跨源 → 403')
+  const remote = await call(postEvents, makeReq({
+    method: 'POST', url: ROUTE_EVENTS, remote: '10.0.0.9', body: JSON.stringify([]),
+  }))
+  ok(remote.status === 403 && remote.json.error === 'not-loopback', '批量：非本机 → 403')
+
+  // 单条路由仍只收对象：批量参数没有泄漏到旧路径。
+  const singleArray = await call(postEvent, makeReq({
+    method: 'POST', url: ROUTE_EVENT,
+    body: JSON.stringify([{ kind: 'recall', node: 'math.array', ok: 1 }]),
+  }))
+  ok(singleArray.status === 400 && singleArray.json.error === 'bad-shape', '单条路由仍拒裸数组（行为不变）')
 }
 
 process.exit(process.exitCode || 0)

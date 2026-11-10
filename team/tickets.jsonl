@@ -14,3 +14,8 @@
 {"t":"2026-11-10T17:30:45.323Z","ev":"claim","id":"T-0007","by":"lead"}
 {"t":"2026-11-10T17:30:45.369Z","ev":"complete","id":"T-0007","by":"lead","note":"brief 增加第 5 步 bus 命令（带票号 ref）；dispatch 测试 +2 断言；gate 13/13"}
 {"t":"2026-11-10T17:30:45.428Z","ev":"complete","id":"T-0001","by":"lead","note":"复核：envelope 保留旧字段并加 data/rev；limit 1..200，非法 bad-limit；旧错误码未改；新增 11 断言；gate 13/13（首次 net.cjs flake，复跑全绿）"}
+{"t":"2026-11-10T17:32:59.482Z","ev":"claim","id":"T-0002","by":"core-agent"}
+{"t":"2026-11-10T17:48:46.798Z","ev":"create","id":"T-0008","title":"v1 行的 ok 字段兼容 0/1 与字符串","role":"core-dev","scope":["storage/legacy.js"],"deps":[],"accept":["storage/legacy.js 把 ok:0/'false' 也当 miss；legacy.test 增 3 断言；gate 13/13"]}
+{"t":"2026-11-10T17:48:46.865Z","ev":"claim","id":"T-0008","by":"lead"}
+{"t":"2026-11-10T17:51:08.497Z","ev":"complete","id":"T-0002","by":"lead","note":"复核：onEvents 支持 {events:[]} 与裸数组；>200 先于写盘挡回 batch-too-large；逐条 normalize+addEvent；新增 30 断言；gate 13/13"}
+{"t":"2026-11-10T17:51:08.541Z","ev":"complete","id":"T-0008","by":"lead","note":"isFalse 兼容 false/0/'false'/'0'；legacy.test 增 1 条（8 个取值）；gate 13/13"}

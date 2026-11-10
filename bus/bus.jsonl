@@ -4,3 +4,5 @@
 {"id":"58cfdff2lr82","at":"2026-11-10T17:23:48.626Z","lane":"sub","from":"lead","to":"lead","text":"T-0006 交付：控制台头部 SUB/REPO/WX 三枚未读，读 /neuroloop/bus 的 pending","ref":"T-0006"}
 {"id":"b8e4716bmew8","at":"2026-11-10T17:24:19.304Z","ack":["597f5d423u4l","1b05639c9dv1","2ce58eef9dwv","58cfdff2lr82"],"by":"lead"}
 {"id":"5f9c1760rouw","at":"2026-11-10T17:28:25.496Z","lane":"sub","from":"host-agent","to":"lead","text":"T-0001 交付：/neuroloop/* GET 统一 {ok,data,rev} 并保留顶层旧字段；bus/team 支持 limit(1..200，非法 400 bad-limit)；test/host.mjs 新增 11 断言；门禁 13 passed, 0 failed（net 首跑偶发，复跑全绿）","ref":"T-0001"}
+{"id":"62ebe34adkjv","at":"2026-11-10T17:45:26.347Z","lane":"sub","from":"core-agent","to":"lead","text":"T-0002 交付：POST /neuroloop/events 批量导入（≤200、逐条校验、部分成功，写入仍走 addEvent）；test/host.mjs 新增 30 条断言；门禁 13 passed, 0 failed","ref":"T-0002"}
+{"id":"761b751bhv87","at":"2026-11-10T17:48:46.807Z","lane":"repo","from":"intake","to":"lead","text":"开票 T-0008：v1 行的 ok 字段兼容 0/1 与字符串（core-dev）","ref":"T-0008"}

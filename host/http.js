@@ -30,8 +30,12 @@ export function writeJson(res, status, payload, extra) {
   res.end(body)
 }
 
-/** 读 JSON 体。超限、非 JSON、非对象都返回 {ok:false}。 */
-export function readJsonBody(req) {
+/**
+ * 读 JSON 体。超限、非 JSON、非对象都返回 {ok:false}。
+ * opts.allowArray：批量端点也收裸数组；缺省仍只收对象，单条路由的行为不变。
+ */
+export function readJsonBody(req, opts = {}) {
+  const allowArray = opts.allowArray === true
   return new Promise((resolve) => {
     let size = 0
     const chunks = []
@@ -63,7 +67,7 @@ export function readJsonBody(req) {
       } catch {
         return finish({ ok: false, code: 'bad-json' })
       }
-      if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      if (!value || typeof value !== 'object' || (!allowArray && Array.isArray(value))) {
         return finish({ ok: false, code: 'bad-shape' })
       }
       finish({ ok: true, value })

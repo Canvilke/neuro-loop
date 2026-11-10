@@ -5,10 +5,12 @@
 //
 //   GET  /neuroloop/state    → 整个投影（客户端启动时合并）
 //   POST /neuroloop/event    → 追加一条事件（recall | note | flatten | unflatten）
+//   POST /neuroloop/events   → 批量导入（≤200 条，逐条校验，部分成功）
 
 import { addEvent, getState, reset as resetService } from './host/service.js'
 import { isLoopback, isSameOrigin, readJsonBody, writeJson } from './host/http.js'
 import { normalizeEvent } from './host/event.js'
+import { LIMITS } from './core/contract.js'
 import { inbox, markRead, readAll, send as postalSend, isValidName } from './host/mail.js'
 import { buildToday, isValidDate } from './host/today.js'
 import { board as teamBoard, create as createTicket, readLedger, update as updateTicket } from './host/team.js'
@@ -27,6 +29,7 @@ export const inject = ['webServer']
 
 export const ROUTE_STATE = '/neuroloop/state'
 export const ROUTE_EVENT = '/neuroloop/event'
+export const ROUTE_EVENTS = '/neuroloop/events'
 export const ROUTE_MAIL = '/neuroloop/mail'
 export const ROUTE_TODAY = '/neuroloop/today'
 export const ROUTE_TEAM = '/neuroloop/team'
@@ -56,6 +59,8 @@ function envelope(payload, rev) {
 }
 
 const LIMIT_MAX = 200
+// 批量导入的上限与 core 的 LIMITS 同一个数：超了整批拒，一条都不写。
+const BATCH_MAX = LIMITS.batchMax
 
 /**
  * 解析列表端点的 limit：缺省 → 不裁剪（null）；非法 → { ok:false, error:'bad-limit' }。
@@ -100,6 +105,56 @@ async function onEvent(req, res) {
   } catch (err) {
     writeJson(res, 500, { ok: false, error: 'write-failed', detail: String(err && err.message) })
   }
+}
+
+/**
+ * 批量导入：POST /neuroloop/events
+ *
+ * 与单条路由共用同一条链路（host/event.js 校验 → service.addEvent 落盘），
+ * 所以"什么算合法事件"永远只有一个答案，不另写一份 append/投影逻辑。
+ * 逐条校验、部分成功：一条非法只进 rejected，不连累整批；
+ * 只有"请求体形状不对"和"超上限"才是整批 400。
+ */
+async function onEvents(req, res) {
+  if (req.method !== 'POST') return writeJson(res, 405, { ok: false, error: 'method-not-allowed' })
+  const why = blocked(req)
+  if (why) return writeJson(res, 403, { ok: false, error: why })
+
+  const body = await readJsonBody(req, { allowArray: true })
+  if (!body.ok) return writeJson(res, 400, { ok: false, error: body.code })
+
+  // 两种入参都收：{ events: [...] } 与裸数组。
+  const list = Array.isArray(body.value) ? body.value : body.value.events
+  if (!Array.isArray(list)) return writeJson(res, 400, { ok: false, error: 'bad-shape' })
+  // 超上限先挡在磁盘外：一条都不写。
+  if (list.length > BATCH_MAX) return writeJson(res, 400, { ok: false, error: 'batch-too-large' })
+
+  const rejected = []
+  const ids = []
+  let rev = null
+  for (let i = 0; i < list.length; i += 1) {
+    const norm = normalizeEvent(list[i])
+    if (!norm.ok) {
+      rejected.push({ index: i, error: norm.code })
+      continue
+    }
+    try {
+      // 唯一写路径：与单条路由完全一样的 addEvent。
+      const { state: s, event: stored } = addEvent(norm.event)
+      ids.push(stored.id)
+      rev = s.rev
+    } catch (err) {
+      // core 的 DomainError 原样带 code（bad-concept / bad-text ...），不新造含糊字符串。
+      if (err && typeof err.code === 'string') {
+        rejected.push({ index: i, error: err.code })
+        continue
+      }
+      return writeJson(res, 500, { ok: false, error: 'write-failed', detail: String(err && err.message) })
+    }
+  }
+
+  // 全被拒时也要回报 rev（没写过就取当前投影的）。
+  writeJson(res, 200, { ok: true, accepted: ids.length, rejected, ids, rev: rev === null ? state().rev : rev })
 }
 
 // 信箱：跨会话投递。GET 取信、POST 寄信、POST ?read=1 标记已读。
@@ -246,6 +301,7 @@ export function apply(ctx) {
     try {
       disposers.push(ws.register({ kind: 'exact', path: ROUTE_STATE, handler: onState }))
       disposers.push(ws.register({ kind: 'exact', path: ROUTE_EVENT, handler: onEvent }))
+      disposers.push(ws.register({ kind: 'exact', path: ROUTE_EVENTS, handler: onEvents }))
       disposers.push(ws.register({ kind: 'exact', path: ROUTE_MAIL, handler: onMail }))
       disposers.push(ws.register({ kind: 'exact', path: ROUTE_TODAY, handler: onToday }))
       disposers.push(ws.register({ kind: 'exact', path: ROUTE_TEAM, handler: onTeam }))

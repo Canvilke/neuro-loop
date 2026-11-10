@@ -15,6 +15,10 @@
  * @param {any} ev
  * @returns {object|null}
  */
+function isFalse(v) {
+  return v === false || v === 0 || v === 'false' || v === '0'
+}
+
 export function fromLegacy(ev) {
   if (!ev || typeof ev !== 'object' || typeof ev.k !== 'string') return null;
   const at = typeof ev.t === 'string' ? ev.t : null;
@@ -26,7 +30,9 @@ export function fromLegacy(ev) {
         kind: 'attempt',
         at,
         concept: ev.n ?? ev.node,
-        recall: ev.ok === false ? 'miss' : 'hit',
+        // v1 磁盘上有三种写法：布尔 false、数字 0、字符串 'false'。
+        // 只认 `=== false` 会把 0 当成"会"，等于把错题记成做对。
+        recall: isFalse(ev.ok) ? 'miss' : 'hit',
         solve: null,
         durationMs: 0,
       };

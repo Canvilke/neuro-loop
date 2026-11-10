@@ -82,6 +82,17 @@ test('adapter：recall 的 ok 缺省视为命中（v1 的写法）', () => {
   assert.equal(mapped.recall, 'hit');
 });
 
+
+test('adapter：ok 写成 0 / "false" / "0" 都算 miss（T-0008）', () => {
+  const base = { k: 'recall', t: '2026-11-01T00:00:00Z', n: 'math-trig' };
+  for (const v of [false, 0, 'false', '0']) {
+    assert.equal(fromLegacy({ ...base, ok: v }).recall, 'miss', 'ok=' + String(v));
+  }
+  for (const v of [true, 1, 'true', undefined]) {
+    assert.equal(fromLegacy({ ...base, ok: v }).recall, 'hit', 'ok=' + String(v));
+  }
+});
+
 test.after(() => {
   fs.rmSync(tmp, { recursive: true, force: true });
 });
