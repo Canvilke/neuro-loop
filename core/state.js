@@ -40,6 +40,24 @@ export function emptyState() {
 }
 
 /**
+ * 一次 attempt 对计数桶的增量（唯一的计算入口）。
+ * storage 层用同一份增量去写 SQL，避免"JS 一套、SQL 一套"两套逻辑漂移。
+ * @param {{recall:'hit'|'miss'|'recon', solve:'ok'|'fail'|null}} ev
+ * @returns {{hits:number, misses:number, recon:number, solveOk:number, solveFail:number, fp:number, ok:boolean}}
+ */
+export function attemptDelta(ev) {
+  return {
+    hits: ev.recall === 'hit' ? 1 : 0,
+    misses: ev.recall === 'miss' ? 1 : 0,
+    recon: ev.recall === 'recon' ? 1 : 0,
+    solveOk: ev.solve === 'ok' ? 1 : 0,
+    solveFail: ev.solve === 'fail' ? 1 : 0,
+    fp: ev.recall === 'hit' && ev.solve === 'fail' ? 1 : 0,
+    ok: isOk(ev),
+  };
+}
+
+/**
  * 取（或建）某考点的计数桶。
  * @param {object} state
  * @param {string} id
@@ -69,16 +87,16 @@ export function applyEvent(state, ev) {
   switch (ev.kind) {
     case 'attempt': {
       const c = bucket(state, ev.concept);
+      const d = attemptDelta(ev);
       c.attempts += 1;
-      if (ev.recall === 'hit') c.hits += 1;
-      else if (ev.recall === 'miss') c.misses += 1;
-      else c.recon += 1;
+      c.hits += d.hits;
+      c.misses += d.misses;
+      c.recon += d.recon;
+      c.solveOk += d.solveOk;
+      c.solveFail += d.solveFail;
+      c.fp += d.fp;
 
-      if (ev.solve === 'ok') c.solveOk += 1;
-      else if (ev.solve === 'fail') c.solveFail += 1;
-      if (ev.recall === 'hit' && ev.solve === 'fail') c.fp += 1;
-
-      const ok = isOk(ev);
+      const ok = d.ok;
       c.streak = ok ? c.streak + 1 : 0;
       c.lastAt = ev.at;
       c.dueAt = dueAt(ev.at, intervalDays(c.streak, ok));

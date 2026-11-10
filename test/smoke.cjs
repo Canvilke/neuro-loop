@@ -138,7 +138,7 @@ const ctx = {
 };
 
 mod.apply(ctx);
-if (registrations.length !== 7) throw new Error('expected 7 registrations, got ' + registrations.length);
+if (registrations.length !== 9) throw new Error('expected 9 registrations, got ' + registrations.length);
 if (!registrations.filter((r) => r.reg.key === 'neuro-loop-code').length) throw new Error('code panel not registered');
 if (!registrations.filter((r) => r.reg.key === 'neuro-loop-today').length) throw new Error('today panel not registered');
 if (!registrations.filter((r) => r.reg.id === 'neuro-loop-code').length) throw new Error('code sidebar entry not registered');

@@ -45,7 +45,7 @@ export const RE_METHOD = /^m\.[a-z0-9][a-z0-9._-]{0,63}$/;
 /** 题 id：`p.2026-11-10.001` */
 export const RE_PROBLEM = /^p\.[a-z0-9][a-z0-9._-]{1,63}$/;
 /** 碎片键：`sh:politics:1a2b3c` */
-export const RE_SHARD = /^sh:[a-z]{1,12}:[a-z0-9]{1,32}$/;
+export const RE_SHARD = /^(?:sh|shard):[a-z0-9._:-]{1,80}$/;
 /** 日期：YYYY-MM-DD */
 export const RE_DATE = /^\d{4}-\d{2}-\d{2}$/;
 

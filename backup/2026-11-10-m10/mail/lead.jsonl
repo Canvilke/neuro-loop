@@ -1,0 +1,2 @@
+{"id": "71cff1acf77e", "to": "lead", "from": "moya", "subject": "桥接自检", "body": "这是一封自检信，用于验证跨会话投递。", "replyTo": null, "at": "2026-11-09T03:26:03"}
+{"id":"6d226e454505","to":"lead","from":"wechat","subject":"微信转交测试","body":"如果这条出现在主会话，说明信箱通了。","replyTo":null,"at":"2026-11-08T19:26:38.535Z"}

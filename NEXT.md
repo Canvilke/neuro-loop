@@ -1,9 +1,9 @@
+# NEXT
 
-## 2026-11-10 02:25 M10 完成
-- 新增 `core/`（4 个文件）+ `storage/legacy.js`，28 条测试 + 真实事件对账，`check_all.ps1` 9/9 通过。
-- 下一步 M11：`storage/projection.js`（node:sqlite）与 v2 事件切换，host 一并改，保持 48 checks。
-- 本周主线不变：软件可用；打印仍等硬件。
-
+## 现在做什么（2026-11-10 07:22，白天暂停）
+1. **白天不跑**（用户 11-10 07:22）：目标已 `pause`，两个定时任务已 `paused`（07:00 出纸、40min 心跳）。晚上回来再继续。
+2. 恢复时先做 M11 收尾：`powershell tools/check_all.ps1`（应 9 项全绿）→ 更新 TASKS/README 记 ADR-0002 与 M11 → commit + push（当前未提交：`core/ team/ host/ storage/ src/14-team.js docs/ADR-0002* test/*`）。
+3. 之后接 ADR-0002 的执行侧：定时任务按票派发子代理（没有票单不开工）。
 
 ## 2026-11-10 02:00 数据模型 v2 研究
 - 交付 `docs/RESEARCH-PLAN.pdf`（8 页，HTML→Edge headless 出 PDF）。

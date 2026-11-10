@@ -7,8 +7,10 @@ import path from 'node:path'
 
 const HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'nl-host-'))
 process.env.NEUROLOOP_HOME = HOME
+process.env.NEUROLOOP_TEAM_ROOT = HOME
+process.env.NEUROLOOP_BUS_ROOT = HOME  // 台账也写到临时目录，别污染仓库
 
-const { apply, inject, resetCache, ROUTE_STATE, ROUTE_EVENT, ROUTE_MAIL, ROUTE_TODAY } = await import('../index.js')
+const { apply, inject, resetCache, ROUTE_STATE, ROUTE_EVENT, ROUTE_MAIL, ROUTE_TODAY, ROUTE_TEAM, ROUTE_BUS } = await import('../index.js')
 
 let pass = 0
 function ok(cond, msg) {
@@ -109,7 +111,7 @@ apply(ctx)
  * 插件永远 pending，路由整块不存在（14:35 实际踩过）。 */
 ok(Array.isArray(inject) && inject.includes('webServer'), 'inject 以数组声明依赖 webServer')
 ok(!(inject && !Array.isArray(inject) && inject.optional), 'inject 不得使用 { optional } 写法（会永久 pending）')
-ok(routes.length === 4, '注册了 4 条路由（实际 ' + routes.length + '）')
+ok(routes.length === 6, '注册了 6 条路由（实际 ' + routes.length + '）')
 ok(routes.some((r) => r.path === ROUTE_STATE && r.kind === 'exact'), 'GET 路由 ' + ROUTE_STATE)
 ok(routes.some((r) => r.path === ROUTE_EVENT && r.kind === 'exact'), 'POST 路由 ' + ROUTE_EVENT)
 ok(routes.some((r) => r.path === ROUTE_MAIL && r.kind === 'exact'), 'POST 路由 ' + ROUTE_MAIL)
@@ -124,7 +126,7 @@ const onToday = routes.find((r) => r.path === ROUTE_TODAY).handler
 {
   const r = await call(getState, makeReq())
   ok(r.status === 200, 'GET state 200')
-  ok(r.json && r.json.ok === true && r.json.state.version === 1, 'state 带 version=1')
+  ok(r.json && r.json.ok === true && r.json.state.version === 2, 'state 带 version=2')
   ok(Object.keys(r.json.state.nodes).length === 0, '空库 nodes 为空')
 }
 
@@ -150,7 +152,7 @@ const onToday = routes.find((r) => r.path === ROUTE_TODAY).handler
   const ev = fs.readdirSync(HOME).filter((f) => f.startsWith('events-'))
   ok(ev.length === 1, 'L1 按月一个文件（' + ev.join(',') + '）')
   const lines = fs.readFileSync(path.join(HOME, ev[0]), 'utf8').trim().split('\n')
-  ok(lines.length === 1 && JSON.parse(lines[0]).k === 'recall', 'L1 一行一个事件')
+  ok(lines.length === 1 && JSON.parse(lines[0]).v === 2 && JSON.parse(lines[0]).kind === 'attempt', 'L1 一行一个 v2 事件')
 }
 
 // 4. 错的要拒
@@ -261,7 +263,7 @@ const onToday = routes.find((r) => r.path === ROUTE_TODAY).handler
   ok(cross.status === 403, '信箱拒绝跨源写入')
 }
 
-console.log('\nhost ok — ' + pass + ' checks, routes 4, home ' + HOME)
+console.log('\nhost ok — ' + pass + ' checks, routes 5, home ' + HOME)
 /* ---------- 今天（/neuroloop/today） ---------- */
 {
   const day = await call(onToday, makeReq({ url: ROUTE_TODAY + '?date=2026-11-10' }))
@@ -280,6 +282,79 @@ console.log('\nhost ok — ' + pass + ' checks, routes 4, home ' + HOME)
 
   const wrongMethod = await call(onToday, makeReq({ method: 'POST', url: ROUTE_TODAY }))
   ok(wrongMethod.status === 405, '今天：只接受 GET')
+}
+
+/* ---------- 维护台账（/neuroloop/team） ---------- */
+{
+  const g = routes.find((r) => r.path === ROUTE_TEAM).handler
+  const empty = await call(g, makeReq({ url: ROUTE_TEAM }))
+  ok(empty.status === 200 && empty.json.ok && empty.json.counts.total === 0, '团队：空台账可读')
+  ok(Array.isArray(empty.json.roles) && empty.json.roles.length >= 5, '团队：带角色契约')
+
+  const a = await call(g, makeReq({ method: 'POST', url: ROUTE_TEAM, body: JSON.stringify({
+    title: 'storage：SQLite 投影', role: 'core-dev', scope: ['storage/'],
+    accept: ['node --test test/storage.test.mjs 全绿'],
+  }) }))
+  ok(a.status === 200 && /^T-\d{4}$/.test(a.json.ticket.id), '团队：开票成功 ' + (a.json.ticket && a.json.ticket.id))
+  const id = a.json.ticket.id
+  ok(a.json.ticket.status === 'ready' && a.json.ticket.claimable === true, '团队：新票可领')
+
+  const b = await call(g, makeReq({ method: 'POST', url: ROUTE_TEAM, body: JSON.stringify({
+    title: '依赖票', role: 'qa', deps: [id],
+  }) }))
+  ok(b.json.ticket.claimable === false && b.json.ticket.depsOpen[0] === id, '团队：依赖未完成不可领')
+  const early = await call(g, makeReq({ method: 'POST', url: ROUTE_TEAM, body: JSON.stringify({ id: b.json.ticket.id, action: 'claim', by: 'qa' }) }))
+  ok(early.status === 400 && early.json.error === 'deps-open', '团队：抢跑被拒 deps-open')
+
+  const c = await call(g, makeReq({ method: 'POST', url: ROUTE_TEAM, body: JSON.stringify({ id, action: 'claim', by: 'lead' }) }))
+  ok(c.status === 200 && c.json.ticket.status === 'claimed' && c.json.ticket.by === 'lead', '团队：领票成功')
+
+  const twice = await call(g, makeReq({ method: 'POST', url: ROUTE_TEAM, body: JSON.stringify({ id, action: 'claim', by: 'qa' }) }))
+  ok(twice.status === 400 && twice.json.error === 'already-claimed', '团队：同一票不能重复领')
+
+  const blk = await call(g, makeReq({ method: 'POST', url: ROUTE_TEAM, body: JSON.stringify({ id, action: 'block' }) }))
+  ok(blk.status === 400 && blk.json.error === 'note-required', '团队：阻塞必须写原因')
+
+  const done = await call(g, makeReq({ method: 'POST', url: ROUTE_TEAM, body: JSON.stringify({ id, action: 'complete', note: '8/8 通过' }) }))
+  ok(done.status === 200 && done.json.ticket.status === 'done', '团队：完票')
+
+  const after = await call(g, makeReq({ url: ROUTE_TEAM }))
+  ok(after.json.counts.done === 1 && after.json.counts.total === 2, '团队：看板统计正确')
+  const unlocked = after.json.tickets.find((t) => t.id === b.json.ticket.id)
+  ok(unlocked.claimable === true, '团队：依赖完成后自动可领')
+
+  const badRole = await call(g, makeReq({ method: 'POST', url: ROUTE_TEAM, body: JSON.stringify({ title: 'x', role: 'nobody' }) }))
+  ok(badRole.status === 400 && badRole.json.error === 'bad-role', '团队：拒绝未知角色')
+}
+
+/* ---------- 总线（/neuroloop/bus） ---------- */
+{
+  const g = routes.find((r) => r.path === ROUTE_BUS).handler
+  const empty = await call(g, makeReq({ url: ROUTE_BUS + '?to=lead' }))
+  ok(empty.status === 200 && empty.json.ok && empty.json.msgs.length === 0, '总线：空总线可读')
+  ok(empty.json.pending && empty.json.pending.sub === 0, '总线：带未读计数')
+
+  const p = await call(g, makeReq({ method: 'POST', url: ROUTE_BUS, body: JSON.stringify({
+    lane: 'sub', from: 'ui-agent', to: 'lead', text: 'T-0003 已交付', ref: 'T-0003',
+  }) }))
+  ok(p.status === 200 && /^[0-9a-z]{12}$/.test(p.json.msg.id), '总线：投递成功 ' + (p.json.msg && p.json.msg.id))
+  ok(p.json.msg.lane === 'sub' && p.json.msg.ref === 'T-0003', '总线：lane 与 ref 保留')
+
+  const got = await call(g, makeReq({ url: ROUTE_BUS + '?to=lead&limit=5' }))
+  ok(got.json.msgs.length === 1 && got.json.msgs[0].text === 'T-0003 已交付', '总线：按收件人读回')
+  ok(got.json.pending.sub === 1, '总线：未读 +1')
+
+  const other = await call(g, makeReq({ url: ROUTE_BUS + '?to=nobody' }))
+  ok(other.json.msgs.length === 0, '总线：收件人过滤生效')
+
+  const badLane = await call(g, makeReq({ method: 'POST', url: ROUTE_BUS, body: JSON.stringify({ lane: 'nope', text: 'x' }) }))
+  ok(badLane.status === 400 && badLane.json.error === 'bad-lane', '总线：拒绝未知 lane')
+
+  const emptyText = await call(g, makeReq({ method: 'POST', url: ROUTE_BUS, body: JSON.stringify({ lane: 'note', text: '   ' }) }))
+  ok(emptyText.status === 400 && emptyText.json.error === 'empty-text', '总线：拒绝空正文')
+
+  const wrong = await call(g, makeReq({ method: 'PUT', url: ROUTE_BUS }))
+  ok(wrong.status === 405, '总线：只接受 GET/POST')
 }
 
 process.exit(process.exitCode || 0)

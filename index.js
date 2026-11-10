@@ -6,16 +6,19 @@
 //   GET  /neuroloop/state    → 整个投影（客户端启动时合并）
 //   POST /neuroloop/event    → 追加一条事件（recall | note | flatten | unflatten）
 
-import { appendEvent, derive, fold, loadState, saveState } from './host/store.js'
+import { addEvent, getState, reset as resetService } from './host/service.js'
 import { isLoopback, isSameOrigin, readJsonBody, writeJson } from './host/http.js'
 import { normalizeEvent } from './host/event.js'
 import { inbox, markRead, send as postalSend, isValidName } from './host/mail.js'
 import { buildToday, isValidDate } from './host/today.js'
+import { board as teamBoard, create as createTicket, update as updateTicket } from './host/team.js'
+import { post as busPost, pending as busPending, recent as busRecent } from './host/bus.js'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 // 仓库根目录：plan/ 与 daily/ 都在这下面。
 const ROOT = path.dirname(fileURLToPath(import.meta.url))
+const BUS_ROOT = process.env.NEUROLOOP_BUS_ROOT || ROOT
 
 // 依赖 webServer：这个 profile 一定有它（页面就是它发的）。
 // 不用 { optional: [...] } 的写法——当前 loader 会把键名当成服务名去等，
@@ -26,17 +29,18 @@ export const ROUTE_STATE = '/neuroloop/state'
 export const ROUTE_EVENT = '/neuroloop/event'
 export const ROUTE_MAIL = '/neuroloop/mail'
 export const ROUTE_TODAY = '/neuroloop/today'
-
-let CACHE = null
+export const ROUTE_TEAM = '/neuroloop/team'
+export const ROUTE_BUS = '/neuroloop/bus'
+// 台账默认跟着仓库走；测试用 NEUROLOOP_TEAM_ROOT 指到临时目录，避免污染真台账。
+const TEAM_ROOT = process.env.NEUROLOOP_TEAM_ROOT || ROOT
 
 function state() {
-  if (!CACHE) CACHE = loadState()
-  return CACHE
+  return getState()
 }
 
-/** 测试用：丢掉内存缓存，下次读会从磁盘/事件重建。 */
+/** 测试用：丢掉内存里的库句柄，下次读会从 L1 重建投影。 */
 export function resetCache() {
-  CACHE = null
+  resetService()
 }
 
 function blocked(req) {
@@ -68,13 +72,9 @@ async function onEvent(req, res) {
   if (!norm.ok) return writeJson(res, 400, { ok: false, error: norm.code })
 
   try {
-    // 顺序要紧：先落 L1（真源），再改 L2，再原子覆盖。
-    appendEvent(norm.event)
-    const s = state()
-    fold(s, norm.event)
-    derive(s)
-    saveState(s)
-    writeJson(res, 200, { ok: true, rev: s.rev, event: norm.event, state: s })
+    // 顺序要紧：先落 L1（真源），再改投影，再原子覆盖 state.json。
+    const { state: s, event: stored } = addEvent(norm.event)
+    writeJson(res, 200, { ok: true, rev: s.rev, event: stored, state: s })
   } catch (err) {
     writeJson(res, 500, { ok: false, error: 'write-failed', detail: String(err && err.message) })
   }
@@ -144,6 +144,65 @@ function onToday(req, res) {
   }
 }
 
+
+// 维护台账（ADR-0002）：GET 看板，POST 开票/领票/完票/阻塞。
+// 这是"可持久化维护"的接口层——票在磁盘上，谁来跑都可以。
+async function onTeam(req, res) {
+  const why = blocked(req)
+  if (why) return writeJson(res, 403, { ok: false, error: why })
+
+  if (req.method === 'GET') {
+    try {
+      return writeJson(res, 200, { ok: true, ...teamBoard(TEAM_ROOT) })
+    } catch (err) {
+      return writeJson(res, 500, { ok: false, error: 'board-failed', detail: String(err && err.message) })
+    }
+  }
+  if (req.method !== 'POST') return writeJson(res, 405, { ok: false, error: 'method-not-allowed' })
+
+  const body = await readJsonBody(req)
+  if (!body.ok) return writeJson(res, 400, { ok: false, error: body.code })
+  const v = body.value || {}
+
+  try {
+    if (v.action) return writeJson(res, 200, { ok: true, ticket: updateTicket(TEAM_ROOT, v) })
+    return writeJson(res, 200, { ok: true, ticket: createTicket(TEAM_ROOT, v) })
+  } catch (err) {
+    writeJson(res, 400, { ok: false, error: (err && err.code) || 'ticket-failed' })
+  }
+}
+
+// 总线：三个投递通道（sub / repo / wx）共用一条 append-only 日志。
+// GET  ?to=lead&limit=20 → {pending, msgs}；POST {lane,from,to,text,ref} → 追加一条。
+async function onBus(req, res) {
+  const why = blocked(req)
+  if (why) return writeJson(res, 403, { ok: false, error: why })
+
+  if (req.method === 'GET') {
+    const url = new URL(req.url, 'http://127.0.0.1')
+    const to = url.searchParams.get('to') || 'lead'
+    const limit = Number(url.searchParams.get('limit') || 20)
+    try {
+      return writeJson(res, 200, {
+        ok: true,
+        pending: busPending(BUS_ROOT, to),
+        msgs: busRecent(BUS_ROOT, { to: url.searchParams.get('all') ? undefined : to, limit }),
+      })
+    } catch (err) {
+      return writeJson(res, 500, { ok: false, error: 'bus-failed', detail: String(err && err.message) })
+    }
+  }
+  if (req.method !== 'POST') return writeJson(res, 405, { ok: false, error: 'method-not-allowed' })
+
+  const body = await readJsonBody(req)
+  if (!body.ok) return writeJson(res, 400, { ok: false, error: body.code })
+  try {
+    return writeJson(res, 200, { ok: true, msg: busPost(body.value || {}, BUS_ROOT) })
+  } catch (err) {
+    writeJson(res, 400, { ok: false, error: (err && err.message) || 'bus-failed' })
+  }
+}
+
 export function apply(ctx) {
   const ws = (ctx.get && ctx.get('webServer')) || ctx.webServer
   if (!ws || typeof ws.register !== 'function') {
@@ -157,6 +216,8 @@ export function apply(ctx) {
       disposers.push(ws.register({ kind: 'exact', path: ROUTE_EVENT, handler: onEvent }))
       disposers.push(ws.register({ kind: 'exact', path: ROUTE_MAIL, handler: onMail }))
       disposers.push(ws.register({ kind: 'exact', path: ROUTE_TODAY, handler: onToday }))
+      disposers.push(ws.register({ kind: 'exact', path: ROUTE_TEAM, handler: onTeam }))
+      disposers.push(ws.register({ kind: 'exact', path: ROUTE_BUS, handler: onBus }))
     } catch (err) {
       for (const d of disposers) {
         try {

@@ -9,6 +9,8 @@
 #   6) node test/host.mjs
 #   7) node --test test/core.test.mjs
 #   8) node --test test/legacy.test.mjs
+#   9) node --test test/storage.test.mjs
+#  10) node --test test/dispatch.test.mjs
 #   9) python tools/activate.py
 #
 # Prints a PASS/FAIL summary and exits non-zero if any step fails.
@@ -61,6 +63,9 @@ Invoke-Step -Name 'test/net.cjs'      -Exe 'node'   -Arguments @('test/net.cjs')
 Invoke-Step -Name 'test/host.mjs'     -Exe 'node'   -Arguments @('test/host.mjs')
 Invoke-Step -Name 'test/core.test.mjs' -Exe 'node'  -Arguments @('--test','test/core.test.mjs')
 Invoke-Step -Name 'test/legacy.test.mjs' -Exe 'node' -Arguments @('--test','test/legacy.test.mjs')
+Invoke-Step -Name 'test/storage.test.mjs' -Exe 'node' -Arguments @('--test','test/storage.test.mjs')
+Invoke-Step -Name 'test/dispatch.test.mjs' -Exe 'node' -Arguments @('--test','test/dispatch.test.mjs')
+Invoke-Step -Name 'test/bus.test.mjs' -Exe 'node' -Arguments @('test/bus.test.mjs')
 Invoke-Step -Name 'tools/activate.py' -Exe 'python' -Arguments @('tools/activate.py')
 
 $failed = @($results | Where-Object { $_.Code -ne 0 })

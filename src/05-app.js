@@ -859,4 +859,5 @@ function install(ctx) {
   /* 编程通道：独立 key，崩了不连累学习面板 */
   try { registerCode(ctx); } catch (e) { NL_ERR = NL_ERR || e; }
   try { registerToday(ctx); } catch (e) { NL_ERR = NL_ERR || e; }
+  try { registerTeam(ctx); } catch (e) { NL_ERR = NL_ERR || e; }
 }

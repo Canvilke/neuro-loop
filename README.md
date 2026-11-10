@@ -33,6 +33,9 @@ docs/       ADR、ROADMAP v3、研究报告
 | 今天该干什么 | [`NEXT.md`](NEXT.md) 顶部三行 |
 | 这周的安排与验收 | [`WEEK-01.md`](WEEK-01.md) |
 | 全部任务与进度（唯一真源） | [`TASKS.md`](TASKS.md) |
+| 谁负责哪块、票单怎么流转 | [`docs/TEAM-PROTOCOL.md`](docs/TEAM-PROTOCOL.md) |
+| 为什么这样分层、被否过什么 | [`docs/ADR-0001-architecture.md`](docs/ADR-0001-architecture.md) · [`docs/ADR-0002-persistent-team.md`](docs/ADR-0002-persistent-team.md) |
+| 数据模型 v2 的研究与取舍 | [`docs/RESEARCH-PLAN.pdf`](docs/RESEARCH-PLAN.pdf) |
 
 接手规则（不手改产物、五套测试全绿、提交纪律）写在 [`AGENTS.md`](AGENTS.md)；
 设计案在 [`DESIGN.md`](DESIGN.md)，四层库在 [`ENGINE.md`](ENGINE.md)，每日一页的版面与语言契约在 [`FORMAT-politics.md`](FORMAT-politics.md)、[`FORMAT-english.md`](FORMAT-english.md)。

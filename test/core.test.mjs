@@ -70,7 +70,7 @@ test('规范化：daily 的日期、学科、分钟、错题', () => {
     kind: 'daily', date: '2026-11-10', subject: 'politics', minutes: 25, wrong: [3, 5], blocked: true,
   }, { now: NOW });
   assert.deepEqual(ev.wrong, [3, 5]);
-  assert.equal(ev.blocked, true);
+  assert.equal(ev.blocked, ''); // 现在是卡点原文，布尔值丢弃
   rejects(() => normalizeEvent({ kind: 'daily', date: '2026-02-30', subject: 'politics' }, { now: NOW }), 'bad-date');
   rejects(() => normalizeEvent({ kind: 'daily', date: '2026-11-10', subject: 'history' }, { now: NOW }), 'bad-subject');
   rejects(() => normalizeEvent({ kind: 'daily', date: '2026-11-10', subject: 'politics', minutes: 601 }, { now: NOW }), 'bad-minutes');

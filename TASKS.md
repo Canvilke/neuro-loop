@@ -281,3 +281,34 @@
 - [x] M10-5 `test/core.test.mjs`（24 条）+ `test/legacy.test.mjs`（4 条，拿 v1 当 oracle 交叉验证）。
 - [x] M10-6 `storage/legacy.js` + `tools/core_verify.mjs`：用磁盘上的真实事件重放，与 `state.json` 比对一致。
 - 说明：`host/store.js` 暂未切到 core——切换与状态格式升级一起做（M11），避免同一周内两套投影并存。
+
+### M11 —— storage + host 切换（2026-11-10，DONE）
+- [x] M11-1 备份真数据到 `backup/2026-11-10-m10/`（事件流 6 条 + state.json + 信箱）。
+- [x] M11-2 `core/state.js` 抽出 `attemptDelta(ev)`：增量的唯一入口，JS 与 SQL 共用，避免两套逻辑漂移。
+- [x] M11-3 `storage/events.js`：`rootDir/ensureRoot/monthFile/append/listFiles/parseLine/readAll/size`，v1 行经 `storage/legacy` 翻译。
+- [x] M11-4 `storage/projection.js`：`node:sqlite` 六表 + 索引；`applyIncremental` / `rebuild`（事务、失败回滚）/ `dueList` / `dump`。
+- [x] M11-5 `test/storage.test.mjs`（8 条，含"增量 == 重建"、一万条重建 < 2s，实测 535ms）。
+- [x] M11-6 `host/service.js`：`db()/view()/getState()/addEvent()/reset()/saveState()`；`meta.rev !== 事件条数` 自动重建。
+- [x] M11-7 `index.js` 写路径改为 `addEvent`；`state.version` → 2；`blocked` 语义改为"卡点原文"。
+- [x] M11-8 `test/host.mjs` 适配 v2（L1 行断言 `.v===2 && .kind==='attempt'`）→ 71 checks。
+- 说明：`host/store.js` 保留为只读兼容层（读旧 state.json 的迁移用），新写入一律走 `host/service.js`。
+
+### M12 —— 多子代理维护性（ADR-0002 执行侧，进行中）
+- [x] M12-1 `docs/ADR-0002-persistent-team.md`：问题/决策/被否方案/纪律（没有票不开工）。
+- [x] M12-2 `team/roles.json`：六角色 `architect/core-dev/host-dev/ui-dev/content/qa`，各带 `owns/done/never`。
+- [x] M12-3 `host/team.js`：append-only 台账 + 重放看板 + 依赖/领票/阻塞校验（`deps-open`/`already-claimed`/`note-required`）。
+- [x] M12-4 `index.js` 路由 `/neuroloop/team`（GET 看板 / POST 开票与流转），`TEAM_ROOT` 可注入（测试用临时目录）。
+- [x] M12-5 `src/14-team.js` + 侧栏「控制台」（order 23）：五格计数、角色契约、票单列表。
+- [x] M12-6 `tools/ticket.mjs`：`list/next/brief/new/claim/done/block/reopen`，子代理能用的唯一下手点；`brief` 生成"可直接交给子代理"的提示词。
+- [x] M12-7 `test/dispatch.test.mjs`（25 checks）：空台账拒绝开工、依赖未完成拒领、重复领拒、block 必须写理由、brief 内容契约。
+- [x] M12-8 `docs/TEAM-PROTOCOL.md`：Lead 视角与子代理视角的两套循环、并发写域、恢复现场三步。
+- [x] M12-9 `check_all.ps1` 扩到 11 项（新增 storage、dispatch）。
+- [ ] M12-10 端到端演练：真实派一张票给子代理，走完 claim → 施工 → 复核 → done（本轮进行中）。
+- [x] M12-11 `ticket.mjs` 的写域冲突提示：`scopeOverlap` / `conflictsOf`，`new` 时前缀相交就告警；dispatch 测试扩到 32 checks。
+
+### M12 续（三条通道）
+- M12-12 总线 v1：`bus/bus.jsonl` 只追加，四条 lane（sub/repo/wx/note），追加前补行边界 —— DONE
+- M12-13 两套读写：`tools/bus.mjs`（CLI）与 `host/bus.js`（HTTP `/neuroloop/bus`），`test/bus.test.mjs` 19 条双向校验 —— DONE
+- M12-14 微信段能力边界写进 `docs/BUS.md`：异步双工（无推送接口），AGENTS §2 同步 —— DONE
+- M12-15 控制台显示总线未读（bus pending 进 TeamPanel 头部）—— TODO
+- M12-16 子代理派票时把 bus id 写进 brief（派单即可回信）—— TODO

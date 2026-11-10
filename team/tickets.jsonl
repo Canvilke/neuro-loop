@@ -1,0 +1,8 @@
+{"t":"2026-11-10T16:33:28.770Z","ev":"create","id":"T-0001","title":"路由统一外壳：/neuroloop/* 统一 {ok,data,rev} 与 limit 裁剪","role":"host-dev","scope":["host/","index.js","test/host.mjs"],"deps":[],"accept":[]}
+{"t":"2026-11-10T16:33:28.819Z","ev":"create","id":"T-0002","title":"批量导入：POST /neuroloop/events 支持 ≤200 条、逐条校验、部分成功回报","role":"core-dev","scope":["core/","host/","test/"],"deps":[],"accept":[]}
+{"t":"2026-11-10T16:33:28.886Z","ev":"create","id":"T-0003","title":"控制台可操作：面板内 claim/done 按钮，走 POST /neuroloop/team","role":"ui-dev","scope":["src/14-team.js","test/smoke.cjs"],"deps":[],"accept":[]}
+{"t":"2026-11-10T16:34:40.496Z","ev":"claim","id":"T-0003","by":"ui-agent"}
+{"t":"2026-11-10T16:37:22.187Z","ev":"create","id":"T-0004","title":"写域冲突提示的回归","role":"qa","scope":["tools/ticket.mjs","test/dispatch.test.mjs"],"deps":[],"accept":[]}
+{"t":"2026-11-10T16:37:22.248Z","ev":"create","id":"T-0005","title":"重叠测试票","role":"content","scope":["tools/"],"deps":[],"accept":[]}
+{"t":"2026-11-10T16:37:56.777Z","ev":"block","id":"T-0005","by":"lead","note":"演示用票，被 T-0004 覆盖，不再施工"}
+{"t":"2026-11-10T17:10:50.630Z","ev":"complete","id":"T-0003","by":"lead","note":"复核通过：只改 src/14-team.js；check_all 12/12；无 setInterval；CLAIM/DONE 与 POST body 均符合票面"}

@@ -42,7 +42,7 @@ export function fromLegacy(ev) {
         subject: ev.s,
         minutes: ev.min ?? 0,
         wrong: Array.isArray(ev.w) ? ev.w : [],
-        blocked: ev.blk === true,
+        blocked: typeof ev.blk === 'string' ? ev.blk : '',
         note: ev.note ?? '',
       };
 

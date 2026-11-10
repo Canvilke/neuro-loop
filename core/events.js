@@ -132,7 +132,7 @@ export function normalizeEvent(raw, opts = {}) {
       });
       const body = {
         date: src.date, subject: src.subject, minutes: Math.round(min),
-        wrong: nums, blocked: src.blocked === true,
+        wrong: nums, blocked: typeof src.blocked === 'string' ? clip(src.blocked, LIMITS.note) : '',
       };
       return {
         v: EVENT_VERSION, id: eventId(src.id, at, body), at, kind: 'daily',
