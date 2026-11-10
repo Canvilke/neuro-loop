@@ -1,9 +1,9 @@
 # NEXT
 
-## 现在做什么（2026-11-11 01:20，端到端维护）
-1. **主线**：把"一句话 → 票 → 子代理 → 门禁 → 验收"跑成日常（`docs/END-TO-END.md`）。门禁已 13 项全绿。
-2. **在飞**：`host-agent` 在做 T-0001（路由统一外壳 `{ok,data,rev}`）；我这边刚做完 T-0006（控制台三条未读）与 `tools/intake.mjs`。
-3. **下一步**：T-0001 回来复核 → 标 done；再派 T-0002（批量导入）与 T-0007（brief 带 bus 指令）；GH watcher 等网络（`api.github.com` 仍 301）。
+## 现在做什么（2026-11-11 01:52，端到端维护已通）
+1. **主线已通**：`intake → ticket → brief → 子代理 claim → 门禁 → Lead done`，本轮真实闭环 3 张票（T-0001 路由外壳、T-0002 批量导入、T-0006 控制台未读），另 1 张（T-0008 v1 ok 兼容）由我直接修。门禁 **13 项全绿**，远端 `490fba7`。
+2. **并发安全**：`check_all.ps1` 已加目录锁——两个 agent 同时跑门禁会互相重建 `client.js`，那是 `net.cjs` 偶发失败的根因。
+3. **卡点**：GitHub watcher 装不上（`api.github.com` 被改写 301 → `github.com`，`gh auth login --with-token` 报 406）；推送走 `github.com` 正常。Gitee 令牌路线见 `docs/BUS.md`。
 
 ## 2026-11-10 02:00 数据模型 v2 研究
 - 交付 `docs/RESEARCH-PLAN.pdf`（8 页，HTML→Edge headless 出 PDF）。
