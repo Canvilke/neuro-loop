@@ -111,7 +111,19 @@ mod.apply({
 
 const main = regs.filter((r) => r.reg.name === 'main')[0];
 if (!main) throw new Error('main panel not registered');
-const tree = main.comp({});
+/* 控制台把四个面板收成页签；这一套测的是星图，先落到 map 页。 */
+global.window.localStorage.setItem('neuroloop.tab', 'map');
+
+/* 迷你渲染器：把函数组件展开到宿主元素。 */
+function expand(el) {
+  if (!el || typeof el !== 'object') return el;
+  if (typeof el.type === 'function') return expand(el.type(el.props || {}));
+  if (!el.props || el.props.children === undefined) return el;
+  const kids = Array.isArray(el.props.children) ? el.props.children : [el.props.children];
+  return { ...el, props: { ...el.props, children: kids.map(expand) } };
+}
+
+const tree = expand(main.comp({}));
 
 function bind(el) {
   if (!el || typeof el !== 'object') return;

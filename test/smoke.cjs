@@ -138,10 +138,10 @@ const ctx = {
 };
 
 mod.apply(ctx);
-if (registrations.length !== 9) throw new Error('expected 9 registrations, got ' + registrations.length);
-if (!registrations.filter((r) => r.reg.key === 'neuro-loop-code').length) throw new Error('code panel not registered');
-if (!registrations.filter((r) => r.reg.key === 'neuro-loop-today').length) throw new Error('today panel not registered');
-if (!registrations.filter((r) => r.reg.id === 'neuro-loop-code').length) throw new Error('code sidebar entry not registered');
+if (registrations.length !== 3) throw new Error('expected 3 registrations, got ' + registrations.length);
+if (!registrations.filter((r) => r.reg.key === 'neuro-loop').length) throw new Error('hub main panel not registered');
+if (registrations.filter((r) => r.reg.key && r.reg.key.indexOf('neuro-loop-') === 0).length) throw new Error('old per-panel keys must be gone');
+if (!registrations.filter((r) => r.reg.id === 'neuro-loop').length) throw new Error('hub sidebar entry not registered');
 if (!registrations.filter((r) => r.reg.name === 'shell.overlay').length) throw new Error('boot overlay not registered');
 
 const main = registrations.filter((r) => r.reg.name === 'main')[0];
@@ -154,7 +154,19 @@ const icon = side.comp({ size: 18 });
 if (!icon || icon.type !== 'svg') throw new Error('icon did not return an svg');
 
 /* panel: walk the element tree, bind refs, then run effects */
-const tree = main.comp({});
+/* 控制台把四个面板收成页签；测试要的是星图那一页。 */
+global.window.localStorage.setItem('neuroloop.tab', 'map');
+
+/* 迷你渲染器：把函数组件展开到宿主元素（真实 React 里由 reconciler 做）。 */
+function expand(el) {
+  if (!el || typeof el !== 'object') return el;
+  if (typeof el.type === 'function') return expand(el.type(el.props || {}));
+  if (!el.props || el.props.children === undefined) return el;
+  const kids = Array.isArray(el.props.children) ? el.props.children : [el.props.children];
+  return { ...el, props: { ...el.props, children: kids.map(expand) } };
+}
+
+const tree = expand(main.comp({}));
 function bind(el) {
   if (!el || typeof el !== 'object') return;
   const ref = el.props && el.props.ref;
@@ -196,7 +208,16 @@ if (frames < 100) throw new Error('animation loop stalled after ' + frames + ' f
 if (typeof global.__cleanup !== 'function') throw new Error('mount did not return a cleanup');
 
 /* ── interaction sweep: hover / click everything on a grid ───────────────── */
-const cv = tree.props.children.filter((c) => c && c.type === 'canvas')[0];
+function findAll(el, pred, out) {
+  out = out || [];
+  if (!el || typeof el !== 'object') return out;
+  if (pred(el)) out.push(el);
+  const kids = (el.props && el.props.children) || [];
+  (Array.isArray(kids) ? kids : [kids]).forEach((k) => findAll(k, pred, out));
+  return out;
+}
+const cv = findAll(tree, (e) => e.type === 'canvas')[0];
+if (!cv) throw new Error('star-map canvas not found inside hub');
 const cref = cv.props.ref.current;
 let hits = 0;
 for (let gy = 1; gy < 14; gy++) {

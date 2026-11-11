@@ -839,25 +839,8 @@ function NeuroLoopPanel() {
 function install(ctx) {
   try { registerBoot(ctx); } catch (e) { NL_ERR = NL_ERR || e; }
 
-  try {
-    ctx.slots.inject('sidebar.panellist', function () {
-      return ctx.slots.register({
-        name: 'sidebar.panellist',
-        id: PANEL_ID,
-        order: 20,
-        label: function () { return '认知巡检'; }
-      }, NeuroLoopIcon);
-    });
-  } catch (e) { NL_ERR = NL_ERR || e; }
-
-  try {
-    ctx.slots.inject('main', function () {
-      return ctx.slots.register({ name: 'main', key: PANEL_ID }, NeuroLoopPanel);
-    });
-  } catch (e) { NL_ERR = NL_ERR || e; }
-
-  /* 编程通道：独立 key，崩了不连累学习面板 */
-  try { registerCode(ctx); } catch (e) { NL_ERR = NL_ERR || e; }
-  try { registerToday(ctx); } catch (e) { NL_ERR = NL_ERR || e; }
-  try { registerTeam(ctx); } catch (e) { NL_ERR = NL_ERR || e; }
+  /* 侧边栏只留一个入口（认知终端），内部用页签切换：
+     今天 / 认知星图 / 控制台 / 编程台。
+     各自的注册函数保留，但不再各自占一个全局图标。 */
+  try { registerHub(ctx); } catch (e) { NL_ERR = NL_ERR || e; }
 }
