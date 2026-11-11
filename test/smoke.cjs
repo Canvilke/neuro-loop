@@ -167,6 +167,30 @@ function expand(el) {
 }
 
 const tree = expand(main.comp({}));
+
+/* 导航页签：九个入口都在，且每个都带 key（点错就是去别的面板） */
+{
+  global.window.localStorage.setItem('neuroloop.tab', 'nav');
+  const navTree = expand(main.comp({}));
+  const tiles = [];
+  (function walk(el) {
+    if (Array.isArray(el)) { el.forEach(walk); return; }
+    if (!el || typeof el !== 'object') return;
+    if (el.props && el.props.className === 'nl-nav-tile') tiles.push(el);
+    const c = el.props && el.props.children;
+    (Array.isArray(c) ? c : [c]).forEach(walk);
+  })(navTree);
+  if (tiles.length !== 9) throw new Error('nav tiles expected 9, got ' + tiles.length);
+  const text = (el) => {
+    if (Array.isArray(el)) return el.map(text).join(' ');
+    if (!el || typeof el !== 'object') return typeof el === 'string' ? el : '';
+    return text(el.props && el.props.children);
+  };
+  const keys = tiles.map((t) => text(t));
+  ['conversation','task-board','schedules','lingshu','engram','dsh-context','skill-explorer','plugins','dsh-market']
+    .forEach((k) => { if (!keys.some((s) => s.indexOf(k) >= 0)) throw new Error('nav missing ' + k); });
+  global.window.localStorage.setItem('neuroloop.tab', 'map');
+}
 function bind(el) {
   if (!el || typeof el !== 'object') return;
   const ref = el.props && el.props.ref;
