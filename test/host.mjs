@@ -118,6 +118,22 @@ ok(routes.some((r) => r.path === ROUTE_EVENTS && r.kind === 'exact'), 'POST 路�
 ok(routes.some((r) => r.path === ROUTE_MAIL && r.kind === 'exact'), 'POST 路由 ' + ROUTE_MAIL)
 ok(routes.some((r) => r.path === ROUTE_TODAY && r.kind === 'exact'), 'GET 路由 ' + ROUTE_TODAY)
 
+/* 路由表快照：路径、种类、顺序一起钉死。
+ * 拆分 index.js 时这张表必须一字不差地保留；以后增删路由要显式改这里，不能悄悄变。 */
+const ROUTE_TABLE = [
+  { path: '/neuroloop/state', kind: 'exact' },
+  { path: '/neuroloop/event', kind: 'exact' },
+  { path: '/neuroloop/events', kind: 'exact' },
+  { path: '/neuroloop/mail', kind: 'exact' },
+  { path: '/neuroloop/today', kind: 'exact' },
+  { path: '/neuroloop/team', kind: 'exact' },
+  { path: '/neuroloop/bus', kind: 'exact' },
+]
+ok(
+  JSON.stringify(routes.map((r) => ({ path: r.path, kind: r.kind }))) === JSON.stringify(ROUTE_TABLE),
+  '路由表快照：7 条路径、kind 与注册顺序不变',
+)
+
 const getState = routes.find((r) => r.path === ROUTE_STATE).handler
 const postEvent = routes.find((r) => r.path === ROUTE_EVENT).handler
 const postEvents = routes.find((r) => r.path === ROUTE_EVENTS).handler
@@ -497,6 +513,138 @@ console.log('\nhost ok — ' + pass + ' checks, routes 5, home ' + HOME)
     body: JSON.stringify([{ kind: 'recall', node: 'math.array', ok: 1 }]),
   }))
   ok(singleArray.status === 400 && singleArray.json.error === 'bad-shape', '单条路由仍拒裸数组（行为不变）')
+}
+
+/* —— 错误码快照 ——
+ * 拆 index.js 之前先抓了一份错误码清单；这里是它的三道锁：
+ * 1) 清单文件本身（42 个，顺序即快照）；
+ * 2) 每个码仍在源码里以字面量出现（防止改名、拼接、动态生成）；
+ * 3) 运行时电池：非法请求走一圈，status:code 集合必须与拆之前完全一致。 */
+{
+  const ERROR_CODES = [
+    'already-claimed', 'bad-action', 'bad-body', 'bad-date', 'bad-from', 'bad-id', 'bad-json',
+    'bad-kind', 'bad-lane', 'bad-limit', 'bad-minutes', 'bad-node', 'bad-ok', 'bad-role', 'bad-shape',
+    'bad-shard', 'bad-subject', 'bad-tag', 'bad-title', 'bad-to', 'bad-wrong', 'batch-too-large',
+    'board-failed', 'body-too-large', 'body-too-long', 'bus-failed', 'deps-open', 'empty-body',
+    'empty-text', 'method-not-allowed', 'no-ticket', 'not-loopback', 'note-required', 'origin-mismatch',
+    'read-error', 'read-failed', 'send-failed', 'state-failed', 'text-too-long', 'ticket-failed',
+    'today-failed', 'write-failed',
+  ]
+  const snapshotUrl = new URL('../host/handlers/.error-codes.txt', import.meta.url)
+  const onDisk = fs.readFileSync(snapshotUrl, 'utf8').trim().split(/\r?\n/)
+  ok(
+    onDisk.length === ERROR_CODES.length && onDisk.every((c, i) => c === ERROR_CODES[i]),
+    '错误码快照：.error-codes.txt 与 42 个码逐行一致（实际 ' + onDisk.length + '）',
+  )
+
+  const codeFiles = ['../index.js', '../host/reply.js']
+  for (const ent of fs.readdirSync(new URL('../host/', import.meta.url), { withFileTypes: true })) {
+    if (ent.isFile() && ent.name.endsWith('.js')) codeFiles.push('../host/' + ent.name)
+  }
+  for (const ent of fs.readdirSync(new URL('../host/handlers/', import.meta.url), { withFileTypes: true })) {
+    if (ent.isFile() && ent.name.endsWith('.js')) codeFiles.push('../host/handlers/' + ent.name)
+  }
+  let source = ''
+  for (const rel of codeFiles) source += fs.readFileSync(new URL(rel, import.meta.url), 'utf8')
+  const missing = ERROR_CODES.filter((code) => !source.includes("'" + code + "'"))
+  ok(missing.length === 0, '错误码快照：源码里仍能找到全部字面量（缺 ' + missing.join(',') + '）')
+
+  // 电池全部是非法请求：405 / 403 / 400 都发生在落盘之前，不会改数据。
+  const observed = new Set()
+  const teamHandler = routes.find((r) => r.path === ROUTE_TEAM).handler
+  const busHandler = routes.find((r) => r.path === ROUTE_BUS).handler
+  const probe = async (handler, opts) => {
+    const r = await call(handler, makeReq(opts))
+    observed.add(r.status + ':' + (r.json && r.json.error))
+  }
+  await probe(getState, { method: 'POST' })
+  await probe(getState, { headers: { origin: 'https://evil.example' } })
+  await probe(getState, { remote: '10.0.0.9' })
+  await probe(postEvent, { method: 'GET' })
+  await probe(postEvent, { method: 'POST', body: '{oops' })
+  await probe(postEvent, { method: 'POST', body: '' })
+  await probe(postEvent, { method: 'POST', body: '42' })
+  await probe(postEvent, { method: 'POST', body: '[]' })
+  await probe(postEvent, { method: 'POST', body: JSON.stringify({ kind: 'drop-database' }) })
+  await probe(postEvent, { method: 'POST', body: JSON.stringify({ kind: 'recall', node: 'Bad Node', ok: 1 }) })
+  await probe(postEvent, { method: 'POST', body: JSON.stringify({ kind: 'recall', node: 'math.x', ok: 'yes' }) })
+  await probe(postEvent, { method: 'POST', body: JSON.stringify({ kind: 'note', node: 'math.x', tag: 'zzz', text: 'x' }) })
+  await probe(postEvent, {
+    method: 'POST',
+    body: JSON.stringify({ kind: 'note', node: 'math.x', text: 'x'.repeat(401) }),
+  })
+  await probe(postEvent, { method: 'POST', body: JSON.stringify({ kind: 'daily', date: '11-10', subject: 'politics' }) })
+  await probe(postEvent, { method: 'POST', body: JSON.stringify({ kind: 'daily', date: '2026-11-10', subject: 'x' }) })
+  await probe(postEvent, {
+    method: 'POST',
+    body: JSON.stringify({ kind: 'daily', date: '2026-11-10', subject: 'politics', minutes: 9999 }),
+  })
+  await probe(postEvent, {
+    method: 'POST',
+    body: JSON.stringify({ kind: 'daily', date: '2026-11-10', subject: 'politics', wrong: ['x'] }),
+  })
+  await probe(postEvent, { method: 'POST', body: JSON.stringify({ kind: 'flatten', shard: 'nope' }) })
+  await probe(postEvent, {
+    method: 'POST',
+    body: JSON.stringify({ kind: 'note', node: 'math.x', text: 'x'.repeat(70 * 1024) }),
+  })
+  await probe(postEvents, { method: 'GET', url: ROUTE_EVENTS })
+  await probe(postEvents, { method: 'POST', url: ROUTE_EVENTS, body: '{oops' })
+  await probe(postEvents, {
+    method: 'POST', url: ROUTE_EVENTS, body: JSON.stringify({ kind: 'recall', node: 'math.x', ok: 1 }),
+  })
+  await probe(postEvents, { method: 'POST', url: ROUTE_EVENTS, body: JSON.stringify({ events: 'nope' }) })
+  await probe(postEvents, {
+    method: 'POST',
+    url: ROUTE_EVENTS,
+    body: JSON.stringify(Array.from({ length: 201 }, (_, i) => ({ kind: 'recall', node: 'math.p' + i, ok: 1 }))),
+  })
+  await probe(postEvents, { method: 'POST', url: ROUTE_EVENTS, body: '42' })
+  await probe(onMail, { url: ROUTE_MAIL + '?to=BAD%20NAME' })
+  await probe(onMail, {
+    method: 'POST', url: ROUTE_MAIL, body: JSON.stringify({ to: 'lead', from: 'moy a', subject: 's', body: 'b' }),
+  })
+  await probe(onMail, {
+    method: 'POST', url: ROUTE_MAIL, body: JSON.stringify({ to: 'lead', from: 'im', subject: 's', body: '' }),
+  })
+  await probe(onMail, {
+    method: 'POST',
+    url: ROUTE_MAIL,
+    body: JSON.stringify({ to: 'lead', from: 'im', subject: 's', body: 'x'.repeat(9000) }),
+  })
+  await probe(onMail, { method: 'PUT', url: ROUTE_MAIL })
+  await probe(onToday, { method: 'POST', url: ROUTE_TODAY })
+  await probe(onToday, { url: ROUTE_TODAY + '?date=11-10' })
+  await probe(onToday, { url: ROUTE_TODAY, headers: { origin: 'https://evil.example' } })
+  await probe(teamHandler, { url: ROUTE_TEAM + '?limit=0' })
+  await probe(teamHandler, { url: ROUTE_TEAM + '?limit=abc' })
+  await probe(teamHandler, { method: 'POST', url: ROUTE_TEAM, body: JSON.stringify({ role: 'qa' }) })
+  await probe(teamHandler, {
+    method: 'POST', url: ROUTE_TEAM, body: JSON.stringify({ title: 'x', role: 'nobody' }),
+  })
+  await probe(teamHandler, { method: 'PUT', url: ROUTE_TEAM })
+  await probe(busHandler, { url: ROUTE_BUS + '?to=lead&limit=0' })
+  await probe(busHandler, { url: ROUTE_BUS + '?to=lead&limit=abc' })
+  await probe(busHandler, { url: ROUTE_BUS + '?to=lead&limit=201' })
+  await probe(busHandler, { method: 'POST', url: ROUTE_BUS, body: JSON.stringify({ lane: 'nope', text: 'x' }) })
+  await probe(busHandler, { method: 'POST', url: ROUTE_BUS, body: JSON.stringify({ lane: 'note', text: '   ' }) })
+  await probe(busHandler, {
+    method: 'POST', url: ROUTE_BUS, body: JSON.stringify({ lane: 'note', text: 'x'.repeat(4001) }),
+  })
+  await probe(busHandler, { method: 'PUT', url: ROUTE_BUS })
+
+  const RUNTIME_SNAPSHOT = [
+    '400:bad-body', '400:bad-date', '400:bad-from', '400:bad-json', '400:bad-kind', '400:bad-lane',
+    '400:bad-limit', '400:bad-minutes', '400:bad-node', '400:bad-ok', '400:bad-role', '400:bad-shape',
+    '400:bad-shard', '400:bad-subject', '400:bad-tag', '400:bad-title', '400:bad-to', '400:bad-wrong',
+    '400:batch-too-large', '400:body-too-large', '400:body-too-long', '400:empty-body', '400:empty-text',
+    '400:text-too-long', '403:not-loopback', '403:origin-mismatch', '405:method-not-allowed',
+  ]
+  const got = [...observed].sort()
+  ok(
+    JSON.stringify(got) === JSON.stringify(RUNTIME_SNAPSHOT),
+    '错误码快照：运行时非法请求产出同样的 status:code 集合（实际 ' + got.join(' ') + '）',
+  )
 }
 
 process.exit(process.exitCode || 0)

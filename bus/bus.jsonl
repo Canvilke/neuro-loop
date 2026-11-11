@@ -6,3 +6,9 @@
 {"id":"5f9c1760rouw","at":"2026-11-10T17:28:25.496Z","lane":"sub","from":"host-agent","to":"lead","text":"T-0001 交付：/neuroloop/* GET 统一 {ok,data,rev} 并保留顶层旧字段；bus/team 支持 limit(1..200，非法 400 bad-limit)；test/host.mjs 新增 11 断言；门禁 13 passed, 0 failed（net 首跑偶发，复跑全绿）","ref":"T-0001"}
 {"id":"62ebe34adkjv","at":"2026-11-10T17:45:26.347Z","lane":"sub","from":"core-agent","to":"lead","text":"T-0002 交付：POST /neuroloop/events 批量导入（≤200、逐条校验、部分成功，写入仍走 addEvent）；test/host.mjs 新增 30 条断言；门禁 13 passed, 0 failed","ref":"T-0002"}
 {"id":"761b751bhv87","at":"2026-11-10T17:48:46.807Z","lane":"repo","from":"intake","to":"lead","text":"开票 T-0008：v1 行的 ok 字段兼容 0/1 与字符串（core-dev）","ref":"T-0008"}
+{"id":"f266e0d7m5ep","at":"2026-11-10T17:52:06.625Z","ack":["5f9c1760rouw","62ebe34adkjv","761b751bhv87"],"by":"lead"}
+{"id":"80e0affb9oeh","at":"2026-11-11T16:34:05.897Z","lane":"repo","from":"intake","to":"lead","text":"开票 T-0009：拆路由：index.js 只留注册，handler 迁到 host/handlers（host-dev）","ref":"T-0009"}
+{"id":"93a36bab9oiv","at":"2026-11-11T16:34:06.055Z","lane":"repo","from":"intake","to":"lead","text":"开票 T-0010：写接口幂等键：同键重放不重复记账（core-dev）","ref":"T-0010"}
+{"id":"af7b718c9okr","at":"2026-11-11T16:34:06.123Z","lane":"repo","from":"intake","to":"lead","text":"开票 T-0011：数据契约 docs/DATA.md：字段、版本、回滚（architect）","ref":"T-0011"}
+{"id":"e17dcddeoevy","at":"2026-11-11T16:45:33.406Z","lane":"sub","from":"contract-agent","to":"lead","text":"T-0011 交付：docs/DATA.md 数据契约 + tools/check_contract.mjs 校验已入 14 项门禁全绿","ref":"T-0011"}
+{"id":"54ff8958yawi","at":"2026-11-11T16:53:14.802Z","lane":"sub","from":"router-agent","to":"lead","text":"T-0009 交付：index.js 329→69 行，7 条路由拆进 host/handlers/ + host/reply.js，错误码 42 条与运行时 27 组快照上锁，门禁 14 passed 0 failed","ref":"T-0009"}

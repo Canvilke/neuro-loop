@@ -19,3 +19,10 @@
 {"t":"2026-11-10T17:48:46.865Z","ev":"claim","id":"T-0008","by":"lead"}
 {"t":"2026-11-10T17:51:08.497Z","ev":"complete","id":"T-0002","by":"lead","note":"复核：onEvents 支持 {events:[]} 与裸数组；>200 先于写盘挡回 batch-too-large；逐条 normalize+addEvent；新增 30 断言；gate 13/13"}
 {"t":"2026-11-10T17:51:08.541Z","ev":"complete","id":"T-0008","by":"lead","note":"isFalse 兼容 false/0/'false'/'0'；legacy.test 增 1 条（8 个取值）；gate 13/13"}
+{"t":"2026-11-11T16:34:05.888Z","ev":"create","id":"T-0009","title":"拆路由：index.js 只留注册，handler 迁到 host/handlers","role":"host-dev","scope":["index.js"],"deps":[],"accept":["每条路由一个 handler 文件；index.js 行数下降≥50%；错误码快照逐条一致；13 项门禁绿"]}
+{"t":"2026-11-11T16:34:06.047Z","ev":"create","id":"T-0010","title":"写接口幂等键：同键重放不重复记账","role":"core-dev","scope":["host/"],"deps":["T-0009"],"accept":["同 Idempotency-Key 二次提交只产生 1 条事件并返回 replayed:true；不同键 2 条；24h 过期；测试覆盖；13 项门禁绿"]}
+{"t":"2026-11-11T16:34:06.114Z","ev":"create","id":"T-0011","title":"数据契约 docs/DATA.md：字段、版本、回滚","role":"architect","scope":["docs/"],"deps":[],"accept":["六表+事件流逐字段写清谁写/谁读/可丢；含版本升级与回滚步骤；字段名与 storage/projection.js 一致（脚本校验）"]}
+{"t":"2026-11-11T16:34:44.916Z","ev":"claim","id":"T-0009","by":"router-agent"}
+{"t":"2026-11-11T16:34:53.930Z","ev":"claim","id":"T-0011","by":"contract-agent"}
+{"t":"2026-11-11T16:47:49.730Z","ev":"complete","id":"T-0011","by":"lead","note":"复核：docs/DATA.md + tools/check_contract.mjs；contract ok — 7 tables, 9 event kinds, fields match；门禁 14 passed, 0 failed"}
+{"t":"2026-11-11T16:55:02.489Z","ev":"complete","id":"T-0009","by":"lead","note":"复核：index.js 329→69 行（-79%），路由表快照 + 42 码 .error-codes.txt + 运行时电池一致；host test 全绿；门禁 14/14"}

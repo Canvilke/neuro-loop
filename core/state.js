@@ -120,7 +120,8 @@ export function applyEvent(state, ev) {
       state.daily[ev.date][ev.subject] = {
         minutes: ev.minutes,
         wrong: ev.wrong,
-        blocked: ev.blocked === true,
+        // blocked 是「卡点原文」（字符串）。v1 里曾是布尔，没有原文可留，落空串。
+        blocked: typeof ev.blocked === 'string' ? ev.blocked : '',
         note: ev.note ?? '',
         at: ev.at,
       };
