@@ -20,7 +20,7 @@
       "id": "host-dev",
       "name": "宿主层",
       "owns": ["host/", "index.js", "test/host.mjs"],
-      "done": ["check_all 9/9", "错误码不变"],
+      "done": ["check_all 14/14", "错误码不变"],
       "never": ["把业务规则写进路由"]
     },
     {

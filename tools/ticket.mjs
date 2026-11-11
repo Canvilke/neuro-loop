@@ -184,10 +184,15 @@ export function run(argv, root = ROOT) {
         accept: a.accept,
       });
       console.log('开票 ' + t.id + ' · ' + t.title + '（role ' + t.role + '）');
-      const conflicts = conflictsOf(board(root), t.scope, t.id);
+      // 票上没写 --scope 时，实际写域就是角色的 owns（briefOf 也这么兜底）。
+      // 拿空数组去比等于永远不告警，等于这条提示对最常见的开票方式失效。
+      const declared = t.scope && t.scope.length ? t.scope : null;
+      const roleDef = (roles(root).roles || []).find((r) => r.id === t.role) || { owns: [] };
+      const conflicts = conflictsOf(board(root), declared || roleDef.owns || [], t.id);
       if (conflicts.length) {
+        const how = declared ? '' : '（未指定 --scope，按 ' + t.role + ' 的默认写域比较）';
         for (const c of conflicts) {
-          console.error('  警告：写域与 ' + c.id + '（' + c.status + '）重叠 ' + c.a + ' ↔ ' + c.b + ' —— 并行施工前先切分目录');
+          console.error('  警告：写域与 ' + c.id + '（' + c.status + '）重叠 ' + c.a + ' ↔ ' + c.b + how + ' —— 并行施工前先切分目录');
         }
       }
       return 0;

@@ -160,6 +160,47 @@ function quiet(fn) {
   ok(conflictsOf(b, ['docs/'], null).length === 0, '不相交时没有冲突');
 }
 
+/* ── 9. 写域冲突提示的回归：CLI 要真的说出来，而且只提示不拦人 ───────────── */
+{
+  const root = tmpRoot();
+  create(root, { title: '占住 host', role: 'host-dev', scope: ['host/'] });
+
+  const hit = quiet(() => run(['new', '--role', 'qa', '--title', '碰同一个文件', '--scope', 'host/http.js'], root));
+  ok(hit.code === 0, '重叠开票仍然成功（提示不拦人）');
+  ok(/警告：写域与 T-0001（ready）重叠 host\/http\.js ↔ host/.test(hit.out), '提示点名对方票号、状态与两侧写域');
+  ok(!/未指定 --scope/.test(hit.out), '显式给了 --scope 就不带"按角色默认写域"的注脚');
+
+  const miss = quiet(() => run(['new', '--role', 'qa', '--title', '不重叠', '--scope', 'docs/'], root));
+  ok(miss.code === 0 && !/警告：写域/.test(miss.out), '写域不相交时不出提示');
+
+  const sibling = quiet(() => run(['new', '--role', 'core-dev', '--title', '兄弟目录', '--scope', 'host2/'], root));
+  ok(!/警告：写域/.test(sibling.out), 'host2/ 不吃 host/（前缀不相交）');
+}
+
+/* ── 10. 已完成的票不再占写域 ────────────────────────────────────────────── */
+{
+  const root = tmpRoot();
+  create(root, { title: '占住 host', role: 'host-dev', scope: ['host/'] });
+  const c = quiet(() => run(['claim', 'T-0001', '--by', 'h1'], root));
+  const d = quiet(() => run(['done', 'T-0001', '--by', 'h1', '--note', '演示'], root));
+  ok(c.code === 0 && d.code === 0, '先把 T-0001 做完');
+  const after = quiet(() => run(['new', '--role', 'qa', '--title', '做完的票不再占域', '--scope', 'host/'], root));
+  ok(after.code === 0 && !/警告：写域/.test(after.out), '已完成的票不再报冲突');
+}
+
+/* ── 11. 没写 --scope 时按角色默认写域比较（否则最常见的开票方式永远不告警） ── */
+{
+  const root = tmpRoot();
+  create(root, { title: '显式占住 test/', role: 'qa', scope: ['test/'] });
+
+  const r = quiet(() => run(['new', '--role', 'qa', '--title', '没写 scope'], root));
+  ok(r.code === 0 && /警告：写域与 T-0001/.test(r.out), '未指定 --scope 也要提示（按 qa 默认写域 test/）');
+  ok(/未指定 --scope/.test(r.out), '提示里说明是按角色默认写域比较的');
+
+  const claim = quiet(() => run(['claim', 'T-0002', '--by', 'qa-2'], root));
+  ok(claim.code === 0, '有冲突也能领票（这条只是提示，不强制）');
+}
+
 console.log('');
 if (fails.length) {
   console.error('dispatch FAILED — ' + fails.length + ' 条未通过');
