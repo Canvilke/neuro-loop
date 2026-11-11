@@ -25,9 +25,10 @@
 
 ## 现在到哪了
 
-- 后端重构三步：**T-0009 拆路由（在飞）→ T-0010 幂等键（等 T-0009）→ T-0011 数据契约 ✅ done**
-- 门禁 14 项（新增 `tools/check_contract.mjs`），最后一次全绿：`14 passed, 0 failed`
-- 顺手修：`core/state.js` 的 `daily.blocked` 改按字符串折叠（原先布尔判断会把卡点原文吞成 false）
+- 后端重构三步全部 done：**T-0009 拆路由 ✅（index.js 329→69）→ T-0010 幂等键 ✅ → T-0011 数据契约 ✅**
+- 门禁 14 项全绿；`test/host.mjs` 151 条断言
+- **未推送**：本地 `af00a76` 之后还有一个提交（T-0010），`git push` 连吃两次 `Recv failure: Connection was reset`，网络恢复后先 `git push origin main`
+- 台账：ready 1（T-0004 写域冲突回归）/ blocked 1（T-0005 重叠测试票，非真票）
 
 ## 怎么验证（三级，别跳级）
 ```bash
