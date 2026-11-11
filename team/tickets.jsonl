@@ -26,3 +26,5 @@
 {"t":"2026-11-11T16:34:53.930Z","ev":"claim","id":"T-0011","by":"contract-agent"}
 {"t":"2026-11-11T16:47:49.730Z","ev":"complete","id":"T-0011","by":"lead","note":"复核：docs/DATA.md + tools/check_contract.mjs；contract ok — 7 tables, 9 event kinds, fields match；门禁 14 passed, 0 failed"}
 {"t":"2026-11-11T16:55:02.489Z","ev":"complete","id":"T-0009","by":"lead","note":"复核：index.js 329→69 行（-79%），路由表快照 + 42 码 .error-codes.txt + 运行时电池一致；host test 全绿；门禁 14/14"}
+{"t":"2026-11-11T16:55:54.982Z","ev":"claim","id":"T-0010","by":"core-agent"}
+{"t":"2026-11-11T17:12:20.999Z","ev":"complete","id":"T-0010","by":"lead","note":"复核：host/idempotency.js + handlers/event.js 接线；host 151 ok；重放不写 L1；错误码 42→44；门禁 14/14"}

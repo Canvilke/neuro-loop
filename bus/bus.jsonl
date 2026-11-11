@@ -12,3 +12,4 @@
 {"id":"af7b718c9okr","at":"2026-11-11T16:34:06.123Z","lane":"repo","from":"intake","to":"lead","text":"开票 T-0011：数据契约 docs/DATA.md：字段、版本、回滚（architect）","ref":"T-0011"}
 {"id":"e17dcddeoevy","at":"2026-11-11T16:45:33.406Z","lane":"sub","from":"contract-agent","to":"lead","text":"T-0011 交付：docs/DATA.md 数据契约 + tools/check_contract.mjs 校验已入 14 项门禁全绿","ref":"T-0011"}
 {"id":"54ff8958yawi","at":"2026-11-11T16:53:14.802Z","lane":"sub","from":"router-agent","to":"lead","text":"T-0009 交付：index.js 329→69 行，7 条路由拆进 host/handlers/ + host/reply.js，错误码 42 条与运行时 27 组快照上锁，门禁 14 passed 0 failed","ref":"T-0009"}
+{"id":"099257bbic53","at":"2026-11-11T17:08:49.527Z","lane":"sub","from":"core-agent","to":"lead","text":"T-0010 交付：Idempotency-Key 幂等（24h 同键重放不重复记账、同键异载荷 409、bad-idem-key；新增 host/idempotency.js + 25 条断言；错误码快照 42→44）；门禁 14 passed, 0 failed","ref":"T-0010"}

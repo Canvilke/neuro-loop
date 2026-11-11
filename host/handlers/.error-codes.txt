@@ -4,6 +4,7 @@ bad-body
 bad-date
 bad-from
 bad-id
+bad-idem-key
 bad-json
 bad-kind
 bad-lane
@@ -27,6 +28,7 @@ bus-failed
 deps-open
 empty-body
 empty-text
+idem-key-conflict
 method-not-allowed
 no-ticket
 not-loopback

@@ -515,18 +515,154 @@ console.log('\nhost ok — ' + pass + ' checks, routes 5, home ' + HOME)
   ok(singleArray.status === 400 && singleArray.json.error === 'bad-shape', '单条路由仍拒裸数组（行为不变）')
 }
 
+/* ---------- 幂等键（Idempotency-Key） ---------- */
+{
+  // L1 行数：只用来算增量（历史上故意塞的坏行也一起数，两边相同即可）。
+  const l1 = () => {
+    let n = 0
+    for (const f of fs.readdirSync(HOME)) {
+      if (!/^events-\d{4}-\d{2}\.jsonl$/.test(f)) continue
+      n += fs.readFileSync(path.join(HOME, f), 'utf8').split('\n').filter((x) => x.trim()).length
+    }
+    return n
+  }
+  const idemFile = path.join(HOME, 'idempotency.jsonl')
+
+  // 1. 同 key 重放：只记一条，第二次回放首次响应。
+  const sameBody = JSON.stringify({ kind: 'recall', node: 'math.idem1', ok: 1 })
+  const beforeSame = l1()
+  const first = await call(postEvent, makeReq({
+    method: 'POST', body: sameBody, headers: { 'idempotency-key': 'same-key-0001' },
+  }))
+  ok(first.status === 200 && first.json.ok === true, '幂等：首写仍 200')
+  ok(first.json.idem && first.json.idem.key === 'same-key-0001' && first.json.idem.replayed === false,
+    '幂等：首写回 idem.replayed=false')
+  const second = await call(postEvent, makeReq({
+    method: 'POST', body: sameBody, headers: { 'idempotency-key': 'same-key-0001' },
+  }))
+  ok(second.status === 200 && second.json.idem && second.json.idem.replayed === true,
+    '幂等：重放 200 且 replayed=true')
+  ok(second.json.event && second.json.event.id === first.json.event.id && second.json.rev === first.json.rev,
+    '幂等：重放返回首次响应体（同 eventId/rev）')
+  ok(typeof second.json.idem.firstAt === 'string' && !Number.isNaN(Date.parse(second.json.idem.firstAt)),
+    '幂等：重放带 firstAt')
+  ok(l1() === beforeSame + 1, '幂等：同 key 只多 1 行 L1（' + (l1() - beforeSame) + '）')
+
+  // 2. 不同 key → 各记一条。
+  const beforeTwo = l1()
+  const keyA = await call(postEvent, makeReq({
+    method: 'POST', body: JSON.stringify({ kind: 'recall', node: 'math.idem2', ok: 1 }),
+    headers: { 'idempotency-key': 'diff-key-0001' },
+  }))
+  const keyB = await call(postEvent, makeReq({
+    method: 'POST', body: JSON.stringify({ kind: 'recall', node: 'math.idem3', ok: 1 }),
+    headers: { 'idempotency-key': 'diff-key-0002' },
+  }))
+  ok(keyA.status === 200 && keyB.status === 200, '幂等：不同 key 都正常 200')
+  ok(l1() === beforeTwo + 2, '幂等：不同 key 各记一条')
+
+  // 3. 同 key 不同载荷 → 409，不写。
+  const beforeConflict = l1()
+  const conflict = await call(postEvent, makeReq({
+    method: 'POST', body: JSON.stringify({ kind: 'recall', node: 'math.idem1', ok: 0 }),
+    headers: { 'idempotency-key': 'same-key-0001' },
+  }))
+  ok(conflict.status === 409 && conflict.json.error === 'idem-key-conflict',
+    '幂等：同 key 不同载荷 → 409 idem-key-conflict')
+  ok(l1() === beforeConflict, '幂等：冲突不写 L1')
+
+  // 4. 没带 key：行为与旧版本一致，两次都写、响应里没有 idem。
+  const beforeNoKey = l1()
+  const plain = JSON.stringify({ kind: 'recall', node: 'math.idem4', ok: 1 })
+  const no1 = await call(postEvent, makeReq({ method: 'POST', body: plain }))
+  const no2 = await call(postEvent, makeReq({ method: 'POST', body: plain }))
+  ok(no1.status === 200 && no2.status === 200 && no1.json.idem === undefined && no2.json.idem === undefined,
+    '幂等：无 key 行为不变（响应无 idem 字段）')
+  ok(l1() === beforeNoKey + 2, '幂等：无 key 两次各记一条')
+
+  // 5. 过期（手写一条 25h 前的行）→ 视为新请求。
+  const { fingerprint } = await import('../host/idempotency.js')
+  const expiredPayload = { kind: 'recall', node: 'math.idem5', ok: 1 }
+  fs.appendFileSync(idemFile, JSON.stringify({
+    key: 'old-key-0001',
+    at: new Date(Date.now() - 25 * 3600 * 1000).toISOString(),
+    fingerprint: fingerprint(expiredPayload),
+    status: 200,
+    body: { ok: true, note: 'stale' },
+  }) + '\n', 'utf8')
+  const beforeExpired = l1()
+  const expired = await call(postEvent, makeReq({
+    method: 'POST', body: JSON.stringify(expiredPayload), headers: { 'idempotency-key': 'old-key-0001' },
+  }))
+  ok(expired.status === 200 && expired.json.idem && expired.json.idem.replayed === false,
+    '幂等：超 24h 视为新请求（不重放）')
+  ok(l1() === beforeExpired + 1, '幂等：过期后照常记一条')
+
+  // 6. 非法 key：太短 / 非法字符 / 超 128 字节 → 400，且不写。
+  const beforeBadKey = l1()
+  const shortKey = await call(postEvent, makeReq({
+    method: 'POST', body: JSON.stringify({ kind: 'recall', node: 'math.idem6', ok: 1 }),
+    headers: { 'idempotency-key': 'short' },
+  }))
+  ok(shortKey.status === 400 && shortKey.json.error === 'bad-idem-key', '幂等：太短的 key → 400 bad-idem-key')
+  const spacedKey = await call(postEvent, makeReq({
+    method: 'POST', body: JSON.stringify({ kind: 'recall', node: 'math.idem6', ok: 1 }),
+    headers: { 'idempotency-key': 'has space!' },
+  }))
+  ok(spacedKey.status === 400 && spacedKey.json.error === 'bad-idem-key', '幂等：非法字符 → 400 bad-idem-key')
+  const longKey = await call(postEvent, makeReq({
+    method: 'POST', body: JSON.stringify({ kind: 'recall', node: 'math.idem6', ok: 1 }),
+    headers: { 'idempotency-key': 'k'.repeat(129) },
+  }))
+  ok(longKey.status === 400 && longKey.json.error === 'bad-idem-key', '幂等：超 128 字节 → 400 bad-idem-key')
+  ok(l1() === beforeBadKey, '幂等：非法 key 不写 L1')
+
+  // 7. 批量：同 key 同批回放整批，不增行；同 key 不同批 409。
+  const batchBody = JSON.stringify({
+    events: [{ kind: 'recall', node: 'math.idem7', ok: 1 }, { kind: 'recall', node: 'math.idem8', ok: 1 }],
+  })
+  const b1 = await call(postEvents, makeReq({
+    method: 'POST', url: ROUTE_EVENTS, body: batchBody, headers: { 'idempotency-key': 'batch-key-0001' },
+  }))
+  ok(b1.status === 200 && b1.json.idem && b1.json.idem.replayed === false && b1.json.accepted === 2,
+    '幂等：批量首写 200、replayed=false、accepted=2')
+  const revBeforeReplay = (await call(getState, makeReq())).json.rev
+  const beforeBatchReplay = l1()
+  const b2 = await call(postEvents, makeReq({
+    method: 'POST', url: ROUTE_EVENTS, body: batchBody, headers: { 'idempotency-key': 'batch-key-0001' },
+  }))
+  ok(b2.status === 200 && b2.json.idem && b2.json.idem.replayed === true && b2.json.accepted === 2,
+    '幂等：批量重放 200、replayed=true')
+  ok(JSON.stringify(b2.json.ids) === JSON.stringify(b1.json.ids), '幂等：批量重放返回整批缓存（同 ids）')
+  ok(l1() === beforeBatchReplay, '幂等：批量重放不增行')
+  ok((await call(getState, makeReq())).json.rev === revBeforeReplay, '幂等：批量重放不动投影 rev')
+  const bConflict = await call(postEvents, makeReq({
+    method: 'POST', url: ROUTE_EVENTS,
+    body: JSON.stringify({ events: [{ kind: 'recall', node: 'math.idem9', ok: 1 }] }),
+    headers: { 'idempotency-key': 'batch-key-0001' },
+  }))
+  ok(bConflict.status === 409 && bConflict.json.error === 'idem-key-conflict',
+    '幂等：批量同 key 不同载荷 → 409')
+
+  // 落盘形状：一行一条 {key,at,fingerprint,status,body}。
+  const logged = fs.readFileSync(idemFile, 'utf8').trim().split('\n').map((line) => JSON.parse(line))
+  ok(logged.length >= 5 && logged.every((e) => typeof e.key === 'string' && typeof e.at === 'string'
+    && typeof e.fingerprint === 'string' && typeof e.status === 'number' && e.body && typeof e.body === 'object'),
+  '幂等：idempotency.jsonl 每行 {key,at,fingerprint,status,body}（' + logged.length + ' 行）')
+}
+
 /* —— 错误码快照 ——
  * 拆 index.js 之前先抓了一份错误码清单；这里是它的三道锁：
- * 1) 清单文件本身（42 个，顺序即快照）；
+ * 1) 清单文件本身（44 个，顺序即快照）；
  * 2) 每个码仍在源码里以字面量出现（防止改名、拼接、动态生成）；
  * 3) 运行时电池：非法请求走一圈，status:code 集合必须与拆之前完全一致。 */
 {
   const ERROR_CODES = [
-    'already-claimed', 'bad-action', 'bad-body', 'bad-date', 'bad-from', 'bad-id', 'bad-json',
+    'already-claimed', 'bad-action', 'bad-body', 'bad-date', 'bad-from', 'bad-id', 'bad-idem-key', 'bad-json',
     'bad-kind', 'bad-lane', 'bad-limit', 'bad-minutes', 'bad-node', 'bad-ok', 'bad-role', 'bad-shape',
     'bad-shard', 'bad-subject', 'bad-tag', 'bad-title', 'bad-to', 'bad-wrong', 'batch-too-large',
     'board-failed', 'body-too-large', 'body-too-long', 'bus-failed', 'deps-open', 'empty-body',
-    'empty-text', 'method-not-allowed', 'no-ticket', 'not-loopback', 'note-required', 'origin-mismatch',
+    'empty-text', 'idem-key-conflict', 'method-not-allowed', 'no-ticket', 'not-loopback', 'note-required', 'origin-mismatch',
     'read-error', 'read-failed', 'send-failed', 'state-failed', 'text-too-long', 'ticket-failed',
     'today-failed', 'write-failed',
   ]
@@ -534,7 +670,7 @@ console.log('\nhost ok — ' + pass + ' checks, routes 5, home ' + HOME)
   const onDisk = fs.readFileSync(snapshotUrl, 'utf8').trim().split(/\r?\n/)
   ok(
     onDisk.length === ERROR_CODES.length && onDisk.every((c, i) => c === ERROR_CODES[i]),
-    '错误码快照：.error-codes.txt 与 42 个码逐行一致（实际 ' + onDisk.length + '）',
+    '错误码快照：.error-codes.txt 与 44 个码逐行一致（实际 ' + onDisk.length + '）',
   )
 
   const codeFiles = ['../index.js', '../host/reply.js']
