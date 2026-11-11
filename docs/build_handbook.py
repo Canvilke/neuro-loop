@@ -115,7 +115,9 @@ def render(md_path, title, sub, no, out_pdf):
         cover=COVER.format(title=title, sub=sub, no=no, date=DATE),
         body=body,
     )
-    html_path = os.path.splitext(out_pdf)[0] + ".html"
+    rendered = os.path.join(HERE, "rendered")
+    os.makedirs(rendered, exist_ok=True)
+    html_path = os.path.join(rendered, os.path.splitext(os.path.basename(out_pdf))[0] + ".html")
     io.open(html_path, "w", encoding="utf-8").write(html)
     subprocess.run(
         [
