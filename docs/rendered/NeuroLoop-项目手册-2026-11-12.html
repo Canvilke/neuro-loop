@@ -1,0 +1,956 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8"><title>Neuro-Loop 项目手册</title><style>
+@page { size: A4; margin: 17mm 15mm 16mm; }
+* { box-sizing: border-box; }
+body {
+  font-family: "Microsoft YaHei", "Msyh", "PingFang SC", system-ui, sans-serif;
+  font-size: 10.2pt; line-height: 1.78; color: #1b2430; margin: 0;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+h1 {
+  font-size: 19pt; font-weight: 800; letter-spacing: 0.3pt; margin: 0 0 6mm;
+  padding-bottom: 3mm; border-bottom: 1.6pt solid #16202c;
+}
+h2 {
+  font-size: 13pt; font-weight: 700; margin: 9mm 0 3mm; padding-left: 3mm;
+  border-left: 3.2pt solid #2a5d8f;
+}
+h3 { font-size: 11pt; font-weight: 700; margin: 6mm 0 2mm; color: #22303f; }
+p { margin: 0 0 2.6mm; text-align: justify; }
+ul, ol { margin: 0 0 3mm; padding-left: 7mm; }
+li { margin: 0 0 1.2mm; }
+hr { border: 0; border-top: 0.6pt solid #ccd6e0; margin: 6mm 0; }
+code {
+  font-family: "Cascadia Mono", Consolas, monospace; font-size: 9pt;
+  background: #f2f5f8; padding: 0.3mm 1.2mm; border-radius: 1pt;
+}
+pre {
+  background: #f5f7fa; border: 0.5pt solid #d8e0e8; padding: 3mm;
+  font-size: 8.6pt; line-height: 1.55; overflow: hidden; page-break-inside: avoid;
+}
+pre code { background: none; padding: 0; font-size: 8.6pt; }
+table {
+  width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 9.2pt;
+  page-break-inside: auto;
+}
+thead { display: table-header-group; }
+tr { page-break-inside: avoid; }
+th, td { border: 0.5pt solid #c9d4df; padding: 1.6mm 2mm; vertical-align: top; }
+th { background: #eef2f6; font-weight: 700; text-align: left; }
+td { word-break: break-word; }
+a { color: #1f5c96; text-decoration: none; }
+blockquote {
+  margin: 2mm 0 3mm; padding: 1.5mm 4mm; border-left: 2pt solid #b9c8d8;
+  background: #f7f9fb; color: #33414f;
+}
+.cover { page-break-after: always; padding-top: 34mm; }
+.cover .kicker { font-size: 9pt; letter-spacing: 3pt; color: #6b7b8c; }
+.cover h1 { font-size: 30pt; border: 0; padding: 0; margin: 6mm 0 4mm; letter-spacing: 1pt; }
+.cover .sub { font-size: 12pt; color: #3d4d5e; margin-bottom: 14mm; }
+.cover-meta { width: 150mm; font-size: 9.6pt; margin-top: 2mm; border: 0; }
+.cover-meta th { width: 26mm; background: none; border: 0; border-bottom: 0.4pt solid #dde5ec; font-weight: 700; padding: 2mm 0; }
+.cover-meta td { border: 0; border-bottom: 0.4pt solid #dde5ec; padding: 2mm 0; }
+.cover .meta div { display: flex; gap: 6mm; }
+.cover .meta b { flex: none; }
+.cover .meta b { display: block; width: 24mm; color: #16202c; }
+.cover .rule { border-top: 1.4pt solid #16202c; margin: 10mm 0 6mm; width: 42mm; }
+</style></head><body>
+<div class="cover">
+  <div class="kicker">NEURO&#8209;LOOP &middot; PROJECT DOCUMENT</div>
+  <h1>Neuro-Loop 项目手册</h1>
+  <div class="sub">项目来源 &middot; 结构 &middot; 数据落点 &middot; 任务分配 &middot; 协作约定</div>
+  <div class="rule"></div>
+  <table class="cover-meta">
+    <tr><th>文档编号</th><td>NL-HB-001</td></tr>
+    <tr><th>版本</th><td>v1.0</td></tr>
+    <tr><th>编制</th><td>主会话（lead）</td></tr>
+    <tr><th>日期</th><td>2026-11-12</td></tr>
+    <tr><th>项目</th><td>认知终端（DSH 插件 @local/neuro-loop）</td></tr>
+    <tr><th>工作区</th><td>C:\Users\86152\Desktop\致远</td></tr>
+  </table>
+</div>
+<h2>文档信息</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>适用范围</td>
+<td>本项目全部代码、数据、文档、出纸内容与协作流程</td>
+</tr>
+<tr>
+<td>存放</td>
+<td>桌面 PDF（正式版）+ <code>neuro-loop/docs/HANDBOOK.md</code>（源文件）</td>
+</tr>
+<tr>
+<td>更新规则</td>
+<td>任何改变结构、接口、数据落点、协作规则的提交，必须同步本文件并把版本号加一</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>1. 项目来源</h2>
+<h3>1.1 起点</h3>
+<p>项目始于 2026-11-08 的一份设计文档（<code>C:\Users\86152\Desktop\设计文档.doc</code>），内容是一个"认知巡检"界面的场景描述：倾斜银色星环上分布六颗行星对应六门学科，中央是知识网络，悬停触发引力透镜，行星外沿的暗物质陨石带表示"错题与遗忘"。</p>
+<p>同一时期存在一个早期原型：<code>Untitled-1.py</code>（41093 B）与 <code>neuro_loop.db</code>（40960 B），以及一个三栏面板式网页 <code>历史存档/frontend.html</code>。原型包含三张表：</p>
+<table>
+<thead>
+<tr>
+<th>表</th>
+<th>内容</th>
+<th>行数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>params</code></td>
+<td>知识点：名称、域、定义、公式、锚点、稳定性</td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>connections</code></td>
+<td>知识点连线：prereq / derive / contrast / analogy + 注意力权重</td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>kv_cache</code></td>
+<td>题目与缓存状态：hit / miss / hallucination、失误次数、到期</td>
+<td>11</td>
+</tr>
+</tbody>
+</table>
+<p>原型数据是"大模型与人脑同构"理论的演示样本（梯度下降、注意力机制、位置编码等），不是高考考点。该库已于 2026-11-08 以只读方式导出到 <code>neuro-loop/imports/proto-20261108-143640/</code>，作为设计参照，未并入正式数据。</p>
+<h3>1.2 理论来源</h3>
+<p>项目的数据模型来自用户提出的一套同构假设，即把大模型的运行范式映射到学习过程：</p>
+<table>
+<thead>
+<tr>
+<th>理论条目</th>
+<th>映射</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>预训练</td>
+<td>听课、教材、基础作业，决定基座</td>
+</tr>
+<tr>
+<td>MLA 特征压缩</td>
+<td>把知识点压成"核心考点 / 设错陷阱 / 方法判据"三个表征</td>
+</tr>
+<tr>
+<td>推理与 KV 缓存命中</td>
+<td>考场：熟题命中 vs 新题重推；瓶颈从"补知识"转向"提高命中率与还原速度"</td>
+</tr>
+<tr>
+<td>幻觉 / 假阳性</td>
+<td>粗心与假性掌握：命中率高但准确率低</td>
+</tr>
+<tr>
+<td>RLHF + 防灾难性遗忘</td>
+<td>错题复盘（权重惩罚）+ 间隔重复（遗忘临界点唤醒）</td>
+</tr>
+</tbody>
+</table>
+<h3>1.3 沿革</h3>
+<p>|---|---|---|<br>
+| 2026-11-08 | 读设计文档，确认实现路线（客户端插件页） | 设计判断、字段映射 |<br>
+| 2026-11-08 | 插件 v0.1：星环、行星、知识网、陨石带、悬停透镜 | <code>client.js</code> 87 KB |<br>
+| 2026-11-08 | 视觉迭代 v2/v3：去廉价文字框、冷色阶、真 3D 星图、底部操控台 | 91→134 KB |<br>
+| 2026-11-09 | 启动序列（UEG 风格，七阶段：自检→同步→验证→简报→通道→扫描→跃迁） | <code>src/10-boot-core.js</code>、<code>src/11-boot-view.js</code> |<br>
+| 2026-11-10 | 事件流与投影、今天视图、信箱、总线 | <code>host/store.js</code>、<code>host/service.js</code>、<code>storage/</code> |<br>
+| 2026-11-11 | 可持久化维护层：票单、角色契约、控制台、端到端闭环 | <code>host/team.js</code>、<code>tools/ticket.mjs</code>、<code>tools/intake.mjs</code> |<br>
+| 2026-11-11 | 分层重写：领域层 / 存储层 / 宿主层分离 | ADR-0001、<code>core/</code>、<code>storage/</code> |<br>
+| 2026-11-12 | 侧边栏收敛为一个入口，内部五页签（今天 / 认知星图 / 控制台 / 编程台 / 导航） | <code>src/15-hub.js</code> |</p>
+<hr>
+<h2>2. 目标与边界</h2>
+<h3>2.1 目标</h3>
+<ol>
+<li>以"一次判定"为最小数据单位，记录做题时的判断、推理与耗时，而不是收集题目。</li>
+<li>知识点、方法、题目三类对象分层存放，方法是跨章节的一等公民。</li>
+<li>数据可重建：真源为追加日志，任何派生层损坏均可重建。</li>
+<li>每日产出两张可打印的 A4：内容扁平、一页装完、语言客观。</li>
+<li>协作可持久化：任务在磁盘上，不依赖单个会话的记忆。</li>
+</ol>
+<h3>2.2 明确不做</h3>
+<ul>
+<li>不做题库型产品：不追求题目数量与刷题量。</li>
+<li>不显示总分、排名、掌握度分数。</li>
+<li>不引入前端框架、打包器或第三方运行时依赖。</li>
+<li>不自动刷新页面、不自动改写用户数据。</li>
+<li>不在缺少材料时编造学科内容。</li>
+</ul>
+<h3>2.3 硬约束</h3>
+<table>
+<thead>
+<tr>
+<th>约束</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>语言</td>
+<td>面向学生的文字客观、无第二人称、无劝勉语</td>
+</tr>
+<tr>
+<td>版面</td>
+<td>一页 A4 装完；超页先砍内容，不硬打两页</td>
+</tr>
+<tr>
+<td>打印</td>
+<td>页面必须扁平（纯色块、细线、文字），含渐变或大面积半透明的页会被驱动丢弃</td>
+</tr>
+<tr>
+<td>数据</td>
+<td>真源只追加；派生层可删可重建；正文与统计分离</td>
+</tr>
+<tr>
+<td>依赖</td>
+<td>后端零第三方依赖（Node 内置模块）</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>3. 项目分块</h2>
+<p>项目按七块划分，每块有唯一负责人、唯一入口、独立验收方式。</p>
+<table>
+<thead>
+<tr>
+<th>块</th>
+<th>名称</th>
+<th>负责人角色</th>
+<th>目录</th>
+<th>完成标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B1</td>
+<td>领域层</td>
+<td>core-dev</td>
+<td><code>core/</code></td>
+<td><code>node --test</code> 全绿；事件九种形状稳定；不引依赖</td>
+</tr>
+<tr>
+<td>B2</td>
+<td>存储层</td>
+<td>core-dev</td>
+<td><code>storage/</code></td>
+<td>增量与重建结果一致；一万条重建 &lt; 2s</td>
+</tr>
+<tr>
+<td>B3</td>
+<td>宿主接口</td>
+<td>host-dev</td>
+<td><code>host/</code>、<code>index.js</code></td>
+<td>门禁全绿；错误码快照不变；路由只做校验与转发</td>
+</tr>
+<tr>
+<td>B4</td>
+<td>客户端</td>
+<td>ui-dev</td>
+<td><code>src/</code>、<code>build.py</code></td>
+<td>构建通过；smoke 注册数对齐；无内联第三方库</td>
+</tr>
+<tr>
+<td>B5</td>
+<td>内容与出纸</td>
+<td>content</td>
+<td><code>daily/</code>、<code>plan/</code>、<code>content/</code>、<code>tools/make_docx.py</code>、<code>tools/en_page.py</code></td>
+<td>一页装完；语言客观；打印链路可验证</td>
+</tr>
+<tr>
+<td>B6</td>
+<td>维护层</td>
+<td>qa</td>
+<td><code>team/</code>、<code>bus/</code>、<code>tools/ticket.mjs</code>、<code>tools/intake.mjs</code></td>
+<td>票单可开可领可验收；总线一致；失忆可恢复</td>
+</tr>
+<tr>
+<td>B7</td>
+<td>文档与验证</td>
+<td>architect</td>
+<td><code>docs/</code>、<code>test/</code>、<code>tools/check_all.ps1</code></td>
+<td>每项决策有 ADR；门禁 14 项全绿</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>4. 系统结构</h2>
+<h3>4.1 四层单向依赖</h3>
+<pre><code>client（浏览器） → host（HTTP 薄路由） → storage（SQLite 投影 + JSONL 真源） → core（纯函数）
+</code></pre>
+<p>依赖只能向右，反向禁止。客户端不直接读数据库；宿主不实现业务规则；存储不改事件形状；领域层不接触 HTTP。</p>
+<h3>4.2 模块清单</h3>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>文件</th>
+<th>行数</th>
+<th>职责</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>领域</td>
+<td><code>core/contract.js</code></td>
+<td>98</td>
+<td>事件形状、限制、正则、错误类型</td>
+</tr>
+<tr>
+<td>领域</td>
+<td><code>core/events.js</code></td>
+<td>254</td>
+<td>事件归一化、v1 兼容、行编解码</td>
+</tr>
+<tr>
+<td>领域</td>
+<td><code>core/metrics.js</code></td>
+<td>133</td>
+<td>命中率、准确率、间隔、缓存状态</td>
+</tr>
+<tr>
+<td>领域</td>
+<td><code>core/state.js</code></td>
+<td>258</td>
+<td>投影折叠、重建、汇总、增量入口</td>
+</tr>
+<tr>
+<td>存储</td>
+<td><code>storage/events.js</code></td>
+<td>150</td>
+<td>追加日志读写、坏行计数</td>
+</tr>
+<tr>
+<td>存储</td>
+<td><code>storage/projection.js</code></td>
+<td>260</td>
+<td>SQLite 六表、增量与整体重建</td>
+</tr>
+<tr>
+<td>存储</td>
+<td><code>storage/legacy.js</code></td>
+<td>95</td>
+<td>v1 短字段兼容</td>
+</tr>
+<tr>
+<td>宿主</td>
+<td><code>index.js</code></td>
+<td>69</td>
+<td>路由注册</td>
+</tr>
+<tr>
+<td>宿主</td>
+<td><code>host/handlers/*.js</code></td>
+<td>310</td>
+<td>六个路由处理（state / event / mail / today / team / bus）</td>
+</tr>
+<tr>
+<td>宿主</td>
+<td><code>host/service.js</code></td>
+<td>189</td>
+<td>一致性校验、视图、写路径</td>
+</tr>
+<tr>
+<td>宿主</td>
+<td><code>host/team.js</code> / <code>host/today.js</code> / <code>host/bus.js</code> / <code>host/mail.js</code></td>
+<td>233 / 175 / — / 103</td>
+<td>票单、今天视图、总线、信箱</td>
+</tr>
+<tr>
+<td>宿主</td>
+<td><code>host/idempotency.js</code></td>
+<td>160</td>
+<td>幂等键 24h 重放</td>
+</tr>
+<tr>
+<td>客户端</td>
+<td><code>src/*.js</code>（18 个文件）</td>
+<td>约 6400</td>
+<td>星图、启动序列、背景、特效、仪表盘、今天、控制台、编程台、总入口</td>
+</tr>
+<tr>
+<td>构建</td>
+<td><code>build.py</code></td>
+<td>96</td>
+<td>拼接源码、生成 <code>client.js</code> 与 <code>version.json</code></td>
+</tr>
+</tbody>
+</table>
+<h3>4.3 请求路径</h3>
+<ol>
+<li>浏览器加载 <code>client.js</code>，向宿主注册一个侧边栏图标与一个主面板。</li>
+<li>客户端按需 <code>GET /neuroloop/state</code>、<code>/neuroloop/today</code>、<code>/neuroloop/team</code>、<code>/neuroloop/bus</code>。</li>
+<li>写入走 <code>POST /neuroloop/event</code>：先校验 → 追加 L1 → 更新投影 → 回写视图。</li>
+<li>客户端合并投影、刷新界面，失败进入本地队列，恢复后补发。</li>
+</ol>
+<hr>
+<h2>5. 数据与存储</h2>
+<h3>5.1 分层</h3>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>实现</th>
+<th>位置</th>
+<th>丢失后果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0 静态星图</td>
+<td>JSON</td>
+<td><code>neuro-loop/data/seed.json</code></td>
+<td>脚手架丢失，可重建（占位数据）</td>
+</tr>
+<tr>
+<td>L1 事件流（真源）</td>
+<td>JSONL，只追加</td>
+<td><code>%USERPROFILE%\.dsh\neuro-loop\events-YYYY-MM.jsonl</code></td>
+<td>不可恢复，必须备份</td>
+</tr>
+<tr>
+<td>L2 投影</td>
+<td>SQLite（<code>node:sqlite</code>，WAL）</td>
+<td><code>%USERPROFILE%\.dsh\neuro-loop\projection.db</code></td>
+<td>可整体重建</td>
+</tr>
+<tr>
+<td>L3 视图</td>
+<td>JSON（原子写）</td>
+<td><code>%USERPROFILE%\.dsh\neuro-loop\state.json</code></td>
+<td>可重建</td>
+</tr>
+<tr>
+<td>内容正文</td>
+<td>文件</td>
+<td><code>neuro-loop/content/{method,problem,point,material}/</code></td>
+<td>需备份（正文不在库里）</td>
+</tr>
+<tr>
+<td>计划与排程</td>
+<td>JSON / Markdown</td>
+<td><code>neuro-loop/plan/</code></td>
+<td>可重排</td>
+</tr>
+<tr>
+<td>每日页面</td>
+<td>docx / pdf</td>
+<td><code>neuro-loop/daily/</code></td>
+<td>可重生成</td>
+</tr>
+</tbody>
+</table>
+<h3>5.2 事件</h3>
+<p>九种：<code>attempt</code>、<code>problem.new</code>、<code>problem.edit</code>、<code>method.new</code>、<code>method.edit</code>、<code>daily</code>、<code>flatten</code>、<code>unflatten</code>、<code>note</code>。</p>
+<p><code>attempt</code> 是核心，字段含：知识点 id、方法 id、<code>recall</code>（是否命中）、<code>solve</code>（推理是否成立）、<code>durationMs</code>（还原耗时）、<code>mode</code>。命中率高而 <code>solve</code> 失败即假阳性，是系统要报警的对象。</p>
+<h3>5.3 投影表</h3>
+<p>七表：<code>meta</code>、<code>concepts</code>、<code>methods</code>、<code>daily</code>、<code>flattened</code>、<code>problems</code>、<code>notes</code>。<code>meta.rev</code> 等于事件条数，用于判断是否需要重建。概念表只存计数与到期时间，不存"掌握度"。</p>
+<h3>5.4 协作日志</h3>
+<p><code>bus/bus.jsonl</code>（总线）、<code>team/tickets.jsonl</code>（票单）、<code>%USERPROFILE%\.dsh\neuro-loop\mail\</code>（信箱）。三者都是追加型文本，不进数据库，便于人工查看与 git 追踪。</p>
+<h3>5.5 备份与恢复</h3>
+<ul>
+<li>备份：<code>cp -r "$USERPROFILE/.dsh/neuro-loop/." neuro-loop/backup/&lt;日期&gt;/</code>（已有一个 2026-11-10 的快照）。</li>
+<li>恢复三步：确认 L1 存在 → 删除 <code>projection.db</code> 与 <code>state.json</code> → 调用一次读接口触发的整体重建。</li>
+<li>数据与内容分离：库里只有 id 与统计，题干与解析正文在 <code>content/</code>，删除投影不会丢正文。</li>
+</ul>
+<hr>
+<h2>6. 进展台账</h2>
+<h3>6.1 里程碑</h3>
+<table>
+<thead>
+<tr>
+<th>里程碑</th>
+<th>内容</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M1–M5</td>
+<td>星图骨架、视觉迭代、启动序列、仪表盘、分层知识点</td>
+<td>完成</td>
+</tr>
+<tr>
+<td>M6</td>
+<td>启动序列七阶段、样式集、背景与特效模块</td>
+<td>完成（视觉验收以用户截图为准）</td>
+</tr>
+<tr>
+<td>M7</td>
+<td>事件流、路由、相位调度、原型库导入</td>
+<td>完成</td>
+</tr>
+<tr>
+<td>M8</td>
+<td>方法卡、每日一页、自评闭环、任务提示块</td>
+<td>数据层完成，内容持续补充</td>
+</tr>
+<tr>
+<td>M9</td>
+<td>数据模型 v2 参考研究与实施计划</td>
+<td>完成（<code>docs/RESEARCH-PLAN.pdf</code>，8 页）</td>
+</tr>
+<tr>
+<td>M10</td>
+<td>领域层重写</td>
+<td>完成（24 条测试）</td>
+</tr>
+<tr>
+<td>M11</td>
+<td>存储层与宿主切换</td>
+<td>完成（8 条存储测试，一万条重建 535ms）</td>
+</tr>
+<tr>
+<td>M12</td>
+<td>多子代理维护性：票单、总线、端到端闭环</td>
+<td>完成主体，余 T-0004 待做</td>
+</tr>
+</tbody>
+</table>
+<h3>6.2 票单</h3>
+<table>
+<thead>
+<tr>
+<th>票</th>
+<th>角色</th>
+<th>内容</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T-0001</td>
+<td>host-dev</td>
+<td>路由统一外壳与 limit 裁剪</td>
+<td>done</td>
+</tr>
+<tr>
+<td>T-0002</td>
+<td>core-dev</td>
+<td>批量导入 ≤200 条、逐条校验</td>
+<td>done</td>
+</tr>
+<tr>
+<td>T-0003</td>
+<td>ui-dev</td>
+<td>控制台可操作（claim / done）</td>
+<td>done</td>
+</tr>
+<tr>
+<td>T-0005</td>
+<td>content</td>
+<td>演示票（被覆盖）</td>
+<td>blocked</td>
+</tr>
+<tr>
+<td>T-0006</td>
+<td>ui-dev</td>
+<td>控制台显示总线未读</td>
+<td>done</td>
+</tr>
+<tr>
+<td>T-0007</td>
+<td>host-dev</td>
+<td>派票作业书带总线指令</td>
+<td>done</td>
+</tr>
+<tr>
+<td>T-0008</td>
+<td>core-dev</td>
+<td>v1 行 <code>ok</code> 字段兼容 0 / 字符串</td>
+<td>done</td>
+</tr>
+<tr>
+<td>T-0009</td>
+<td>host-dev</td>
+<td>拆路由，<code>index.js</code> 329→69 行</td>
+<td>done</td>
+</tr>
+<tr>
+<td>T-0010</td>
+<td>core-dev</td>
+<td>写接口幂等键</td>
+<td>done</td>
+</tr>
+<tr>
+<td>T-0011</td>
+<td>architect</td>
+<td>数据契约 <code>docs/DATA.md</code></td>
+<td>done</td>
+</tr>
+<tr>
+<td>T-0004</td>
+<td>qa</td>
+<td>写域冲突提示的回归</td>
+<td>ready</td>
+</tr>
+</tbody>
+</table>
+<h3>6.3 验证</h3>
+<p>门禁共 14 项，串行执行并带目录锁（避免两个 agent 同时重建产物）：</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>项</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>构建</td>
+<td><code>python build.py --check</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>界面冒烟</td>
+<td><code>test/smoke.cjs</code>（652 帧、48 画布、3 注册）</td>
+</tr>
+<tr>
+<td>3</td>
+<td>分层视图</td>
+<td><code>test/levels.cjs</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>启动序列</td>
+<td><code>test/boot.cjs</code>（七阶段按序）</td>
+</tr>
+<tr>
+<td>5</td>
+<td>网络队列</td>
+<td><code>test/net.cjs</code>（25 条）</td>
+</tr>
+<tr>
+<td>6</td>
+<td>宿主契约</td>
+<td><code>test/host.mjs</code>（151 条断言、44 个错误码快照）</td>
+</tr>
+<tr>
+<td>7</td>
+<td>领域层</td>
+<td><code>test/core.test.mjs</code>（24 条）</td>
+</tr>
+<tr>
+<td>8</td>
+<td>旧数据兼容</td>
+<td><code>test/legacy.test.mjs</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td>存储层</td>
+<td><code>test/storage.test.mjs</code>（含一万条重建）</td>
+</tr>
+<tr>
+<td>10</td>
+<td>派票</td>
+<td><code>test/dispatch.test.mjs</code>（32 条）</td>
+</tr>
+<tr>
+<td>11</td>
+<td>总线</td>
+<td><code>test/bus.test.mjs</code>（19 条）</td>
+</tr>
+<tr>
+<td>12</td>
+<td>入口开票</td>
+<td><code>test/intake.test.mjs</code>（12 条）</td>
+</tr>
+<tr>
+<td>13</td>
+<td>数据契约</td>
+<td><code>tools/check_contract.mjs</code></td>
+</tr>
+<tr>
+<td>14</td>
+<td>环境自检</td>
+<td><code>tools/activate.py</code></td>
+</tr>
+</tbody>
+</table>
+<h3>6.4 提交</h3>
+<p>最近提交（本地 <code>main</code>）：<code>e78278b</code> 导航页签 → <code>a2e0681</code> 侧边栏收敛 → <code>4ce0f1c</code> 长期对话开场白 → <code>f886cfa</code> / <code>5dba4d7</code> 幂等 → <code>af00a76</code> 拆路由与数据契约 → <code>33c3021</code> / <code>878ed66</code> / <code>490fba7</code> / <code>ca483f3</code> / <code>4f6c33b</code> / <code>1c88c0d</code>。</p>
+<p>远端 <code>https://github.com/Canvilke/neuro-loop</code>，<code>main</code> 分支。推送偶发 <code>Connection was reset</code>，本地提交不丢，网络恢复后补推。</p>
+<hr>
+<h2>7. 角色与任务分配</h2>
+<p>六个角色，契约写在 <code>team/roles.json</code>，详细职责见同目录 <code>ROLES.md</code>。</p>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>中文名</th>
+<th>负责块</th>
+<th>主要目录</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>architect</td>
+<td>架构</td>
+<td>B7</td>
+<td><code>docs/</code>、<code>AGENTS.md</code>、<code>README.md</code></td>
+</tr>
+<tr>
+<td>core-dev</td>
+<td>领域层</td>
+<td>B1、B2</td>
+<td><code>core/</code>、<code>storage/</code></td>
+</tr>
+<tr>
+<td>host-dev</td>
+<td>宿主层</td>
+<td>B3</td>
+<td><code>host/</code>、<code>index.js</code></td>
+</tr>
+<tr>
+<td>ui-dev</td>
+<td>界面</td>
+<td>B4</td>
+<td><code>src/</code>、<code>build.py</code></td>
+</tr>
+<tr>
+<td>content</td>
+<td>内容</td>
+<td>B5</td>
+<td><code>daily/</code>、<code>plan/</code>、<code>content/</code></td>
+</tr>
+<tr>
+<td>qa</td>
+<td>验证</td>
+<td>B6</td>
+<td><code>test/</code>、<code>tools/check_all.ps1</code>、<code>team/</code>、<code>bus/</code></td>
+</tr>
+</tbody>
+</table>
+<p>分配原则：一票一人一写域；同一文件的修改权只属于其负责角色；跨块改动必须由架构角色开票并在票面写明理由。</p>
+<hr>
+<h2>8. 通讯约定</h2>
+<h3>8.1 三条通道</h3>
+<table>
+<thead>
+<tr>
+<th>通道</th>
+<th>用途</th>
+<th>载体</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>票单</td>
+<td>任务本身：谁做、做什么、验收标准</td>
+<td><code>team/tickets.jsonl</code> + <code>tools/ticket.mjs</code></td>
+</tr>
+<tr>
+<td>总线</td>
+<td>过程与结论：交付、报警、仓库事件、微信转发</td>
+<td><code>bus/bus.jsonl</code> + <code>tools/bus.mjs</code></td>
+</tr>
+<tr>
+<td>信箱</td>
+<td>一对一留言，适合较长说明</td>
+<td><code>tools/mail.py</code></td>
+</tr>
+</tbody>
+</table>
+<h3>8.2 总线约定</h3>
+<p>四条 lane：<code>sub</code>（子代理交付）、<code>repo</code>（仓库与票单事件）、<code>wx</code>（微信进出）、<code>note</code>（备忘）。</p>
+<ul>
+<li>一条消息只表达一件事，控制在 400 字以内。</li>
+<li>交付必须带四要素：票号、改了什么、验证结果、遗留问题。</li>
+<li>结论性消息用 <code>ref</code> 指向票号或上一次消息 id，便于串联。</li>
+<li>阅读方用 <code>ack</code> 标记已读；<code>ack</code> 只追加，不改历史。</li>
+</ul>
+<h3>8.3 开工与收工</h3>
+<p>开工三步：<code>node tools/ticket.mjs list</code> → <code>node tools/bus.mjs pending</code> → 读 <code>NEXT.md</code> 顶部三行。</p>
+<p>收工三行：票号与结果、门禁是否全绿、下一次接手要从哪继续。</p>
+<h3>8.4 失忆恢复</h3>
+<p>任何会话中断后，不依赖记忆，按以下顺序恢复：<code>ticket.mjs list --all</code> 看全局 → <code>bus.mjs tail --limit 20</code> 看最近进展 → <code>tools/activate.py</code> 确认环境与产物一致。</p>
+<hr>
+<h2>9. 夜间执行范围</h2>
+<p>用户夜间不在场，执行侧由定时任务与本会话推进。为保证互不影响，约定如下。</p>
+<h3>9.1 时间窗</h3>
+<table>
+<thead>
+<tr>
+<th>时段</th>
+<th>允许的事</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00:00–07:00</td>
+<td>只做票单内的事；不打印；不改前端视觉</td>
+</tr>
+<tr>
+<td>07:00 之后</td>
+<td>允许出纸（晨间任务）；仍不做视觉迭代</td>
+</tr>
+<tr>
+<td>白天（用户在）</td>
+<td>任何改动先开票</td>
+</tr>
+</tbody>
+</table>
+<h3>9.2 写域与并发</h3>
+<ul>
+<li>一个时刻最多两个执行者；两者的 scope 不得相交（<code>tools/ticket.mjs new</code> 会提示冲突）。</li>
+<li>共享产物 <code>client.js</code>、<code>projection.db</code>、<code>state.json</code> 只允许由门禁或宿主单一路径生成，禁止手改。</li>
+<li>门禁带目录锁，两个执行者同时跑会自动串行；锁超过 900 秒视为陈旧可抢占。</li>
+</ul>
+<h3>9.3 提交与推送</h3>
+<ul>
+<li>只有主会话（lead）拥有提交权；子代理只改文件、跑测试、发总线消息。</li>
+<li>提交信息必须带票号；一次提交只覆盖一张票。</li>
+<li>推送失败最多重试两次，仍失败则写入 <code>NEXT.md</code>，不在夜间反复试。</li>
+</ul>
+<h3>9.4 停机条件</h3>
+<p>出现以下任一情况立即停止并记录，不自行绕过：门禁连续两次失败且原因不明；涉及删除数据或改写 L1；需要安装依赖或修改系统设置；需要用户口令或账户操作。</p>
+<h3>9.5 次日汇报格式</h3>
+<p><code>NEXT.md</code> 顶部固定三行：当前本地提交、门禁状态、下一件事。详细记录留在票单与总线，不写进汇报。</p>
+<hr>
+<h2>10. 新会话接入</h2>
+<p>每个专项负责人使用一个长期会话。接入步骤：</p>
+<ol>
+<li>新建会话，工作目录设为 <code>C:\Users\86152\Desktop\致远</code>。</li>
+<li>粘贴 <code>docs/BOOTSTRAP.md</code> 中对应角色的开场白。</li>
+<li>该会话按"开工三步"自检，然后 <code>node tools/ticket.mjs next --role &lt;角色&gt;</code> 领票。</li>
+</ol>
+<p>接入后该会话的权限边界：只读其他块、只写自己块、只跑门禁不提交。跨块需求通过开票解决，不直接改别人的文件。</p>
+<hr>
+<h2>11. 风险与未完成项</h2>
+<table>
+<thead>
+<tr>
+<th>风险</th>
+<th>现状</th>
+<th>处置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>打印机物理断链</td>
+<td>USB 设备不枚举（<code>CM_PROB_PHANTOM</code>）</td>
+<td>恢复后补打；出纸逻辑已做失败降级到 PDF</td>
+</tr>
+<tr>
+<td>GitHub API 被改写</td>
+<td><code>api.github.com</code> 301 → <code>github.com</code>，<code>gh</code> 无法校验令牌</td>
+<td>只用 HTTPS 推送；watcher 暂不可用</td>
+</tr>
+<tr>
+<td>令牌暴露</td>
+<td>曾贴入对话</td>
+<td>建议作废重发，改为文件读取</td>
+</tr>
+<tr>
+<td>方法卡未审核</td>
+<td>10 张全部 <code>verified:false</code></td>
+<td>需用户逐张确认后升为 <code>self</code></td>
+</tr>
+<tr>
+<td>静态星图是脚手架</td>
+<td><code>data/seed.json</code> 六科 69 个考点为占位</td>
+<td>待按教材重建</td>
+</tr>
+<tr>
+<td>启动视图文件过大</td>
+<td><code>src/11-boot-view.js</code> 1223 行</td>
+<td>下一次重构候选</td>
+</tr>
+<tr>
+<td>自动派发未做</td>
+<td>派票仍需人工触发</td>
+<td>见 <code>docs/END-TO-END.md</code> 未做清单</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>12. 附录</h2>
+<h3>12.1 命令速查</h3>
+<pre><code>python build.py --check                     # 构建与语法检查
+powershell -File tools/check_all.ps1        # 门禁 14 项
+node tools/ticket.mjs list [--all]          # 看板
+node tools/ticket.mjs next --role core-dev  # 领票
+node tools/ticket.mjs brief T-0001          # 生成作业书
+node tools/bus.mjs pending                  # 未读
+node tools/bus.mjs tail --limit 20          # 最近消息
+python tools/mail.py check --to lead        # 信箱
+python tools/activate.py --test             # 十秒体检
+</code></pre>
+<h3>12.2 路径速查</h3>
+<table>
+<thead>
+<tr>
+<th>用途</th>
+<th>路径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>项目根</td>
+<td><code>C:\Users\86152\Desktop\致远\neuro-loop</code></td>
+</tr>
+<tr>
+<td>数据真源</td>
+<td><code>%USERPROFILE%\.dsh\neuro-loop\events-YYYY-MM.jsonl</code></td>
+</tr>
+<tr>
+<td>投影与视图</td>
+<td><code>%USERPROFILE%\.dsh\neuro-loop\projection.db</code>、<code>state.json</code></td>
+</tr>
+<tr>
+<td>学习资料</td>
+<td><code>C:\Users\86152\Desktop\致远\学习资料\</code></td>
+</tr>
+<tr>
+<td>每日页面</td>
+<td><code>neuro-loop\daily\</code></td>
+</tr>
+<tr>
+<td>计划与排程</td>
+<td><code>neuro-loop\plan\</code></td>
+</tr>
+</tbody>
+</table>
+<h3>12.3 术语</h3>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>判定</td>
+<td>一次做题时的判断与结果，系统的最小单位</td>
+</tr>
+<tr>
+<td>假阳性</td>
+<td>命中率高但推理不成立，考场容易翻车</td>
+</tr>
+<tr>
+<td>方法卡</td>
+<td>跨章节的可迁移解题方法，含判据与实例</td>
+</tr>
+<tr>
+<td>投影</td>
+<td>由事件流计算出的当前状态，可重建</td>
+</tr>
+<tr>
+<td>票</td>
+<td>一件可验收的工作，含写域与验收标准</td>
+</tr>
+<tr>
+<td>总线</td>
+<td>追加型协作日志，四条 lane</td>
+</tr>
+</tbody>
+</table></body></html>

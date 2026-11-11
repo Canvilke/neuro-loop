@@ -317,3 +317,13 @@
 - M12-19 `POST /neuroloop/events` 批量导入（≤200、逐条校验、部分成功，T-0002）—— DONE
 - M12-20 门禁目录锁：两个 agent 同时 `check_all` 会互相重建 client.js（net.cjs 偶发失败的根因）—— DONE
 - M12-21 v1 行 `ok` 的 0/'false' 兼容（T-0008，`storage/legacy.js` 的 `isFalse`）—— DONE
+
+## M13 —— 交接材料（2026-11-12）
+
+- [x] M13-1 项目手册 `docs/HANDBOOK.md`（来源、结构、存储、进展、分块、通讯、夜间范围）
+- [x] M13-2 角色职责书 `docs/ROLES.md`（六角色 × 约 1500 字）
+- [x] M13-3 渲染脚本 `docs/build_handbook.py`（Markdown → HTML → Edge PDF）
+- [x] M13-4 桌面整理（15 个文件归档，清单在 `致远/桌面归档-2026-11-12/归档清单.md`）
+- [x] M13-5 `docs/BOOTSTRAP.md` 扩到六角色（新增 architect / qa）
+- [ ] M13-6 六个长期会话建立后，按票单接管各自块
+- [ ] M13-7 本次提交推送（等网络）

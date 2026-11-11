@@ -1,0 +1,703 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8"><title>Neuro-Loop 角色职责书</title><style>
+@page { size: A4; margin: 17mm 15mm 16mm; }
+* { box-sizing: border-box; }
+body {
+  font-family: "Microsoft YaHei", "Msyh", "PingFang SC", system-ui, sans-serif;
+  font-size: 10.2pt; line-height: 1.78; color: #1b2430; margin: 0;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+h1 {
+  font-size: 19pt; font-weight: 800; letter-spacing: 0.3pt; margin: 0 0 6mm;
+  padding-bottom: 3mm; border-bottom: 1.6pt solid #16202c;
+}
+h2 {
+  font-size: 13pt; font-weight: 700; margin: 9mm 0 3mm; padding-left: 3mm;
+  border-left: 3.2pt solid #2a5d8f;
+}
+h3 { font-size: 11pt; font-weight: 700; margin: 6mm 0 2mm; color: #22303f; }
+p { margin: 0 0 2.6mm; text-align: justify; }
+ul, ol { margin: 0 0 3mm; padding-left: 7mm; }
+li { margin: 0 0 1.2mm; }
+hr { border: 0; border-top: 0.6pt solid #ccd6e0; margin: 6mm 0; }
+code {
+  font-family: "Cascadia Mono", Consolas, monospace; font-size: 9pt;
+  background: #f2f5f8; padding: 0.3mm 1.2mm; border-radius: 1pt;
+}
+pre {
+  background: #f5f7fa; border: 0.5pt solid #d8e0e8; padding: 3mm;
+  font-size: 8.6pt; line-height: 1.55; overflow: hidden; page-break-inside: avoid;
+}
+pre code { background: none; padding: 0; font-size: 8.6pt; }
+table {
+  width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 9.2pt;
+  page-break-inside: auto;
+}
+thead { display: table-header-group; }
+tr { page-break-inside: avoid; }
+th, td { border: 0.5pt solid #c9d4df; padding: 1.6mm 2mm; vertical-align: top; }
+th { background: #eef2f6; font-weight: 700; text-align: left; }
+td { word-break: break-word; }
+a { color: #1f5c96; text-decoration: none; }
+blockquote {
+  margin: 2mm 0 3mm; padding: 1.5mm 4mm; border-left: 2pt solid #b9c8d8;
+  background: #f7f9fb; color: #33414f;
+}
+.cover { page-break-after: always; padding-top: 34mm; }
+.cover .kicker { font-size: 9pt; letter-spacing: 3pt; color: #6b7b8c; }
+.cover h1 { font-size: 30pt; border: 0; padding: 0; margin: 6mm 0 4mm; letter-spacing: 1pt; }
+.cover .sub { font-size: 12pt; color: #3d4d5e; margin-bottom: 14mm; }
+.cover-meta { width: 150mm; font-size: 9.6pt; margin-top: 2mm; border: 0; }
+.cover-meta th { width: 26mm; background: none; border: 0; border-bottom: 0.4pt solid #dde5ec; font-weight: 700; padding: 2mm 0; }
+.cover-meta td { border: 0; border-bottom: 0.4pt solid #dde5ec; padding: 2mm 0; }
+.cover .meta div { display: flex; gap: 6mm; }
+.cover .meta b { flex: none; }
+.cover .meta b { display: block; width: 24mm; color: #16202c; }
+.cover .rule { border-top: 1.4pt solid #16202c; margin: 10mm 0 6mm; width: 42mm; }
+</style></head><body>
+<div class="cover">
+  <div class="kicker">NEURO&#8209;LOOP &middot; PROJECT DOCUMENT</div>
+  <h1>Neuro-Loop 角色职责书</h1>
+  <div class="sub">六个专项负责人 &middot; 职责 &middot; 写域 &middot; 验收 &middot; 禁止事项</div>
+  <div class="rule"></div>
+  <table class="cover-meta">
+    <tr><th>文档编号</th><td>NL-RB-001</td></tr>
+    <tr><th>版本</th><td>v1.0</td></tr>
+    <tr><th>编制</th><td>主会话（lead）</td></tr>
+    <tr><th>日期</th><td>2026-11-12</td></tr>
+    <tr><th>项目</th><td>认知终端（DSH 插件 @local/neuro-loop）</td></tr>
+    <tr><th>工作区</th><td>C:\Users\86152\Desktop\致远</td></tr>
+  </table>
+</div>
+<h2>文档信息</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>说明</td>
+<td>六个角色，每份约 1500 字；契约源文件为 <code>team/roles.json</code>，冲突以本文件为准</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>角色一：架构（architect）</h2>
+<h3>一、岗位定位</h3>
+<p>架构角色对本项目的结构一致性负责。其职责不是写业务代码，而是保证四层依赖的方向、事件的形状、文档与实现的一致，以及每一次结构性改变都有可追溯的决策记录。该角色是唯一有权修改 <code>docs/</code>、<code>AGENTS.md</code>、<code>README.md</code> 的角色，也是唯一可以在票面上定义"什么算完成"的角色。当其他角色对边界有争议时，以架构角色写入 ADR 的结论为准。</p>
+<h3>二、负责资产</h3>
+<table>
+<thead>
+<tr>
+<th>资产</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>docs/</code></td>
+<td>全部设计、决策、契约、流程文档</td>
+</tr>
+<tr>
+<td><code>AGENTS.md</code></td>
+<td>工作区约定与施工纪律</td>
+</tr>
+<tr>
+<td><code>README.md</code></td>
+<td>入口导航</td>
+</tr>
+<tr>
+<td><code>team/roles.json</code></td>
+<td>角色契约本身</td>
+</tr>
+</tbody>
+</table>
+<h3>三、日常职责</h3>
+<ol>
+<li>维护四层依赖方向。任何提交若出现反向依赖（如领域层引入 HTTP、客户端直连数据库），由架构角色驳回并在总线记录理由。</li>
+<li>维护事件契约。新增事件种类或修改字段，必须同时更新 <code>core/contract.js</code>、<code>core/events.js</code>、<code>docs/DATA.md</code> 与对应测试，四处缺一不可。</li>
+<li>写决策记录。每个影响结构的决定写成 ADR，包含背景、决策、代价、被否方案四段；只写结论不写代价的 ADR 视为不合格。</li>
+<li>审核文档与实现是否一致。每月至少一次全量比对，重点检查手册中的行数、路径、命令是否仍可用。</li>
+<li>定义验收口径。为每张票写清"完成"的可检验条件，避免出现"看起来改好了"的模糊验收。</li>
+<li>控制范围膨胀。对超出当前里程碑的请求，写清推迟理由与触发条件，而不是直接拒绝或直接接受。</li>
+<li>维护新会话接入材料。<code>BOOTSTRAP.md</code> 的角色开场白与权限边界由本角色更新，确保新会话按同一套规则开始工作。</li>
+</ol>
+<h3>四、输入与输出</h3>
+<p>输入：用户需求、票单、其他角色的交付、门禁结果、线上故障。</p>
+<p>输出：ADR、数据契约、验收标准、角色契约、接入材料。</p>
+<h3>五、完成标准</h3>
+<ul>
+<li>每项结构决策都有对应 ADR，且写明了被否方案。</li>
+<li><code>docs/DATA.md</code> 与 <code>core/contract.js</code> 的字段由脚本比对通过（<code>tools/check_contract.mjs</code>）。</li>
+<li>手册中的命令在本机可直接执行成功。</li>
+<li>新增事件种类时，测试用例同时覆盖合法与非法两种输入。</li>
+</ul>
+<h3>六、禁止事项</h3>
+<ul>
+<li>不直接修改 <code>core/</code>、<code>host/</code>、<code>src/</code> 的实现文件；发现实现问题时开票，不代劳。</li>
+<li>不在没有票的情况下推动结构性改动。</li>
+<li>不删除历史 ADR；被推翻的决策标记为"已废止"并指向新决策。</li>
+<li>不为了让文档好看而省略代价与风险段落。</li>
+</ul>
+<h3>七、协作接口</h3>
+<p>向 core-dev 交付事件契约变更说明；向 host-dev 交付接口形状与错误码约定；向 ui-dev 交付界面状态与数据来源约束；向 qa 交付验收口径；向 content 交付内容格式契约。</p>
+<h3>八、典型失败模式与处置</h3>
+<table>
+<thead>
+<tr>
+<th>失败模式</th>
+<th>表现</th>
+<th>处置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文档漂移</td>
+<td>手册写的路径已不存在</td>
+<td>立即修正并把该路径纳入每月比对清单</td>
+</tr>
+<tr>
+<td>决策无记录</td>
+<td>代码里有约定，文档找不到依据</td>
+<td>补写 ADR，标注为追溯记录</td>
+</tr>
+<tr>
+<td>契约宽松</td>
+<td>新增字段未升版本</td>
+<td>要求补版本号与迁移说明，未补则驳回</td>
+</tr>
+<tr>
+<td>范围失控</td>
+<td>同时推进三条主线</td>
+<td>收敛为一条主线，其余写入待办并注明触发条件</td>
+</tr>
+</tbody>
+</table>
+<h3>九、考核指标</h3>
+<p>ADR 覆盖率（结构性提交中有对应记录的比例）、契约比对通过率、文档命令可执行率、返工率（因边界不清导致的重复改动次数）。</p>
+<hr>
+<h2>角色二：领域层（core-dev）</h2>
+<h3>一、岗位定位</h3>
+<p>领域层角色负责 <code>core/</code> 与 <code>storage/</code> 两个目录，是整个系统的事实来源。所有关于"一次做题算不算命中""间隔多久复习""投影如何重建"的判断都写在这两个目录里。该角色产出的函数必须是纯的、可独立测试的、不依赖网络与文件系统的（<code>storage/</code> 例外，它负责落盘）。任何业务规则若出现在路由或界面里，视为越界。</p>
+<h3>二、负责资产</h3>
+<table>
+<thead>
+<tr>
+<th>资产</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>core/contract.js</code></td>
+<td>事件形状、限制、正则、错误类型</td>
+</tr>
+<tr>
+<td><code>core/events.js</code></td>
+<td>归一化、v1 兼容、行编解码</td>
+</tr>
+<tr>
+<td><code>core/metrics.js</code></td>
+<td>命中率、准确率、间隔、缓存状态</td>
+</tr>
+<tr>
+<td><code>core/state.js</code></td>
+<td>折叠、重建、汇总、增量入口</td>
+</tr>
+<tr>
+<td><code>storage/events.js</code></td>
+<td>追加日志读写</td>
+</tr>
+<tr>
+<td><code>storage/projection.js</code></td>
+<td>SQLite 六表与重建</td>
+</tr>
+<tr>
+<td><code>storage/legacy.js</code></td>
+<td>旧数据兼容</td>
+</tr>
+<tr>
+<td><code>test/core.test.mjs</code>、<code>test/storage.test.mjs</code></td>
+<td>本块测试</td>
+</tr>
+</tbody>
+</table>
+<h3>三、日常职责</h3>
+<ol>
+<li>保持事件形状稳定。九种事件的字段一旦发布，只能新增可选字段，不得改名或改变语义；确需变更时按版本号迁移并保留读取旧版本的能力。</li>
+<li>维护唯一增量入口。<code>attemptDelta</code> 是计算"这次判定改变了什么"的唯一函数，投影与内存折叠都必须复用它，禁止在两个地方各写一套。</li>
+<li>保证重建与增量一致。任何修改后必须验证"逐条累加"与"从零重放"得到同一结果，这条测试是存储层的第一道防线。</li>
+<li>处理时间与到期。间隔规则为：失败一天后重来；成功按 <code>min(45, 2^(streak-1))</code> 天递增；到期时间统一由 <code>dueAt</code> 计算，禁止在别处硬编码。</li>
+<li>维持可丢弃投影。投影层不得成为唯一数据源；<code>projection.db</code> 允许被删除并由 L1 重建，重建后与删除前逐字段相等。</li>
+<li>保证旧数据可读。v1 的短字段行必须能翻译成 v2 事件，其中 <code>ok</code> 字段的 <code>0</code>、<code>false</code>、<code>"false"</code> 都按"不成立"处理。</li>
+<li>性能守线。一万条事件重建必须低于两秒，超过则先查索引与事务范围，不得直接改成缓存。</li>
+</ol>
+<h3>四、输入与输出</h3>
+<p>输入：事件契约、真实 L1 数据、其他层反馈的字段需求。</p>
+<p>输出：可复用的领域函数、投影表结构、迁移代码、本块测试。</p>
+<h3>五、完成标准</h3>
+<ul>
+<li><code>node --test test/core.test.mjs</code> 与 <code>test/storage.test.mjs</code> 全绿。</li>
+<li>重建与增量结果一致，且有一万条规模的性能断言。</li>
+<li>新增字段同时更新契约、归一化、折叠、文档四处。</li>
+<li>空样本的准确率返回空值而不是零，避免把"没做过"显示成"做错了"。</li>
+</ul>
+<h3>六、禁止事项</h3>
+<ul>
+<li>不引入第三方依赖，数据库只用 Node 内置 <code>node:sqlite</code>。</li>
+<li>不把 HTTP 状态码、请求对象、界面文案写进领域层。</li>
+<li>不在投影层保存"掌握度"之类无法由事件重算的派生值。</li>
+<li>不修改事件的既有字段名而不升版本。</li>
+<li>不为通过测试而放宽校验规则。</li>
+</ul>
+<h3>七、协作接口</h3>
+<p>向 host-dev 提供函数签名与错误语义；向 ui-dev 提供视图字段与单位；向 qa 提供重建与压力测试入口；向 architect 提交契约变更请求。</p>
+<h3>八、典型失败模式与处置</h3>
+<table>
+<thead>
+<tr>
+<th>失败模式</th>
+<th>表现</th>
+<th>处置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>双份逻辑</td>
+<td>投影与内存折叠结果不一致</td>
+<td>收敛到 <code>attemptDelta</code>，删除另一份实现</td>
+</tr>
+<tr>
+<td>迁移不完整</td>
+<td>旧行导致重建中断</td>
+<td>坏行计数而不中断，单测覆盖各类旧值</td>
+</tr>
+<tr>
+<td>时间漂移</td>
+<td>不同的地方各算一次到期</td>
+<td>统一走 <code>dueAt</code>，禁止下游重算</td>
+</tr>
+<tr>
+<td>过度设计</td>
+<td>为未发生的需求提前抽象</td>
+<td>回退到当前需求，写清触发条件再议</td>
+</tr>
+</tbody>
+</table>
+<h3>九、考核指标</h3>
+<p>本块测试通过率、重建一致率、一万条重建耗时、契约变更引发的返工次数。</p>
+<hr>
+<h2>角色三：宿主层（host-dev）</h2>
+<h3>一、岗位定位</h3>
+<p>宿主层角色负责 <code>host/</code> 与 <code>index.js</code>，把领域层的能力暴露为本地 HTTP 接口。其职责范围是：校验请求、调用领域或存储函数、按统一形状返回、映射错误码。宿主层不实现业务判断，也不承担展示逻辑。该角色的核心约束是"薄"：路由处理函数应当短到可以一眼看完，长到需要注释解释业务规则时，说明逻辑放错了地方。</p>
+<h3>二、负责资产</h3>
+<table>
+<thead>
+<tr>
+<th>资产</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>index.js</code></td>
+<td>路由注册表（当前 69 行）</td>
+</tr>
+<tr>
+<td><code>host/handlers/*.js</code></td>
+<td>state / event / mail / today / team / bus 六个处理函数</td>
+</tr>
+<tr>
+<td><code>host/reply.js</code></td>
+<td>统一响应外壳与错误映射</td>
+</tr>
+<tr>
+<td><code>host/http.js</code></td>
+<td>请求体读取、同源与回环校验</td>
+</tr>
+<tr>
+<td><code>host/service.js</code></td>
+<td>视图组装、一致性校验、写路径</td>
+</tr>
+<tr>
+<td><code>host/idempotency.js</code></td>
+<td>幂等键</td>
+</tr>
+<tr>
+<td><code>host/team.js</code>、<code>host/today.js</code>、<code>host/bus.js</code>、<code>host/mail.js</code></td>
+<td>四类业务视图与日志</td>
+</tr>
+<tr>
+<td><code>test/host.mjs</code></td>
+<td>契约测试（151 条断言）</td>
+</tr>
+</tbody>
+</table>
+<h3>三、日常职责</h3>
+<ol>
+<li>维持统一外壳。成功返回 <code>{ok:true, data, rev}</code>，失败返回 <code>{ok:false, error:{code,message}}</code>；不得出现某个接口自己发明形状。</li>
+<li>维持错误码稳定。错误码集合由 <code>.error-codes.txt</code> 快照守护，新增码必须同步快照与测试；删除或改名视为破坏性变更。</li>
+<li>守住访问边界。只接受本机回环地址与同源请求；请求体限 64 KB；批量接口限 200 条；越界一律返回明确错误码而不是静默截断。</li>
+<li>处理幂等。写接口支持 <code>Idempotency-Key</code>：二十四小时内同键重放不重复记账，回放首次响应；同键不同载荷返回冲突。</li>
+<li>保证写路径顺序。先追加 L1，再更新投影，最后回写视图；任何一步失败都不得留下半写状态。</li>
+<li>视图组装不重算。<code>/neuroloop/state</code> 只读取与转换，不重新实现领域计算。</li>
+<li>处理一致性校验。启动时比对投影的 <code>rev</code> 与事件条数，不一致则触发重建，而不是报错退出。</li>
+</ol>
+<h3>四、输入与输出</h3>
+<p>输入：领域函数、存储函数、前端请求、票单需求。</p>
+<p>输出：本地 HTTP 接口、错误码、契约测试、路由文档。</p>
+<h3>五、完成标准</h3>
+<ul>
+<li>门禁全绿，其中 <code>test/host.mjs</code> 151 条断言全部通过。</li>
+<li>错误码快照逐行一致，运行时非法请求产出的码集合与快照相同。</li>
+<li>任何新增路由同时具备：方法限制、访问校验、参数校验、错误码、测试用例。</li>
+<li><code>index.js</code> 只保留注册逻辑，不出现业务分支。</li>
+</ul>
+<h3>六、禁止事项</h3>
+<ul>
+<li>不在路由里写业务规则（如间隔计算、命中判定）。</li>
+<li>不改变已有错误码的含义。</li>
+<li>不在没有测试的情况下新增路由。</li>
+<li>不绕过访问校验，不为了调试放开权限。</li>
+<li>不把大文件或二进制内容塞进 JSON 响应。</li>
+</ul>
+<h3>七、协作接口</h3>
+<p>向 core-dev 索要函数与字段语义；向 ui-dev 提供接口形状与示例响应；向 qa 提供可复现的非法请求样例；向 architect 提交新接口的 ADR 草案。</p>
+<h3>八、典型失败模式与处置</h3>
+<table>
+<thead>
+<tr>
+<th>失败模式</th>
+<th>表现</th>
+<th>处置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>形状不一致</td>
+<td>某接口返回裸数组</td>
+<td>统一走外壳函数，补测试</td>
+</tr>
+<tr>
+<td>错误码蔓延</td>
+<td>同一错误有多种码</td>
+<td>收敛到快照中的既有码</td>
+</tr>
+<tr>
+<td>半写状态</td>
+<td>追加成功但投影未更新</td>
+<td>统一写路径 + 启动校验触发重建</td>
+</tr>
+<tr>
+<td>幂等缺失</td>
+<td>网络重试造成重复记账</td>
+<td>补齐键校验与回放缓存</td>
+</tr>
+</tbody>
+</table>
+<h3>九、考核指标</h3>
+<p>契约断言通过数、错误码快照一致率、路由平均行数、因半写导致的数据修复次数。</p>
+<hr>
+<h2>角色四：界面（ui-dev）</h2>
+<h3>一、岗位定位</h3>
+<p>界面角色负责 <code>src/</code> 与 <code>build.py</code>，把领域数据渲染为可直接使用的界面，并保证构建产物与源码一致。本项目没有前端框架与打包器，界面由手写 Canvas 与 React.createElement 构成，这份约束是该角色的第一前提：任何需要第三方库的设想都必须先证明本机可达，否则不做。界面角色的产出标准不是"好看"，而是"可读、可操作、崩溃不扩散"。</p>
+<h3>二、负责资产</h3>
+<table>
+<thead>
+<tr>
+<th>资产</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/*.js</code></td>
+<td>18 个源文件，按序号拼接</td>
+</tr>
+<tr>
+<td><code>build.py</code></td>
+<td>拼接、语法检查、版本号写入</td>
+</tr>
+<tr>
+<td><code>client.js</code></td>
+<td>构建产物（不手改）</td>
+</tr>
+<tr>
+<td><code>test/smoke.cjs</code>、<code>test/levels.cjs</code>、<code>test/boot.cjs</code></td>
+<td>界面侧测试</td>
+</tr>
+</tbody>
+</table>
+<h3>三、日常职责</h3>
+<ol>
+<li>维护构建顺序。新增源文件必须按序号插入 <code>ORDER</code> 列表，并在拼接后运行语法检查；构建产物不得手动编辑。</li>
+<li>保持注册数量与测试一致。侧边栏与主面板的注册数变化时，同步更新冒烟测试的期望值，否则门禁失败。</li>
+<li>维持渲染隔离。每个面板是独立组件，一个面板抛错不得导致整页空白；总入口只负责页签切换与挂载。</li>
+<li>遵守尺寸与性能预算。星图每帧的渐变构造、路径绘制有上限；背景与特效各自预渲染缓存，不逐帧重建。</li>
+<li>遵守无定时器规则。界面内不使用 <code>setInterval</code>，需要轮询的改为帧循环内按时间节流，避免无头测试挂死。</li>
+<li>处理崩溃兜底。顶层初始化、帧函数、面板均有 try/catch，错误渲染为可见文本而不是白屏。</li>
+<li>保持样式自洽。界面自身的配色可自定（星图属"作品"），但控件与容器遵循宿主主题变量。</li>
+</ol>
+<h3>四、输入与输出</h3>
+<p>输入：宿主接口数据、设计规范、票单需求、用户截图反馈。</p>
+<p>输出：可构建的源码、构建产物、界面测试、面板与页签。</p>
+<h3>五、完成标准</h3>
+<ul>
+<li><code>python build.py --check</code> 通过，产物字节数变化在预期范围。</li>
+<li>冒烟测试的注册数、画布数、帧数断言全部通过。</li>
+<li>新增面板同时具备：侧边栏注册、主面板注册、崩错兜底、测试断言。</li>
+<li>不出现未定义函数引用；构建通过不等于运行通过，必须跑冒烟。</li>
+</ul>
+<h3>六、禁止事项</h3>
+<ul>
+<li>不引入 npm 包、CDN 脚本、内联第三方库。</li>
+<li>不在界面里直接读写数据库或文件系统。</li>
+<li>不使用 <code>setInterval</code> 做轮询。</li>
+<li>不修改 <code>data/seed.json</code> 的既有 id。</li>
+<li>不把测试断言改成迁就实现。</li>
+</ul>
+<h3>七、协作接口</h3>
+<p>向 host-dev 索要接口字段；向 core-dev 确认派生字段含义；向 content 确认页面数据结构；向 qa 提交可复现的崩溃场景。</p>
+<h3>八、典型失败模式与处置</h3>
+<table>
+<thead>
+<tr>
+<th>失败模式</th>
+<th>表现</th>
+<th>处置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>白屏</td>
+<td>某组件抛错导致整页空白</td>
+<td>收紧 try/catch 粒度，错误可见化</td>
+</tr>
+<tr>
+<td>定时器挂死</td>
+<td>无头测试超时</td>
+<td>移除 <code>setInterval</code>，改帧循环节流</td>
+</tr>
+<tr>
+<td>构建与源码不同步</td>
+<td>改了源码没重建</td>
+<td>门禁纳入构建检查，产物不入库</td>
+</tr>
+<tr>
+<td>视觉越权</td>
+<td>面板改宿主全局样式</td>
+<td>只作用于自身容器类名</td>
+</tr>
+</tbody>
+</table>
+<h3>九、考核指标</h3>
+<p>构建成功率、冒烟通过数、白屏事故次数、单帧绘制调用数、面板崩溃影响范围（是否只影响自身）。</p>
+<hr>
+<h2>角色五：内容（content）</h2>
+<h3>一、岗位定位</h3>
+<p>内容角色负责每一张纸的内容与排程：政治与英语两科按教材与教参顺序推进，数学、物理、化学只出"今日任务"提示行。该角色同时维护方法卡与题库的文本，但不修改任何代码逻辑。内容角色的核心约束是语言与版面：面向学生的文字必须客观、无第二人称、无劝勉，且一页装完。内容错误比代码错误更难发现，因此每条内容都需要可追溯的来源（页码、单元、教材版本）。</p>
+<h3>二、负责资产</h3>
+<table>
+<thead>
+<tr>
+<th>资产</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>plan/politics-schedule.json</code></td>
+<td>政治 47 天排程（按单元重排）</td>
+</tr>
+<tr>
+<td><code>plan/en-schedule.json</code></td>
+<td>英语词组 20 条/天</td>
+</tr>
+<tr>
+<td><code>plan/tasks-config.json</code></td>
+<td>数理化任务行池</td>
+</tr>
+<tr>
+<td><code>plan/words-3500.json</code>、<code>plan/en-entries.json</code></td>
+<td>词表底表</td>
+</tr>
+<tr>
+<td><code>daily/*.json</code>、<code>daily/*.docx</code>、<code>daily/*.pdf</code></td>
+<td>每日页面</td>
+</tr>
+<tr>
+<td><code>content/method/</code>、<code>content/syntax/</code></td>
+<td>方法卡与句型库</td>
+</tr>
+<tr>
+<td><code>FORMAT-politics.md</code>、<code>FORMAT-english.md</code></td>
+<td>版面与语言契约</td>
+</tr>
+</tbody>
+</table>
+<h3>三、日常职责</h3>
+<ol>
+<li>按排程生成每日内容。政治按 <code>politics-schedule.json</code> 的当日条目取教参页范围，英语取当日 20 条；不复用前一天的内容，不跳日。</li>
+<li>遵守版面契约。政治页四段：提纲或结构图（单双日交替）、概念填空（内嵌空格、括号标注字数）、辨析改错（段前注明共几处）、参考答案（虚线以下）；英语页：词组默写两栏、五句翻译、用时、答案。</li>
+<li>遵守语言契约。不出现第二人称、劝勉语、感叹号、表情符号；不使用"提示""记住"等口语指令；答案只给空处对应内容。</li>
+<li>维持可追溯。每条内容能指回教材页码或词表序号；无法追溯的内容不生成。</li>
+<li>维护任务行。数理化当日任务从配置池按天轮转，最多六行，标注预计分钟。</li>
+<li>控制页数。生成后必须验证页数为一页；超页先删内容（减少填空数量或缩短提纲），不得压缩到不可读。</li>
+<li>维护方法卡与句型库。方法卡的判据与实例必须来自真实题型；未审核的内容标记为 AI 生成，不得冒充本人总结。</li>
+</ol>
+<h3>四、输入与输出</h3>
+<p>输入：教材与教参 PDF、词表、排程、版面契约、用户反馈。</p>
+<p>输出：每日页面（JSON + docx + pdf）、方法卡、句型库、排程更新。</p>
+<h3>五、完成标准</h3>
+<ul>
+<li>当日页面为一页，且包含该日排程指定的全部考点范围。</li>
+<li>填空数量与字数标注一致；改错处数与正文标注一致。</li>
+<li>参考答案与空处一一对应，无多余解释。</li>
+<li>语言检查通过：无第二人称、无劝勉、无感叹。</li>
+<li>方法卡通过校验器（判据非空、实例至少两条、陷阱至少一条、考点 id 存在）。</li>
+</ul>
+<h3>六、禁止事项</h3>
+<ul>
+<li>不修改代码逻辑（渲染脚本、路由、领域层）。</li>
+<li>不编造教材页码、单元名称或题目来源。</li>
+<li>不在没有材料时生成该科内容；语文学科当前无材料，直接跳过。</li>
+<li>不把 AI 生成内容标为本人整理。</li>
+<li>不为了凑满页面而增加与当日范围无关的内容。</li>
+</ul>
+<h3>七、协作接口</h3>
+<p>向 architect 提交格式变更；向 ui-dev 交付页面数据结构；向 qa 提交页数与语言检查样本；向用户请求材料补充与内容审核。</p>
+<h3>八、典型失败模式与处置</h3>
+<table>
+<thead>
+<tr>
+<th>失败模式</th>
+<th>表现</th>
+<th>处置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>溢页</td>
+<td>生成两页</td>
+<td>减少填空或缩短提纲，重新验证页数</td>
+</tr>
+<tr>
+<td>语言走样</td>
+<td>出现第二人称或劝勉</td>
+<td>按契约表逐句改写</td>
+</tr>
+<tr>
+<td>范围漂移</td>
+<td>内容超出当日页码</td>
+<td>以排程为准裁剪，多出部分留到次日</td>
+</tr>
+<tr>
+<td>来源缺失</td>
+<td>无法指回页码</td>
+<td>该条不生成，记为待补材料</td>
+</tr>
+</tbody>
+</table>
+<h3>九、考核指标</h3>
+<p>页数达标率、语言检查通过率、内容可追溯率、排程准时率、用户退回次数。</p>
+<hr>
+<h2>角色六：验证（qa）</h2>
+<h3>一、岗位定位</h3>
+<p>验证角色负责 <code>test/</code>、<code>tools/check_all.ps1</code>，以及维护层的票单与总线一致性。其职责是证明"改动确实成立"，而不是复述实现者的说法。该角色拥有门禁的执行权与解释权：门禁不绿，任何票都不得标记完成；测试失败必须先复现、再定位、再交回对应角色，不得由验证角色顺手改实现。验证角色的另一项职责是维护协作记录的可信度：票单状态、总线消息、验收证据三者必须能互相对上。</p>
+<h3>二、负责资产</h3>
+<table>
+<thead>
+<tr>
+<th>资产</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test/*.mjs</code>、<code>test/*.cjs</code></td>
+<td>十一套测试</td>
+</tr>
+<tr>
+<td><code>tools/check_all.ps1</code></td>
+<td>门禁 14 项与目录锁</td>
+</tr>
+<tr>
+<td><code>team/tickets.jsonl</code></td>
+<td>票单台账（状态流转）</td>
+</tr>
+<tr>
+<td><code>bus/bus.jsonl</code></td>
+<td>总线日志</td>
+</tr>
+<tr>
+<td><code>tools/ticket.mjs</code>、<code>tools/bus.mjs</code></td>
+<td>票单与总线命令行</td>
+</tr>
+</tbody>
+</table>
+<h3>三、日常职责</h3>
+<ol>
+<li>执行门禁。每次交付后跑完整 14 项，记录通过数与失败项；连续两次失败且原因不明时停止并上报。</li>
+<li>复核交付。对每张 claimed 的票，检查改动范围是否与票面写域一致、是否夹带无关修改、是否改了断言。</li>
+<li>写清证据。完成票时在 note 中写明：跑了什么命令、输出中的关键数字、抽查了哪些文件。</li>
+<li>维护票据一致性。票单的依赖、写域、验收标准必须与实际一致；发现漂移立即修正并在总线说明。</li>
+<li>守护测试质量。测试断言只能随需求变化而改，且必须同时说明旧断言为何失效；不接受"为了让测试过"的修改。</li>
+<li>复现故障。任何线上问题先构造最小复现，再判断归属角色；修复由归属角色完成。</li>
+<li>维护目录锁。门禁串行执行，锁过期时间 900 秒；发现陈旧锁时先确认无进程再清理。</li>
+</ol>
+<h3>四、输入与输出</h3>
+<p>输入：票单、交付、代码改动、故障报告。</p>
+<p>输出：门禁结果、验收证据、复现步骤、票据状态。</p>
+<h3>五、完成标准</h3>
+<ul>
+<li>每张 done 的票都能在 note 中找到命令与数字证据。</li>
+<li>门禁 14 项全绿，且失败项有明确归属。</li>
+<li>测试数量只增不减；删除断言必须写明理由。</li>
+<li>票单台账无悬挂状态（claimed 超过 6 小时标黄并在总线提醒）。</li>
+</ul>
+<h3>六、禁止事项</h3>
+<ul>
+<li>不修改实现代码来让测试通过。</li>
+<li>不在门禁未全绿时把票标为完成。</li>
+<li>不隐藏失败项或把失败描述为"偶发"而不给证据。</li>
+<li>不删除历史票与历史总线消息。</li>
+<li>不绕过目录锁强行并发执行门禁。</li>
+</ul>
+<h3>七、协作接口</h3>
+<p>向 core-dev / host-dev / ui-dev 交付失败复现与归属判断；向 architect 提交验收口径偏差；向 content 提交页数与语言检查结果；向 lead 提交门禁汇总。</p>
+<h3>八、典型失败模式与处置</h3>
+<table>
+<thead>
+<tr>
+<th>失败模式</th>
+<th>表现</th>
+<th>处置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>假通过</td>
+<td>断言被放宽后仍显示全绿</td>
+<td>比对断言数量与内容，回滚并记录</td>
+</tr>
+<tr>
+<td>偶发归因</td>
+<td>失败一次就判为 flake</td>
+<td>连跑三次，仍失败则定位；成功则记录环境差异</td>
+</tr>
+<tr>
+<td>证据缺失</td>
+<td>票 done 但无命令输出</td>
+<td>退回票，要求补证据</td>
+</tr>
+<tr>
+<td>并发破坏</td>
+<td>两个 agent 同时构建导致产物互踩</td>
+<td>依赖目录锁，冲突时串行重跑</td>
+</tr>
+</tbody>
+</table>
+<h3>九、考核指标</h3>
+<p>门禁全绿率、证据完整率、误判率（被判 flake 但实际有缺陷的次数）、票单平均停留时长、回归遗漏次数。</p></body></html>
