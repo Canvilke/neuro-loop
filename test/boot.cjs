@@ -279,7 +279,7 @@ if (seen.join('>') !== want) {
 
 /* privacy guard: the boot layer must never carry the real name */
 const bundle = fs.readFileSync(path.join(__dirname, '..', 'client.js'), 'utf8');
-['（已隐去）', 'NAME REDACTED'].forEach((bad) => {
+['\u4f0d\u81f4\u8fdc', 'WU ZHI' + 'YUAN'].forEach((bad) => {
   if (bundle.indexOf(bad) !== -1) throw new Error('real name leaked into client.js: ' + bad);
 });
 if (bundle.indexOf('残梦潇伤') === -1 || bundle.indexOf('星海漫游') === -1) {
