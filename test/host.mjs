@@ -6,11 +6,12 @@ import os from 'node:os'
 import path from 'node:path'
 
 const HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'nl-host-'))
+const ROOM_HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'nl-room-'))
 process.env.NEUROLOOP_HOME = HOME
 process.env.NEUROLOOP_TEAM_ROOT = HOME
 process.env.NEUROLOOP_BUS_ROOT = HOME  // 台账也写到临时目录，别污染仓库
 
-const { apply, inject, resetCache, ROUTE_STATE, ROUTE_EVENT, ROUTE_EVENTS, ROUTE_MAIL, ROUTE_TODAY, ROUTE_TEAM, ROUTE_BUS } = await import('../index.js')
+const { apply, inject, resetCache, ROUTE_STATE, ROUTE_EVENT, ROUTE_EVENTS, ROUTE_MAIL, ROUTE_TODAY, ROUTE_TEAM, ROUTE_BUS, ROUTE_ROOM } = await import('../index.js')
 
 let pass = 0
 function ok(cond, msg) {
@@ -111,7 +112,7 @@ apply(ctx)
  * 插件永远 pending，路由整块不存在（14:35 实际踩过）。 */
 ok(Array.isArray(inject) && inject.includes('webServer'), 'inject 以数组声明依赖 webServer')
 ok(!(inject && !Array.isArray(inject) && inject.optional), 'inject 不得使用 { optional } 写法（会永久 pending）')
-ok(routes.length === 7, '注册了 7 条路由（实际 ' + routes.length + '）')
+ok(routes.length === 8, '注册了 8 条路由（实际 ' + routes.length + '）')
 ok(routes.some((r) => r.path === ROUTE_STATE && r.kind === 'exact'), 'GET 路由 ' + ROUTE_STATE)
 ok(routes.some((r) => r.path === ROUTE_EVENT && r.kind === 'exact'), 'POST 路由 ' + ROUTE_EVENT)
 ok(routes.some((r) => r.path === ROUTE_EVENTS && r.kind === 'exact'), 'POST 路由 ' + ROUTE_EVENTS)
@@ -128,10 +129,11 @@ const ROUTE_TABLE = [
   { path: '/neuroloop/today', kind: 'exact' },
   { path: '/neuroloop/team', kind: 'exact' },
   { path: '/neuroloop/bus', kind: 'exact' },
+  { path: '/neuroloop/room', kind: 'exact' },
 ]
 ok(
   JSON.stringify(routes.map((r) => ({ path: r.path, kind: r.kind }))) === JSON.stringify(ROUTE_TABLE),
-  '路由表快照：7 条路径、kind 与注册顺序不变',
+  '路由表快照：8 条路径、kind 与注册顺序不变',
 )
 
 const getState = routes.find((r) => r.path === ROUTE_STATE).handler
@@ -283,7 +285,6 @@ const onToday = routes.find((r) => r.path === ROUTE_TODAY).handler
   ok(cross.status === 403, '信箱拒绝跨源写入')
 }
 
-console.log('\nhost ok — ' + pass + ' checks, routes 5, home ' + HOME)
 /* ---------- 今天（/neuroloop/today） ---------- */
 {
   const day = await call(onToday, makeReq({ url: ROUTE_TODAY + '?date=2026-11-10' }))
@@ -396,6 +397,50 @@ console.log('\nhost ok — ' + pass + ' checks, routes 5, home ' + HOME)
 
   const wrong = await call(g, makeReq({ method: 'PUT', url: ROUTE_BUS }))
   ok(wrong.status === 405, '总线：只接受 GET/POST')
+}
+
+/* ---------- 会议室（/neuroloop/room） ---------- */
+{
+  process.env.NEUROLOOP_ROOM_ROOT = ROOM_HOME
+  const onRoom = routes.find((r) => r.path === ROUTE_ROOM).handler
+
+  const empty = await call(onRoom, makeReq({ url: ROUTE_ROOM }))
+  ok(empty.status === 200 && empty.json.ok, '会议室：空房间可读')
+  ok(Array.isArray(empty.json.data.msgs) && empty.json.data.msgs.length === 0, '会议室：初始为空')
+
+  const said = await call(onRoom, makeReq({ method: 'POST', url: ROUTE_ROOM, body: JSON.stringify({
+    from: 'lead', role: 'architect', kind: 'say', text: '今晚收尾 T-0012',
+  }) }))
+  ok(said.status === 200 && said.json.data.msg.id, '会议室：发言成功')
+
+  const asked = await call(onRoom, makeReq({ method: 'POST', url: ROUTE_ROOM, body: JSON.stringify({
+    from: 'qa', role: 'qa', kind: 'ask', text: '要不要补边界回归？',
+  }) }))
+  const askId = asked.json.data.msg.id
+  ok(asked.status === 200 && askId, '会议室：提请拍板成功')
+
+  const got = await call(onRoom, makeReq({ url: ROUTE_ROOM + '?limit=10' }))
+  ok(got.json.data.msgs.length === 2, '会议室：读回两条')
+  ok(got.json.data.open.length === 1 && got.json.data.open[0].id === askId, '会议室：待拍板 1 条')
+
+  const badKind = await call(onRoom, makeReq({ method: 'POST', url: ROUTE_ROOM, body: JSON.stringify({ from: 'lead', kind: 'nope', text: 'x' }) }))
+  ok(badKind.status === 400 && badKind.json.error === 'bad-kind', '会议室：拒绝未知 kind')
+
+  const noRef = await call(onRoom, makeReq({ method: 'POST', url: ROUTE_ROOM, body: JSON.stringify({ from: 'lead', kind: 'decision', text: 'x' }) }))
+  ok(noRef.status === 400 && noRef.json.error === 'decision-needs-ref', '会议室：decision 必须带 ref')
+
+  const decided = await call(onRoom, makeReq({ method: 'POST', url: ROUTE_ROOM, body: JSON.stringify({
+    from: 'lead', role: 'architect', kind: 'decision', text: '补', ref: askId,
+  }) }))
+  ok(decided.status === 200, '会议室：拍板成功')
+  const after = await call(onRoom, makeReq({ url: ROUTE_ROOM }))
+  ok(after.json.data.open.length === 0, '会议室：拍板后待办清零')
+
+  const badLimit = await call(onRoom, makeReq({ url: ROUTE_ROOM + '?limit=abc' }))
+  ok(badLimit.status === 400 && badLimit.json.error === 'bad-limit', '会议室：非法 limit 400')
+
+  const wrong = await call(onRoom, makeReq({ method: 'PUT', url: ROUTE_ROOM }))
+  ok(wrong.status === 405, '会议室：只接受 GET/POST')
 }
 
 /* ---------- 批量导入（/neuroloop/events） ---------- */

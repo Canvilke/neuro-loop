@@ -327,3 +327,16 @@
 - [x] M13-5 `docs/BOOTSTRAP.md` 扩到六角色（新增 architect / qa）
 - [ ] M13-6 六个长期会话建立后，按票单接管各自块
 - [ ] M13-7 本次提交推送（等网络）
+
+## M14 —— 会议室（夜间协作）
+
+| 编号 | 内容 | 状态 |
+|---|---|---|
+| M14-1 | `host/room.js` 只追加日志（say/ask/decision，decision 必须带 ref） | DONE |
+| M14-2 | `/neuroloop/room` GET/POST（惰性读 `NEUROLOOP_ROOM_ROOT`） | DONE |
+| M14-3 | `tools/room.mjs`：say / ask / decide / tail / asks | DONE |
+| M14-4 | 客户端「认知终端 → 会议室」页签（不轮询） | DONE |
+| M14-5 | 测试：`test/room.test.mjs` 20 条 + host 路由 12 条 | DONE |
+| M14-6 | 门禁 15 项（加 room） | DONE |
+| M14-7 | 文档 `docs/ROOM.md` + AGENTS §2.1 | DONE |
+| M14-8 | 值守 prompt 改为「先开会、需拍板发 ask」 | TODO |

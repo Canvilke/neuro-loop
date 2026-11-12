@@ -11,6 +11,7 @@ var HUB_TABS = [
   { id: 'map', label: '认知星图', en: 'FIELD', make: function () { return h(NeuroLoopPanel, {}); } },
   { id: 'team', label: '控制台', en: 'CONSOLE', make: function () { return h(TeamPanel, {}); } },
   { id: 'code', label: '编程台', en: 'ENGINEERING', make: function () { return h(CodePanel, {}); } },
+  { id: 'room', label: '会议室', en: 'WAR ROOM', make: function () { return h(RoomPanel, {}); } },
   { id: 'nav', label: '导航', en: 'ALL PANELS', make: function () { return h(NavPanel, {}); } }
 ];
 

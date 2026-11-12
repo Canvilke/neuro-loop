@@ -1,7 +1,7 @@
 // Neuro-Loop 宿主半边（S1/S2）——只做装配：注入、路由表、清理。
 //
 // 打包插件的客户端半边没有 host.call，所以前后端之间只有一条路：HTTP。
-// 端点实现按文件放在 host/handlers/（state / event / today / team / bus / mail），
+// 端点实现按文件放在 host/handlers/（state / event / today / team / bus / room / mail），
 // 共用的守卫与响应壳在 host/reply.js；这里不再写任何处理逻辑。
 import { onState, resetCache } from './host/handlers/state.js'
 import { onEvent, onEvents } from './host/handlers/event.js'
@@ -9,6 +9,7 @@ import { onMail } from './host/handlers/mail.js'
 import { onToday } from './host/handlers/today.js'
 import { onTeam } from './host/handlers/team.js'
 import { onBus } from './host/handlers/bus.js'
+import { onRoom } from './host/handlers/room.js'
 
 export { resetCache }
 
@@ -24,6 +25,7 @@ export const ROUTE_MAIL = '/neuroloop/mail'
 export const ROUTE_TODAY = '/neuroloop/today'
 export const ROUTE_TEAM = '/neuroloop/team'
 export const ROUTE_BUS = '/neuroloop/bus'
+export const ROUTE_ROOM = '/neuroloop/room'
 
 // 路由表：顺序即注册顺序（test/host.mjs 对它做快照断言）。
 const routes = [
@@ -34,6 +36,7 @@ const routes = [
   { kind: 'exact', path: ROUTE_TODAY, handler: onToday },
   { kind: 'exact', path: ROUTE_TEAM, handler: onTeam },
   { kind: 'exact', path: ROUTE_BUS, handler: onBus },
+  { kind: 'exact', path: ROUTE_ROOM, handler: onRoom },
 ]
 
 export function apply(ctx) {

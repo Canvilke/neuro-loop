@@ -96,6 +96,7 @@ Invoke-Step -Name 'test/legacy.test.mjs' -Exe 'node' -Arguments @('--test','test
 Invoke-Step -Name 'test/storage.test.mjs' -Exe 'node' -Arguments @('--test','test/storage.test.mjs')
 Invoke-Step -Name 'test/dispatch.test.mjs' -Exe 'node' -Arguments @('--test','test/dispatch.test.mjs')
 Invoke-Step -Name 'test/bus.test.mjs' -Exe 'node' -Arguments @('test/bus.test.mjs')
+Invoke-Step -Name 'test/room.test.mjs' -Exe 'node' -Arguments @('test/room.test.mjs')
 Invoke-Step -Name 'test/intake.test.mjs' -Exe 'node' -Arguments @('test/intake.test.mjs')
 Invoke-Step -Name 'tools/check_contract.mjs' -Exe 'node' -Arguments @('tools/check_contract.mjs')
 Invoke-Step -Name 'tools/activate.py' -Exe 'python' -Arguments @('tools/activate.py')
