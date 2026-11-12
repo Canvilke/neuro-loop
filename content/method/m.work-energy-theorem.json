@@ -1,0 +1,33 @@
+{
+  "id": "m.work-energy-theorem",
+  "name": "动能定理",
+  "claim": "选一个过程，合外力做功等于动能变化，避开中间状态。",
+  "judge": "多过程、变力做功或只关心初末速度，且不要求时间与方向时。",
+  "steps": [
+    "选定初末状态与整个过程",
+    "逐项写出各力做功并带正负号",
+    "列 W合＝ΔEk",
+    "必要时与动量或能量关系联立"
+  ],
+  "instances": [
+    "斜面下滑与水平滑行组合",
+    "机车启动",
+    "弹簧弹射",
+    "摆球最低点"
+  ],
+  "traps": [
+    "漏掉摩擦力做负功",
+    "把动能定理与机械能守恒混用",
+    "位移取错，用路程代替位移"
+  ],
+  "points": [
+    "physics-work",
+    "physics-momentum"
+  ],
+  "note": "与 m.energy-conserve、m.momentum-conserve 同源：三者都以过程量消去中间状态；先判有无耗散，有则用本卡。",
+  "compression": 25,
+  "source": "ai",
+  "confidence": 0.7,
+  "verified": false,
+  "createdAt": "2026-11-12"
+}

@@ -38,3 +38,12 @@
 {"t":"2026-11-11T18:41:32.745Z","ev":"create","id":"T-0017","title":"边界回归：归档/导出/审核三条新路径的失败分支","role":"qa","scope":["test/regression.test.mjs"],"deps":["T-0013","T-0014"],"accept":["至少覆盖 8 条边界（空库、坏参数、重复调用、非 GET）","node --test test/regression.test.mjs 全绿","check_all.ps1 全绿"]}
 {"t":"2026-11-11T18:41:32.865Z","ev":"create","id":"T-0018","title":"STATUS 刷新：把 M10–M13 完成后的真实状态写回","role":"architect","scope":["docs/STATUS.md"],"deps":[],"accept":["九块“能跑”逐条带可复现命令或测试名","壳与卡住的项逐条写清证据","不新增无证据的结论"]}
 {"t":"2026-11-11T18:44:17.487Z","ev":"claim","id":"T-0016","by":"content"}
+{"t":"2026-11-11T18:46:25.826Z","ev":"claim","id":"T-0013","by":"lead"}
+{"t":"2026-11-11T18:47:08.186Z","ev":"claim","id":"T-0018","by":"architect"}
+{"t":"2026-11-11T18:51:36.492Z","ev":"claim","id":"T-0012","by":"ui-dev"}
+{"t":"2026-11-12T15:26:34.051Z","ev":"complete","id":"T-0016","by":"lead","note":"复核：16 张卡 check_methods 全绿；m.coord-system/m.work-energy-theorem 两张标了同源；instances≥2 traps≥1 points 全在 seed"}
+{"t":"2026-11-12T15:26:34.388Z","ev":"complete","id":"T-0018","by":"lead","note":"复核：STATUS.md 九块逐条带命令与实测数字，基线与 14/14 门禁一致"}
+{"t":"2026-11-12T15:26:34.507Z","ev":"block","id":"T-0012","by":"lead","note":"会话 20.5h 未交付且工作区无相关改动，按 6h 卡住规则回收重派"}
+{"t":"2026-11-12T15:26:34.632Z","ev":"reopen","id":"T-0012","note":"回收后重开，等 ui 角色重新领取"}
+{"t":"2026-11-12T15:26:34.748Z","ev":"block","id":"T-0013","by":"lead","note":"会话 20.6h 未交付且无 core/compact.js 产出，回收重派"}
+{"t":"2026-11-12T15:26:34.862Z","ev":"reopen","id":"T-0013","note":"回收后重开"}
