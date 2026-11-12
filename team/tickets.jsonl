@@ -62,3 +62,17 @@
 {"t":"2026-11-12T17:22:18.273Z","ev":"create","id":"T-0023","title":"boot 测试只断言 5 个阶段，却打印并宣称 7 阶段按序","role":"qa","scope":["test/boot.cjs"],"deps":[],"accept":["断言覆盖 enter 到 dive 的全部 7 个阶段，或把日志与文档统一改成 5","故意打乱 enter/dive 顺序时测试必须红","同步 TASKS.md:102 与 docs/HANDBOOK 6.3 的措辞"]}
 {"t":"2026-11-12T17:23:08.747Z","ev":"create","id":"T-0024","title":"到期文案：逾期不足 1 天仍显示「逾期 1 天」","role":"ui-dev","scope":["src/045-net.js","test/net.cjs"],"deps":[],"accept":["逾期 1 分钟显示「今天之内」或「刚逾期」，不得显示 1 天","逾期 2 天整与 2 天 1 分钟都显示 2 天","test/net.cjs 覆盖正负 1 分钟与 2 天边界，不靠毫秒抽签"]}
 {"t":"2026-11-12T17:23:48.716Z","ev":"claim","id":"T-0021","by":"lead"}
+{"t":"2026-11-12T17:25:02.194Z","ev":"create","id":"T-0025","title":"隐私：真名仍留在 TASKS.md 与 boot 守卫里，守卫只扫 client.js","role":"qa","scope":["TASKS.md","test/boot.cjs"],"deps":[],"accept":["跟踪文件里不再出现真名（git grep 证明，只保留占位）","隐私守卫覆盖 TASKS.md 等跟踪文本，不只 client.js","历史提交里的真名是否重写由用户拍板并记录"]}
+{"t":"2026-11-12T17:25:38.046Z","ev":"create","id":"T-0026","title":"会议室 id 并发下重复：四个代表同时说话 100 条只剩 53 个唯一 id","role":"host-dev","scope":["host/room.js"],"deps":[],"accept":["并发 4 线程 × 25 条 id 全唯一；room.test 断言不放松；跨进程 at 排序不变；门禁 15 项"]}
+{"t":"2026-11-12T17:25:38.225Z","ev":"claim","id":"T-0023","by":"lead"}
+{"t":"2026-11-12T17:25:46.018Z","ev":"reopen","id":"T-0023","note":"lead 手误 claim（本想 claim 新开的 T-0026，票号记错），原样退回；qa 可直接领"}
+{"t":"2026-11-12T17:25:46.058Z","ev":"create","id":"T-0027","title":"会议室 wait：--since 被忽略、100% CPU 忙等、超时提示恒为 0 秒","role":"host-dev","scope":["tools/room.mjs","test/room.test.mjs"],"deps":[],"accept":["wait --since A 时，A 之后已有消息应立即输出并返回 0","5 秒等待的 CPU 时间小于 0.5 秒，不得空转","超时提示写实际等待秒数，--timeout 如实生效","room.test.mjs 补这三条并全绿"]}
+{"t":"2026-11-12T17:25:46.134Z","ev":"claim","id":"T-0026","by":"lead"}
+{"t":"2026-11-12T17:26:25.649Z","ev":"create","id":"T-0028","title":"仓库 AGENTS.md 仍写 13 模块/5 套测试/2 条路由，已漂移","role":"architect","scope":["AGENTS.md"],"deps":[],"accept":["模块数、测试套数、路由数按当前实测值改写","README 与 STATUS 引用同一组数字，不再各写一套","改完 docs 后 git grep 三个旧数字无残留"]}
+{"t":"2026-11-12T17:26:57.406Z","ev":"complete","id":"T-0021","by":"lead","note":"test/room.test.mjs 20→47 checks（wait 超时/唤醒/4线程并发/坏行/meeting 边界）；dispatch.test.mjs +12 节一致性 42→46；并发测试逮到 host/room.js mintId 撞车，拆出 T-0026；门禁 15/15"}
+{"t":"2026-11-12T17:26:57.488Z","ev":"complete","id":"T-0026","by":"lead","note":"host/room.js mintId 加进程随机盐（毫秒6+计数2+盐3，共11位）；4线程×25条 100 条 id 全唯一；跨进程排序不变；门禁 15/15"}
+{"t":"2026-11-12T17:30:43.348Z","ev":"claim","id":"T-0028","by":"architect"}
+{"t":"2026-11-12T17:35:28.239Z","ev":"complete","id":"T-0005","by":"lead","note":"作废：演示用票，目的已由 T-0004 达成；台账 append-only 不删除。"}
+{"t":"2026-11-12T17:39:06.122Z","ev":"create","id":"T-0029","title":"投影 rev 用 events.length：归档后重建只看尾部，账目少算","role":"host-dev","scope":["host/service.js","storage/projection.js"],"deps":[],"accept":[]}
+{"t":"2026-11-12T17:39:06.263Z","ev":"create","id":"T-0030","title":"decision-needs-ref 没进错误码快照：文件与运行时探针各缺一条","role":"host-dev","scope":["host/handlers/.error-codes.txt","test/host.mjs"],"deps":[],"accept":[]}
+{"t":"2026-11-12T17:39:32.579Z","ev":"create","id":"T-0031","title":"rebuild 的 rev 改用 read.rev/read.bases：归档后重建不再只看到尾部","role":"host-dev","scope":["host/service.js","storage/projection.js","test/host.mjs"],"deps":[],"accept":["hotfix 不加；归档后删 state.json 重建，rev 与事件总数一致；test/host.mjs 增断言；16/16"]}

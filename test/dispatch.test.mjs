@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { run, briefOf, scopeOverlap, conflictsOf } from '../tools/ticket.mjs';
+import { agenda as meetAgenda } from '../tools/meeting.mjs';
 import { board, create } from '../host/team.js';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -199,6 +200,33 @@ function quiet(fn) {
 
   const claim = quiet(() => run(['claim', 'T-0002', '--by', 'qa-2'], root));
   ok(claim.code === 0, '有冲突也能领票（这条只是提示，不强制）');
+}
+
+/* ── 12. 议事脚本自己重放一遍台账：结论必须与 board() 一致（两处逻辑不许漂） ── */
+{
+  const root = tmpRoot();
+  quiet(() => run(['new', '--role', 'qa', '--title', '甲的票'], root));
+  quiet(() => run(['new', '--role', 'ui-dev', '--title', '乙的票'], root));
+  quiet(() => run(['new', '--role', 'host-dev', '--title', '丙的票'], root));
+  quiet(() => run(['new', '--role', 'content', '--title', '丁的票'], root));
+  quiet(() => run(['claim', 'T-0002', '--by', 'ui'], root));
+  quiet(() => run(['done', 'T-0002', '--by', 'ui', '--note', '收了'], root));
+  quiet(() => run(['claim', 'T-0003', '--by', 'h1'], root));
+  quiet(() => run(['reopen', 'T-0003', '--note', '退回重做'], root));
+  quiet(() => run(['block', 'T-0004', '--by', 'c1', '--note', '等 T-0001'], root));
+
+  const b = board(root);
+  const mine = new Map(b.tickets.map((t) => [t.id, t.status]));
+  const a = meetAgenda(root);
+  const seen = new Map();
+  for (const t of a.ready) seen.set(t.id, 'ready');
+  for (const t of a.claimed) seen.set(t.id, 'claimed');
+  for (const t of a.blocked) seen.set(t.id, 'blocked');
+
+  ok(a.ready.length + a.claimed.length + a.blocked.length === 3, '议程只列未完成的票（做完的 T-0002 不出现）');
+  ok(seen.size === 3 && [...seen].every(([id, st]) => mine.get(id) === st), '议程与 board() 对每张票的状态判断一致');
+  ok(a.blocked.some((t) => t.id === 'T-0004' && /等 T-0001/.test(t.note || '')), 'block 的原因原样带进议程');
+  ok(a.ready.some((t) => t.id === 'T-0003'), 'reopen 的票回到可派');
 }
 
 console.log('');

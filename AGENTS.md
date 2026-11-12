@@ -9,15 +9,15 @@
 
 ```bash
 python build.py --check            # 拼包 + node --check
-node test/smoke.cjs                # 五套无头测试
-node test/levels.cjs
-node test/boot.cjs
+node test/smoke.cjs                # 13 套无头测试（smoke / levels / boot / net / host /
+node test/levels.cjs               #   core / legacy / storage / dispatch / bus / compact / room / intake）
+node test/boot.cjs                 # 完整顺序以 tools/check_all.ps1 为准
 node test/net.cjs
 node test/host.mjs
 python tools/activate.py           # 环境体检
 
 # 或者一条命令跑完（Windows PowerShell）
-powershell -ExecutionPolicy Bypass -File tools/check_all.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/check_all.ps1
 ```
 
 当前 `client.js` 由根目录的 **`build.py`** 生成（不是 `tools/build.py`，后者不存在）。
@@ -28,14 +28,14 @@ powershell -ExecutionPolicy Bypass -File tools/check_all.ps1
 
 | 路径 | 职责 | 能不能手改 |
 | --- | --- | --- |
-| `src/*.js` | 客户端全部源码，13 个模块拼进同一个闭包；无 JSX、无 import | **只改这里**（配合 `data/seed.json`） |
+| `src/*.js` | 客户端全部源码，17 个模块拼进同一个闭包；无 JSX、无 import | **只改这里**（配合 `data/seed.json`） |
 | `build.py` | 拼包器：按 `ORDER` 把 `src/*.js` + `data/seed.json` 拼成 `client.js`；`--check` 顺带 `node --check` | 可以改，但改动会影响所有人 |
 | `client.js` | 构建产物，已被 `.gitignore` 忽略 | **禁止手改**，只能由 `build.py` 生成 |
 | `version.json` | 构建哈希与字节数，产物，git 忽略 | 禁止手改 |
-| `test/*.cjs`、`test/host.mjs` | 五套无头测试（smoke / levels / boot / net / host） | 可以加测试；**不要改断言来绕过失败** |
+| `test/*.cjs`、`test/*.mjs` | 13 套无头测试（smoke / levels / boot / net / host / core / legacy / storage / dispatch / bus / compact / room / intake） | 可以加测试；**不要改断言来绕过失败** |
 | `data/seed.json` | 六科考点、分组、连线、碎片：星图的唯一数据源 | 只按数据契约改（见 `README.md` §5） |
 | `content/method/*.json` | 方法卡（记忆向量）；`tools/check_methods.py` 校验 | 可以增删，先过 `check_methods.py` |
-| `host/` | 宿主半边：`event.js` 事件白名单、`http.js` 两条路由、`store.js` 追加/投影 | 可改，注意 `inject: ['webServer']` |
+| `host/` | 宿主半边：`event.js` 事件白名单、`http.js` 与 `index.js` 注册九条路由、`store.js` 追加/投影 | 可改，注意 `inject: ['webServer']` |
 | `tools/` | 运维脚本：体检、方法卡校验、每日一页生成、docx/PDF、打印、回填、原型导入 | 可改；PowerShell 脚本遵守 §3 编码规则 |
 | `daily/` | 每日一页产物（json / html / png / docx / pdf） | 生成物；`pdf/png/docx/html` 不入库，json 可留档 |
 | `plan/` | 在校计划案（如 `politics-schedule.md`、未来的 `YYYY-MM-DD.json`） | 可改 |
@@ -51,8 +51,8 @@ powershell -ExecutionPolicy Bypass -File tools/check_all.ps1
 
 1. **不手改 `client.js`，也不手改 `version.json`。** 它们是 `build.py` 的产物。
 2. **改完 `src\`（或 `data\seed.json`）必须跑 `python build.py --check`。** 只改 `src` 不重建，页面不会变。
-3. **五套测试全绿才算「做完」：**
-   `smoke.cjs`、`levels.cjs`、`boot.cjs`、`net.cjs`、`host.mjs`。
+3. **门禁全绿才算「做完」：** 跑 `tools/check_all.ps1`（16 项：build + 13 套 node 测试 +
+   `check_contract` + `activate`），任何一项红都不算完。
    改到 `content/method/` 时还要跑 `python tools/check_methods.py`。
 4. **`client.js` 变了之后页面必须刷新。** 本插件没有 HMR；不刷新看到的永远是旧版本。
    刷新后如果侧栏没有「认知巡检」，先跑 `python tools/activate.py` 看 profile 里插件还在不在。
@@ -108,7 +108,7 @@ PS 5.1 读**无 BOM** 的脚本时按系统 ANSI（本机 GBK）解码。`.ps1` 
 - 提交信息用**中文一句话**说明改了什么、为什么；需要细节写在正文。
   - 好：`修复 hover 时弧线 NaN 导致整帧跳过`
   - 差：`update`、`fix bug`、`改了一下`
-- 提交前必须：`git status` 看清楚 → `powershell -File tools/check_all.ps1` 全绿 → `git add` 明确文件。
+- 提交前必须：`git status` 看清楚 → `powershell -NoProfile -ExecutionPolicy Bypass -File tools/check_all.ps1` 全绿 → `git add` 明确文件。
 - 不提交构建产物与本机记录；不 `git add -A` 之前先确认 `.gitignore` 生效。
 - 不做破坏性回滚：要退就用 `git revert`，保留历史。
 
@@ -119,7 +119,7 @@ PS 5.1 读**无 BOM** 的脚本时按系统 ANSI（本机 GBK）解码。`.ps1` 
 | 级别 | 手段 | 证明什么 |
 | --- | --- | --- |
 | L1 | `python build.py --check` | 能拼包、语法正确 |
-| L2 | 五套 node 测试 + `tools/check_methods.py` | 渲染/分层/启动/网络/宿主路由无异常 |
+| L2 | 13 套 node 测试 + `tools/check_contract.mjs` + `tools/check_methods.py` | 渲染/分层/启动/网络/宿主路由无异常 |
 | L3 | 用户真机刷新 + 截图 | 实际观感与手感 |
 
 L3 只能由用户完成：AI 不能自己截图，任何「看起来怎样」都必须等用户确认，

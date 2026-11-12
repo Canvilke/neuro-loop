@@ -9,6 +9,7 @@
  */
 import fs from 'node:fs'
 import path from 'node:path'
+import crypto from 'node:crypto'
 
 export const KINDS = ['say', 'ask', 'decision']
 
@@ -20,10 +21,14 @@ export function roomPath(root) {
   return path.join(root, 'room', 'room.jsonl')
 }
 
+// id = 毫秒(6) + 进程内计数(2) + 本进程随机盐(3)。
+// 只靠毫秒和进程内计数时，多个代表同时说话会撞：4 线程 × 25 条实测只剩 53 个唯一 id，
+// 而 view(since) 用 findIndex、decide(--ref) 用第一条匹配，撞了就会读错/答错。
+const SALT = crypto.randomBytes(2).toString('hex').slice(0, 3)
 let counter = 0
 function mintId(now = Date.now()) {
   counter = (counter + 1) % 4096
-  return now.toString(36).slice(-6) + counter.toString(36).padStart(2, '0')
+  return now.toString(36).slice(-6) + counter.toString(36).padStart(2, '0') + SALT
 }
 
 export function post(input, root) {
