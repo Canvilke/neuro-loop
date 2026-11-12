@@ -69,6 +69,20 @@ node tools/room.mjs asks
 
 ---
 
+## 4.5 议事会（每 2 小时）
+
+定时任务 `schedule-5caac942`：01:30 / 03:30 / 05:30 各一次。
+
+```bash
+node tools/meeting.mjs agenda              # 议程：待拍板 / claimed / ready / blocked / 最近 8 条
+node tools/meeting.mjs brief --role core-dev  # 出席书（喂给代表）
+node tools/meeting.mjs close --text "结论…"
+```
+
+流程：`agenda` → 挑**最多 3 个**有活的角色 → 各派一个子代理（prompt 就是 `brief` 的输出）→ 代表只发言不改码 → 把三行摘要以该角色身份转写进会议室 → `close` → 有时间再施工一张票。
+
+**为什么是"派人"而不是"叫醒原会话"**：原会话不在我的通讯录里，叫不醒。代表是**代理出席**——它读同一份角色契约、同一份议程，替那一块发言；回去之后由我把结论落票，原会话下次开工时读会议室与票单即可接上。这是能跑的最接近"每位专员派代表"的形态。
+
 ## 5. 边界（诚实写在这里）
 
 - **会议室不会叫醒任何会话。** 它是一份所有人都能读的文件；谁醒着谁看。真正能双向唤醒的只有 lead 自己 spawn 的子代理。
