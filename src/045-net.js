@@ -197,7 +197,7 @@ function nlDueText(nd) {
   var due = Date.parse(nd.dueAt);
   if (!isFinite(due)) return '未排期';
   var days = (due - Date.now()) / 86400000;
-  if (days < 0) return '逾期 ' + Math.max(1, Math.ceil(-days)) + ' 天';
+  if (days < 0) return '逾期 ' + Math.max(1, Math.floor(-days)) + ' 天';
   if (days < 1) return '今天之内';
   return '在 ' + Math.ceil(days) + ' 天后';
 }

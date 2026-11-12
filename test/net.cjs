@@ -144,6 +144,9 @@ const tick = () => new Promise((r) => setTimeout(r, 0));
   const overdue = { dueAt: new Date(Date.now() - 2 * 86400e3).toISOString() };
   ok(nlDueText(inFuture) === '在 3 天后', '未来 → 在 N 天后 (' + nlDueText(inFuture) + ')');
   ok(/逾期 2 天/.test(nlDueText(overdue)), '过去 → 逾期 N 天 (' + nlDueText(overdue) + ')');
+  /* 边界：过了 2 天又 2.5 秒，仍应是「2 天」——旧实现 ceil 会多算成 3 天 */
+  ok(/逾期 2 天/.test(nlDueText({ dueAt: new Date(Date.now() - 2 * 86400e3 - 2500).toISOString() })),
+    '逾期边界：多出 2.5 秒仍是 2 天 (' + nlDueText({ dueAt: new Date(Date.now() - 2 * 86400e3 - 2500).toISOString() }) + ')');
   ok(nlDueText({}) === '未排期', '没有 dueAt → 未排期');
 
   /* 7. 判定的本地即时反馈 */
