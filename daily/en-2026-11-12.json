@@ -1,0 +1,220 @@
+{
+ "date": "2026-11-12",
+ "day": 3,
+ "phrases": [
+  {
+   "n": 41,
+   "page": 3,
+   "en": "hope for sth",
+   "pos": "usage.",
+   "zh": "希望...,期望..."
+  },
+  {
+   "n": 42,
+   "page": 3,
+   "en": "associate... with...",
+   "pos": "usage.",
+   "zh": "把...和...联系起来"
+  },
+  {
+   "n": 43,
+   "page": 3,
+   "en": "separate... from...",
+   "pos": "usage.",
+   "zh": "使...从...分开； 把...和...隔开； 使...与...分离,使...与...分散； 将...和...区分开"
+  },
+  {
+   "n": 44,
+   "page": 3,
+   "en": "make a decision",
+   "pos": "collocation.",
+   "zh": "做决定"
+  },
+  {
+   "n": 45,
+   "page": 3,
+   "en": "up and down",
+   "pos": "idm.",
+   "zh": "起伏,上下波动； 来来回回,往返地； 时好时坏"
+  },
+  {
+   "n": 46,
+   "page": 3,
+   "en": "up to sth",
+   "pos": "idm.",
+   "zh": "到达 (某数量、程度等),多达； 直到,不多于,不迟于； 与...一样高 (或好);能胜任； 正在干,从事着 (尤指坏事)"
+  },
+  {
+   "n": 47,
+   "page": 3,
+   "en": "work out",
+   "pos": "phrv.",
+   "zh": "锻炼身体,做运动； 进展顺利;计算,算出； 找...的答案,解决;计划,思考； (费用或数量) 算下来是"
+  },
+  {
+   "n": 48,
+   "page": 3,
+   "en": "at work",
+   "pos": "collocation.",
+   "zh": "在工作,在上班； 起作用； 忙着 (做某事)"
+  },
+  {
+   "n": 49,
+   "page": 3,
+   "en": "get to work",
+   "pos": "idm.",
+   "zh": "开始工作"
+  },
+  {
+   "n": 50,
+   "page": 3,
+   "en": "work on sth",
+   "pos": "phrv.",
+   "zh": "致力于,改善"
+  },
+  {
+   "n": 51,
+   "page": 3,
+   "en": "no doubt",
+   "pos": "idm.",
+   "zh": "毫无疑问,肯定"
+  },
+  {
+   "n": 52,
+   "page": 3,
+   "en": "drop out",
+   "pos": "phrv.",
+   "zh": "退出,不再参加； 退学,辍学"
+  },
+  {
+   "n": 53,
+   "page": 3,
+   "en": "drop off",
+   "pos": "usage.",
+   "zh": "(开车) 顺便把...送到某处； 打盹;减少,下降"
+  },
+  {
+   "n": 54,
+   "page": 3,
+   "en": "anything but",
+   "pos": "idm.",
+   "zh": "决不,绝对不,一点也不"
+  },
+  {
+   "n": 55,
+   "page": 3,
+   "en": "even if/though",
+   "pos": "idm.",
+   "zh": "即使,纵然,虽然"
+  },
+  {
+   "n": 56,
+   "page": 3,
+   "en": "even so",
+   "pos": "idm.",
+   "zh": "尽管如此,即使那样"
+  },
+  {
+   "n": 57,
+   "page": 3,
+   "en": "make a contribution",
+   "pos": "collocation.",
+   "zh": "做贡献"
+  },
+  {
+   "n": 58,
+   "page": 3,
+   "en": "switch off",
+   "pos": "phrv.",
+   "zh": "关 (电灯、机器等)"
+  },
+  {
+   "n": 59,
+   "page": 3,
+   "en": "switch on",
+   "pos": "phrv.",
+   "zh": "开 (电灯、机器等)"
+  },
+  {
+   "n": 60,
+   "page": 3,
+   "en": "together with",
+   "pos": "idm.",
+   "zh": "包括...在内； 同...一起,连同"
+  }
+ ],
+ "sentences": [
+  {
+   "id": "s.011",
+   "dir": "zh2en",
+   "syntax": [
+    "sp.virtual"
+   ],
+   "words": [],
+   "text": "如果那天他多练了一遍，比赛结果可能就不同了。",
+   "answer": "If he had practised once more that day, the result might have been different.",
+   "note": "与过去事实相反：从句 had done，主句 might have done。"
+  },
+  {
+   "id": "s.012",
+   "dir": "zh2en",
+   "syntax": [
+    "sp.appositive"
+   ],
+   "words": [],
+   "text": "他迟到的消息让大家都很意外。",
+   "answer": "The news that he was late surprised everyone.",
+   "note": "that 从句说明 news 的具体内容，不作成分。"
+  },
+  {
+   "id": "s.013",
+   "dir": "zh2en",
+   "syntax": [
+    "sp.comparison"
+   ],
+   "words": [],
+   "text": "你练得越多，进步就越快。",
+   "answer": "The more you practise, the faster you will improve.",
+   "note": "两个分句都用陈述语序，只把比较级提前。"
+  },
+  {
+   "id": "s.016",
+   "dir": "en2zh",
+   "syntax": [
+    "sp.virtual"
+   ],
+   "words": [],
+   "text": "If I had known the rule earlier, I would not have made that mistake.",
+   "answer": "如果我早点知道这条规则，就不会犯那个错误了。",
+   "note": "与过去事实相反：had known / would not have made。"
+  },
+  {
+   "id": "s.017",
+   "dir": "en2zh",
+   "syntax": [
+    "sp.appositive"
+   ],
+   "words": [],
+   "text": "The idea that practice matters more than talent is widely accepted.",
+   "answer": "练习比天赋更重要这一观点已被广泛接受。",
+   "note": "that 从句说明 idea 的具体内容。"
+  }
+ ],
+ "tasks": [
+  {
+   "subject": "数学",
+   "text": "圆锥曲线·第 3 组　直线与曲线位置关系",
+   "min": 35
+  },
+  {
+   "subject": "物理",
+   "text": "电磁感应·第 1 组　楞次定律与感应电流方向",
+   "min": 25
+  },
+  {
+   "subject": "化学",
+   "text": "化学反应原理·第 5 组　化学平衡与平衡常数",
+   "min": 35
+  }
+ ]
+}
