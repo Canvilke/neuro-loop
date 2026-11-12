@@ -76,3 +76,7 @@
 {"t":"2026-11-12T17:39:06.122Z","ev":"create","id":"T-0029","title":"投影 rev 用 events.length：归档后重建只看尾部，账目少算","role":"host-dev","scope":["host/service.js","storage/projection.js"],"deps":[],"accept":[]}
 {"t":"2026-11-12T17:39:06.263Z","ev":"create","id":"T-0030","title":"decision-needs-ref 没进错误码快照：文件与运行时探针各缺一条","role":"host-dev","scope":["host/handlers/.error-codes.txt","test/host.mjs"],"deps":[],"accept":[]}
 {"t":"2026-11-12T17:39:32.579Z","ev":"create","id":"T-0031","title":"rebuild 的 rev 改用 read.rev/read.bases：归档后重建不再只看到尾部","role":"host-dev","scope":["host/service.js","storage/projection.js","test/host.mjs"],"deps":[],"accept":["hotfix 不加；归档后删 state.json 重建，rev 与事件总数一致；test/host.mjs 增断言；16/16"]}
+{"t":"2026-11-12T18:12:11.486Z","ev":"complete","id":"T-0019","by":"lead","note":"复核：sentences 20 条 id 唯一、中译英 11/英译中 9、syntax 引用 0 悬空、points 12；1 页机器未验证按原口径记"}
+{"t":"2026-11-12T18:12:11.705Z","ev":"complete","id":"T-0020","by":"lead","note":"复核：STATUS 含会议室/通讯两节，README §0 已列 ROOM/COMMS"}
+{"t":"2026-11-12T18:12:11.771Z","ev":"complete","id":"T-0031","by":"lead","note":"作废：与 T-0029 同一件事，保留 T-0029 不重复施工"}
+{"t":"2026-11-12T18:12:11.838Z","ev":"create","id":"T-0032","title":"ADR-0003：代表制的决策、被否与边界","role":"architect","scope":["docs/ADR-0003-representation.md"],"deps":[],"accept":["决策含只读/≤3 say/三行回报/不领票；列三条被否方案；写明叫不醒空闲会话的边界；README 导航加链"]}
