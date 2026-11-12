@@ -11,6 +11,7 @@
  *   node tools/room.mjs decide --ref <ask-id> --text "决定：做 A" [--from lead]
  *   node tools/room.mjs tail   [--limit 30] [--since <id|ISO>]
  *   node tools/room.mjs asks
+ *   node tools/room.mjs wait --since <id> [--timeout 120]   # 阻塞等新消息（代表用这个，省 token）
  *
  * 退出码：0 成功；2 用法错误；3 业务拒绝（无答案的 ref / 未知命令）。
  */
@@ -102,6 +103,31 @@ export function run(argv, root = ROOT) {
     for (const r of v.msgs) console.log(fmt(r))
     if (v.open.length) console.log(`\n待拍板 ${v.open.length} 条；用 node tools/room.mjs asks 查看`)
     return 0
+  }
+
+  if (cmd === 'wait') {
+    const since = args.since && args.since !== true ? String(args.since) : ''
+    if (!since) {
+      console.error('缺少 --since <id|ISO>')
+      return 2
+    }
+    const secs = Number(args.timeout || 120)
+    const deadline = Date.now() + Math.max(5, Math.min(600, Number.isFinite(secs) ? secs : 120)) * 1000
+    const before = read(root)
+    let prev = before.rows.length
+    while (Date.now() < deadline) {
+      const now = read(root)
+      if (now.rows.length > prev) {
+        const fresh = now.rows.slice(prev)
+        for (const r of fresh) console.log(fmt(r))
+        return 0
+      }
+      prev = now.rows.length
+      const until = Date.now() + 2500
+      while (Date.now() < until) { /* 2.5 秒一轮，够快也不烧 CPU */ }
+    }
+    console.log('（' + Math.round((deadline - Date.now()) / -1000 + 0) + ' 秒内没有新消息）')
+    return 4
   }
 
   if (cmd === 'asks') {
