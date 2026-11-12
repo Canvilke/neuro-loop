@@ -7,10 +7,10 @@
 #   4) node test/boot.cjs
 #   5) node test/net.cjs
 #   6) node test/host.mjs
-#   7) node --test test/core.test.mjs
-#   8) node --test test/legacy.test.mjs
-#   9) node --test test/storage.test.mjs
-#  11) node --test test/dispatch.test.mjs
+#   7) node test/core.test.mjs
+#   8) node test/legacy.test.mjs
+#   9) node test/storage.test.mjs
+#  11) node test/dispatch.test.mjs
 #  12) node test/intake.test.mjs
 #   9) python tools/activate.py
 #
@@ -91,10 +91,10 @@ Invoke-Step -Name 'test/levels.cjs'   -Exe 'node'   -Arguments @('test/levels.cj
 Invoke-Step -Name 'test/boot.cjs'     -Exe 'node'   -Arguments @('test/boot.cjs')
 Invoke-Step -Name 'test/net.cjs'      -Exe 'node'   -Arguments @('test/net.cjs')
 Invoke-Step -Name 'test/host.mjs'     -Exe 'node'   -Arguments @('test/host.mjs')
-Invoke-Step -Name 'test/core.test.mjs' -Exe 'node'  -Arguments @('--test','test/core.test.mjs')
-Invoke-Step -Name 'test/legacy.test.mjs' -Exe 'node' -Arguments @('--test','test/legacy.test.mjs')
-Invoke-Step -Name 'test/storage.test.mjs' -Exe 'node' -Arguments @('--test','test/storage.test.mjs')
-Invoke-Step -Name 'test/dispatch.test.mjs' -Exe 'node' -Arguments @('--test','test/dispatch.test.mjs')
+Invoke-Step -Name 'test/core.test.mjs' -Exe 'node'  -Arguments @('test/core.test.mjs')
+Invoke-Step -Name 'test/legacy.test.mjs' -Exe 'node' -Arguments @('test/legacy.test.mjs')
+Invoke-Step -Name 'test/storage.test.mjs' -Exe 'node' -Arguments @('test/storage.test.mjs')
+Invoke-Step -Name 'test/dispatch.test.mjs' -Exe 'node' -Arguments @('test/dispatch.test.mjs')
 Invoke-Step -Name 'test/bus.test.mjs' -Exe 'node' -Arguments @('test/bus.test.mjs')
 Invoke-Step -Name 'test/room.test.mjs' -Exe 'node' -Arguments @('test/room.test.mjs')
 Invoke-Step -Name 'test/intake.test.mjs' -Exe 'node' -Arguments @('test/intake.test.mjs')
