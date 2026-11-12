@@ -59,3 +59,6 @@
 {"t":"2026-11-12T17:11:31.411Z","ev":"complete","id":"T-0013","note":"core/compact.js+tools/compact.mjs+test/compact.test.mjs+storage/events.js。验收：归档后删原文件仍重建出相同 rev 与概念计数（快照+尾部 vs 全量重放 JSON.stringify 逐字节相等，含 gzip 解压回读校验）；连跑两次幂等（第二次输出 无新写入）；node test/compact.test.mjs 16 pass 77 断言；powershell -ExecutionPolicy Bypass -File tools/check_all.ps1 = 15 passed, 0 failed。缺口：hos"}
 {"t":"2026-11-12T17:12:46.003Z","ev":"claim","id":"T-0019","by":"content"}
 {"t":"2026-11-12T17:15:51.735Z","ev":"complete","id":"T-0014","by":"lead","note":"复核：export 路由 200 text/html 1468B、bad-what 400；check_all 15/15；改动仅在 host/handlers/export.js + index.js + reply.js + test/host.mjs"}
+{"t":"2026-11-12T17:22:18.273Z","ev":"create","id":"T-0023","title":"boot 测试只断言 5 个阶段，却打印并宣称 7 阶段按序","role":"qa","scope":["test/boot.cjs"],"deps":[],"accept":["断言覆盖 enter 到 dive 的全部 7 个阶段，或把日志与文档统一改成 5","故意打乱 enter/dive 顺序时测试必须红","同步 TASKS.md:102 与 docs/HANDBOOK 6.3 的措辞"]}
+{"t":"2026-11-12T17:23:08.747Z","ev":"create","id":"T-0024","title":"到期文案：逾期不足 1 天仍显示「逾期 1 天」","role":"ui-dev","scope":["src/045-net.js","test/net.cjs"],"deps":[],"accept":["逾期 1 分钟显示「今天之内」或「刚逾期」，不得显示 1 天","逾期 2 天整与 2 天 1 分钟都显示 2 天","test/net.cjs 覆盖正负 1 分钟与 2 天边界，不靠毫秒抽签"]}
+{"t":"2026-11-12T17:23:48.716Z","ev":"claim","id":"T-0021","by":"lead"}
