@@ -114,5 +114,95 @@
   "text": "Those who keep reviewing every day tend to go further in the end.",
   "answer": "那些每天坚持复习的人，最终往往走得更远。",
   "note": "who 引导定语从句。"
+ },
+ {
+  "id": "s.011",
+  "dir": "zh2en",
+  "syntax": ["sp.virtual"],
+  "words": [],
+  "text": "如果那天他多练了一遍，比赛结果可能就不同了。",
+  "answer": "If he had practised once more that day, the result might have been different.",
+  "note": "与过去事实相反：从句 had done，主句 might have done。"
+ },
+ {
+  "id": "s.012",
+  "dir": "zh2en",
+  "syntax": ["sp.appositive"],
+  "words": [],
+  "text": "他迟到的消息让大家都很意外。",
+  "answer": "The news that he was late surprised everyone.",
+  "note": "that 从句说明 news 的具体内容，不作成分。"
+ },
+ {
+  "id": "s.013",
+  "dir": "zh2en",
+  "syntax": ["sp.comparison"],
+  "words": [],
+  "text": "你练得越多，进步就越快。",
+  "answer": "The more you practise, the faster you will improve.",
+  "note": "两个分句都用陈述语序，只把比较级提前。"
+ },
+ {
+  "id": "s.014",
+  "dir": "zh2en",
+  "syntax": ["sp.concession"],
+  "words": [],
+  "text": "虽然这道题很难，他还是独立做出来了。",
+  "answer": "Although the problem was difficult, he worked it out on his own.",
+  "note": "although 引导让步从句，主句不再用 but。"
+ },
+ {
+  "id": "s.015",
+  "dir": "zh2en",
+  "syntax": ["sp.virtual"],
+  "words": [],
+  "text": "要不是你提醒，我就错过截止日期了。",
+  "answer": "But for your reminder, I would have missed the deadline.",
+  "note": "But for 表示与过去事实相反的含蓄条件。"
+ },
+ {
+  "id": "s.016",
+  "dir": "en2zh",
+  "syntax": ["sp.virtual"],
+  "words": [],
+  "text": "If I had known the rule earlier, I would not have made that mistake.",
+  "answer": "如果我早点知道这条规则，就不会犯那个错误了。",
+  "note": "与过去事实相反：had known / would not have made。"
+ },
+ {
+  "id": "s.017",
+  "dir": "en2zh",
+  "syntax": ["sp.appositive"],
+  "words": [],
+  "text": "The idea that practice matters more than talent is widely accepted.",
+  "answer": "练习比天赋更重要这一观点已被广泛接受。",
+  "note": "that 从句说明 idea 的具体内容。"
+ },
+ {
+  "id": "s.018",
+  "dir": "en2zh",
+  "syntax": ["sp.comparison"],
+  "words": [],
+  "text": "The earlier you start, the more time you will have to revise.",
+  "answer": "你开始得越早，用来复习的时间就越多。",
+  "note": "the + 比较级, the + 比较级；两个分句均用陈述语序。"
+ },
+ {
+  "id": "s.019",
+  "dir": "en2zh",
+  "syntax": ["sp.concession"],
+  "words": [],
+  "text": "No matter how hard the task is, she refuses to give up.",
+  "answer": "无论任务多难，她都不肯放弃。",
+  "note": "no matter how 引导让步从句，后接形容词。"
+ },
+ {
+  "id": "s.020",
+  "dir": "en2zh",
+  "syntax": ["sp.concession"],
+  "words": [],
+  "text": "Although the plan failed, the team learned a great deal from it.",
+  "answer": "虽然计划失败了，团队从中学到了很多。",
+  "note": "although 从句与主句之间不用 but。"
  }
 ]

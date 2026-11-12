@@ -2,6 +2,7 @@ already-claimed
 bad-action
 bad-body
 bad-date
+bad-format
 bad-from
 bad-id
 bad-idem-key
@@ -19,6 +20,7 @@ bad-subject
 bad-tag
 bad-title
 bad-to
+bad-what
 bad-wrong
 batch-too-large
 board-failed
@@ -28,6 +30,7 @@ bus-failed
 deps-open
 empty-body
 empty-text
+export-failed
 idem-key-conflict
 method-not-allowed
 no-ticket
@@ -41,4 +44,4 @@ state-failed
 text-too-long
 ticket-failed
 today-failed
-write-failed
+write-failed

@@ -53,3 +53,19 @@ export function envelope(payload, rev) {
 export function fail(res, status, error, detail) {
   writeJson(res, status, detail === undefined ? { ok: false, error } : { ok: false, error, detail })
 }
+
+/** HTML 文本必须转义：导出页里会出现用户写下的考点名与备注原文。 */
+const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }
+export function escapeHtml(text) {
+  return String(text ?? '').replace(/[&<>"']/g, (ch) => ESCAPES[ch])
+}
+
+/** HTML 响应：只给 /neuroloop/export 用；与 writeJson 一样不缓存。 */
+export function writeHtml(res, status, html) {
+  const body = String(html ?? '')
+  res.statusCode = status
+  res.setHeader('content-type', 'text/html; charset=utf-8')
+  res.setHeader('cache-control', 'no-store')
+  res.setHeader('x-content-type-options', 'nosniff')
+  res.end(body)
+}

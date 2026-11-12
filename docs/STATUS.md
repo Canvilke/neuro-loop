@@ -2,7 +2,7 @@
 
 > 一页看清：**能跑的东西**、**只是壳的东西**、**卡住的东西**。
 > 每条结论后面跟可复现命令或测试名；没有命令支撑的结论不写。
-> 盘点基线：`powershell -NoProfile -ExecutionPolicy Bypass -File tools/check_all.ps1` → **14 passed, 0 failed**（2026-11-12 02:50，本机实测）。
+> 盘点基线：`powershell -NoProfile -ExecutionPolicy Bypass -File tools/check_all.ps1` → **15 passed, 0 failed**（2026-11-13 01:15，本机实测）。
 
 ## 1. 能跑、且验证过（九块）
 
@@ -51,3 +51,21 @@
 - `data/seed.json` 走查脚手架；`content/` 方法卡与句型库；`plan/` 排程与底表
 - `daily/` 每日产物（JSON/docx/PDF，可重生成）
 - 文档：`DESIGN.md`（设计）`ENGINE.md`（四层库）`FORMAT-*.md`（版面契约）`TASKS.md`（进度）`NEXT.md`（当下）`ROADMAP.md`（大范围）`docs/ADR-*.md`（决策）
+
+## 6. 会议室（2026-11-12 夜上线）
+
+- **它是什么**：一份只追加的对话记录 `room/room.jsonl`。三种消息：`say` 说话、`ask` 提请拍板、`decision` 拍板；`decision` 必须 `--ref` 指向被回答的 `ask`。命令：`node tools/room.mjs say|ask|decide|tail|asks|wait`。
+- **为什么需要**：票单管"做什么"，总线管"交付/回执"，会议室管"为什么这么定"——决定不再只活在聊天里。
+- **验证**：`node test/room.test.mjs` → **20 checks**（写读一致、四类校验、ask→decision、since/limit、坏行、未知命令退出码 2）；`node test/host.mjs` 含会议室路由（路由快照 9 条）；`check_all.ps1` 第 15 项；界面「认知终端 → 会议室」**不轮询**（`setInterval` 会挂住无头测试）。
+- **边界（诚实写）**：会议室**叫不醒**任何空闲会话，它只是一份谁醒谁读的文件；代表之间不能私聊；只追加、不编辑，说错了再说一条"更正"。
+- **已知缺陷**：`tail` 的时间列按 UTC 显示（比本地墙上时间早 8 小时），已开 T-0022 交 host-dev。
+- 规则全文：`docs/ROOM.md`。
+
+## 7. 通讯约定（代表制，2026-11-13 起）
+
+- 专员**不亲自**久留会议室：需要讨论时派一个**参会代表**（子代理）。代表先 `node tools/meeting.mjs brief --role <角色>` 拿出席书，只发会议室，**不改文件、不领票、不 git**。
+- 节奏：`room.mjs wait` 每 2.5 s 轮询一次文件，阻塞等新消息；一条发言到被看见通常 ≤3 s。代表单条 ≤200 字、最多 6 条，跑完只回三行：**结论 / 依据 / 需要 Lead 做什么**。
+- 议事：`node tools/meeting.mjs agenda`（待拍板 / claimed / ready / blocked / 最近发言）→ `brief --role <角色>`（出席书）→ `close`。定时任务 `schedule-5caac942` 在 01:30 / 03:30 / 05:30 各开一场。
+- 通道分工：**票单 = 做什么**（`team/tickets.jsonl`）、**总线 = 交付/回执**（`bus/bus.jsonl`）、**会议室 = 为什么**（`room/room.jsonl`）、**信箱 = 点名投递**（`tools/mail.py`）。
+- 做不到的：叫醒空闲会话；代表之间 `send_message` 直连；替用户拍板——动数据 / 花钱 / 改方向只能 `ask` 后等用户。
+- 约定全文：`docs/COMMS-PROMPT.md`。

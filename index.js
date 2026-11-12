@@ -10,6 +10,7 @@ import { onToday } from './host/handlers/today.js'
 import { onTeam } from './host/handlers/team.js'
 import { onBus } from './host/handlers/bus.js'
 import { onRoom } from './host/handlers/room.js'
+import { onExport } from './host/handlers/export.js'
 
 export { resetCache }
 
@@ -26,6 +27,7 @@ export const ROUTE_TODAY = '/neuroloop/today'
 export const ROUTE_TEAM = '/neuroloop/team'
 export const ROUTE_BUS = '/neuroloop/bus'
 export const ROUTE_ROOM = '/neuroloop/room'
+export const ROUTE_EXPORT = '/neuroloop/export'
 
 // 路由表：顺序即注册顺序（test/host.mjs 对它做快照断言）。
 const routes = [
@@ -37,6 +39,7 @@ const routes = [
   { kind: 'exact', path: ROUTE_TEAM, handler: onTeam },
   { kind: 'exact', path: ROUTE_BUS, handler: onBus },
   { kind: 'exact', path: ROUTE_ROOM, handler: onRoom },
+  { kind: 'exact', path: ROUTE_EXPORT, handler: onExport },
 ]
 
 export function apply(ctx) {

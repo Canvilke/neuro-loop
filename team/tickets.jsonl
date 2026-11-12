@@ -49,3 +49,13 @@
 {"t":"2026-11-12T15:26:34.862Z","ev":"reopen","id":"T-0013","note":"回收后重开"}
 {"t":"2026-11-12T15:30:31.058Z","ev":"claim","id":"T-0012","by":"lead"}
 {"t":"2026-11-12T15:34:04.959Z","ev":"complete","id":"T-0012","by":"lead","note":"ceil→floor + 边界断言；net 10 连跑 0 失败；门禁 14/14"}
+{"t":"2026-11-12T16:55:46.353Z","ev":"create","id":"T-0019","title":"英语句子库 10→20：补 10 条覆盖 4 个新句型点","role":"content","scope":["content/syntax/sentences.json","content/syntax/points.json","FORMAT-english.md"],"deps":[],"accept":[]}
+{"t":"2026-11-12T16:55:46.582Z","ev":"create","id":"T-0020","title":"STATUS 增补会议室与通讯约定两节，README 导航校正","role":"architect","scope":["docs/STATUS.md","README.md"],"deps":[],"accept":[]}
+{"t":"2026-11-12T16:55:46.653Z","ev":"create","id":"T-0021","title":"会议室与议事脚本的边界回归：wait 超时、并发追加、坏行","role":"qa","scope":["test/room.test.mjs","test/dispatch.test.mjs"],"deps":[],"accept":[]}
+{"t":"2026-11-12T17:05:37.634Z","ev":"claim","id":"T-0014","by":"host-dev"}
+{"t":"2026-11-12T17:06:21.182Z","ev":"claim","id":"T-0013"}
+{"t":"2026-11-12T17:06:58.391Z","ev":"claim","id":"T-0020","by":"architect"}
+{"t":"2026-11-12T17:07:17.820Z","ev":"create","id":"T-0022","title":"会议室时间列是 UTC：tail 与议程标题按本地时区显示","role":"host-dev","scope":["host/room.js","tools/room.mjs","tools/meeting.mjs"],"deps":[],"accept":["存储 at 仍写 UTC ISO；tail/议程按本机时区；跨日边界与 01:30/03:30/05:30 对得上；room ≥24 断言；门禁 15 项"]}
+{"t":"2026-11-12T17:11:31.411Z","ev":"complete","id":"T-0013","note":"core/compact.js+tools/compact.mjs+test/compact.test.mjs+storage/events.js。验收：归档后删原文件仍重建出相同 rev 与概念计数（快照+尾部 vs 全量重放 JSON.stringify 逐字节相等，含 gzip 解压回读校验）；连跑两次幂等（第二次输出 无新写入）；node test/compact.test.mjs 16 pass 77 断言；powershell -ExecutionPolicy Bypass -File tools/check_all.ps1 = 15 passed, 0 failed。缺口：hos"}
+{"t":"2026-11-12T17:12:46.003Z","ev":"claim","id":"T-0019","by":"content"}
+{"t":"2026-11-12T17:15:51.735Z","ev":"complete","id":"T-0014","by":"lead","note":"复核：export 路由 200 text/html 1468B、bad-what 400；check_all 15/15；改动仅在 host/handlers/export.js + index.js + reply.js + test/host.mjs"}

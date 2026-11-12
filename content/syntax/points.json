@@ -54,5 +54,33 @@
   "pattern": "动词/介词 + that/whether/疑问词 + 从句",
   "judge": "从句作宾语，用陈述语序。",
   "note": "whether 不与 or not 分离时可换 if。"
+ },
+ {
+  "id": "sp.virtual",
+  "name": "虚拟语气（与过去事实相反）",
+  "pattern": "If + 主语 + had done, 主语 + would/could/might have done",
+  "judge": "条件句与过去事实相反：从句用 had done，主句用 would have done；省略 if 时 had 提前倒装。",
+  "note": "含蓄条件（but for / otherwise）主句仍用 would have done。"
+ },
+ {
+  "id": "sp.appositive",
+  "name": "同位语从句",
+  "pattern": "抽象名词(fact/news/idea/belief) + that + 完整从句",
+  "judge": "从句说明前面抽象名词的具体内容，that 不作成分且不可省略；定语从句的 that 在从句中作成分。",
+  "note": "常见先行名词：fact, idea, news, belief, hope, doubt。"
+ },
+ {
+  "id": "sp.comparison",
+  "name": "the + 比较级, the + 比较级",
+  "pattern": "The + 比较级 + 主语 + 谓语, the + 比较级 + 主语 + 谓语",
+  "judge": "表示“越……越……”；两个分句都用陈述语序，只把比较级提前。",
+  "note": "比较级可用 more/less 结构；主句常用将来时。"
+ },
+ {
+  "id": "sp.concession",
+  "name": "让步状语从句",
+  "pattern": "Although/Though/Even though + 从句, 主句；No matter how + adj./adv. + 主语 + 谓语, 主句",
+  "judge": "从句先让一步，主句给结论；although/though 不与 but 在同一句连用。",
+  "note": "No matter how 后接形容词或副词，语序为 how + adj./adv. + 主语 + 谓语。"
  }
 ]

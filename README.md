@@ -1,40 +1,23 @@
 
-## 工程结构（v3 起）
-
-```
-core/       纯函数领域层（无 IO）：contract / events / metrics / state
-storage/    读写与迁移：legacy 适配（v1 事件 → v2）
-host/       路由薄层：state / event / today / mail
-src/        客户端渲染（Canvas）
-test/       node:test（core / legacy）+ 无头渲染（smoke / levels / boot / net / host）
-docs/       ADR、ROADMAP v3、研究报告
-```
-
-新增命令：
-
-- `node --test test/core.test.mjs` —— 领域层契约测试（24 条）
-- `node --test test/legacy.test.mjs` —— v1 与 core 的交叉验证（4 条）
-- `node tools/core_verify.mjs` —— 用磁盘事件重放，与 `state.json` 对账
-- `powershell tools/check_all.ps1` —— 9 项门禁（build + 5 套 UI/host 测试 + core + legacy + activate）
-
 # Neuro-Loop · 认知巡检
 
 一个跑在 DeepSeek Harness 里的**个人认知系统**：左侧一圈银色星环代表六门学科，
 右侧一片可旋转缩放的"知识场"代表你脑子里那张网，行星外沿的暗物质碎片代表
 "你以为会、其实不会"的题。
 
-设计来源：`../设计文档.doc`（场景描述 + LLM/人脑同构性理论）。
+设计来源：《设计文档》（场景描述 + LLM/人脑同构性理论）；原稿不在本仓库，结论已折进 [`DESIGN.md`](DESIGN.md)。
 
-## 0. 从这里开始（先读这四份，按顺序）
+## 0. 从这里开始（按顺序）
 
 | 想知道 | 打开 |
 |---|---|
-| 现在到底有什么、什么还只是壳、什么卡住了 | [`STATUS.md`](STATUS.md) |
+| 现在到底有什么、什么还只是壳、什么卡住了 | [`docs/STATUS.md`](docs/STATUS.md) |
 | 今天该干什么 | [`NEXT.md`](NEXT.md) 顶部三行 |
 | 这周的安排与验收 | [`WEEK-01.md`](WEEK-01.md) |
 | 全部任务与进度（唯一真源） | [`TASKS.md`](TASKS.md) |
 | 谁负责哪块、票单怎么流转 | [`docs/TEAM-PROTOCOL.md`](docs/TEAM-PROTOCOL.md) |
 | 一句话怎么变成验收过的票 | [`docs/END-TO-END.md`](docs/END-TO-END.md) |
+| 会议室怎么用、代表制怎么派 | [`docs/ROOM.md`](docs/ROOM.md) · [`docs/COMMS-PROMPT.md`](docs/COMMS-PROMPT.md) |
 | 为什么这样分层、被否过什么 | [`docs/ADR-0001-architecture.md`](docs/ADR-0001-architecture.md) · [`docs/ADR-0002-persistent-team.md`](docs/ADR-0002-persistent-team.md) |
 | 数据模型 v2 的研究与取舍 | [`docs/RESEARCH-PLAN.pdf`](docs/RESEARCH-PLAN.pdf) |
 
@@ -65,7 +48,10 @@ docs/       ADR、ROADMAP v3、研究报告
 neuro-loop/
 ├─ package.json          # dsh 插件清单（bundle.patch + client 入口）
 ├─ cordis.patch.yml      # 往 profile 里插入本插件
-├─ index.js              # 宿主半边（空实现，纯客户端插件）
+├─ index.js              # 宿主半边：注册 9 条路由（state/event/events/mail/today/team/bus/room/export）
+├─ core/ storage/        # 领域层（纯函数）与存储层（L1 事件流 → SQLite 投影）
+├─ host/                 # 路由薄层 + handlers（只做协议，不写业务规则）
+├─ room/ bus/ team/      # 会议室、总线、票单台账（都是只追加的 jsonl）
 ├─ icon.svg  locale/     # 侧栏图标 / 插件市场文案
 ├─ data/seed.json        # 六科考点 + 分组 + 边 + 碎片（唯一数据源）
 ├─ src/0*.js             # 分模块源码，按序拼进同一闭包
@@ -86,7 +72,11 @@ node test/levels.cjs        # 层级切换契约
 node test/boot.cjs          # 启动序列（必须自己开场）
 node test/net.cjs           # 客户端接线 + 队列补发 + due 调度
 node test/host.mjs          # 宿主路由 + 事件流 + 投影重建
+node test/room.test.mjs     # 会议室（20 checks）
 # 然后：在 DSH 里刷新页面，看侧栏"认知巡检"
+
+# 15 项门禁（含 build 与全部测试）
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/check_all.ps1
 
 # 环境自检（换机器/隔天回来先跑这个）
 python tools/activate.py --test
@@ -127,7 +117,7 @@ python tools/import_proto_db.py --dry
 
 ## 6. 接下来
 
-见 `TASKS.md`。当前等两件事：**仪表盘模块接入**、**真机截图确认观感**。
+见 `TASKS.md`。2026-11-13 在推：T-0013 归档压缩、T-0014 导出路由、T-0015 审核页签、T-0017/T-0021 边界回归；会议室与代表制已上线（见 [`docs/STATUS.md`](docs/STATUS.md) §6–7）。
 
 ## 7. 数据放哪、怎么救
 
@@ -145,11 +135,18 @@ python tools/activate.py          # 十秒体检：构建/数据/插件/文档
 python tools/activate.py --test   # 连五套测试一起跑
 ```
 
-## 8. 两条路由
+## 8. 九条路由
 
 | 方法 | 路径 | 作用 |
 | --- | --- | --- |
 | GET | `/neuroloop/state` | 返回投影（`rev` + nodes + flattened）；客户端启动时合并 |
-| POST | `/neuroloop/event` | 追加一条事件：`recall` / `note` / `flatten` / `unflatten` |
+| POST | `/neuroloop/event` | 追加一条事件：`attempt` / `note` / `flatten` / `unflatten` / `daily` 等 |
+| POST | `/neuroloop/events` | 批量追加（≤200 条，逐条校验，部分成功有明细） |
+| GET/POST | `/neuroloop/mail` | 信箱：GET 读未读，POST 发信 / 标记已读 |
+| GET | `/neuroloop/today` | 「今天」视图：两份资料、数理化任务、到期、两张纸状态 |
+| GET/POST | `/neuroloop/team` | 团队与票单：GET 看板，POST 领票 / 交付 |
+| GET/POST | `/neuroloop/bus` | 总线：GET 未读 / tail，POST 追加一行 |
+| GET/POST | `/neuroloop/room` | 会议室：GET tail / asks，POST say / ask / decide |
+| GET | `/neuroloop/export` | 导出 A4 HTML：`?what=due|blind|fp`（T-0014） |
 
 守卫：只接受本机回环 + 同源 Origin，请求体上限 64KB；方法不对 405，跨源 403，字段不合法 400。

@@ -11,7 +11,7 @@ process.env.NEUROLOOP_HOME = HOME
 process.env.NEUROLOOP_TEAM_ROOT = HOME
 process.env.NEUROLOOP_BUS_ROOT = HOME  // 台账也写到临时目录，别污染仓库
 
-const { apply, inject, resetCache, ROUTE_STATE, ROUTE_EVENT, ROUTE_EVENTS, ROUTE_MAIL, ROUTE_TODAY, ROUTE_TEAM, ROUTE_BUS, ROUTE_ROOM } = await import('../index.js')
+const { apply, inject, resetCache, ROUTE_STATE, ROUTE_EVENT, ROUTE_EVENTS, ROUTE_MAIL, ROUTE_TODAY, ROUTE_TEAM, ROUTE_BUS, ROUTE_ROOM, ROUTE_EXPORT } = await import('../index.js')
 
 let pass = 0
 function ok(cond, msg) {
@@ -112,12 +112,13 @@ apply(ctx)
  * 插件永远 pending，路由整块不存在（14:35 实际踩过）。 */
 ok(Array.isArray(inject) && inject.includes('webServer'), 'inject 以数组声明依赖 webServer')
 ok(!(inject && !Array.isArray(inject) && inject.optional), 'inject 不得使用 { optional } 写法（会永久 pending）')
-ok(routes.length === 8, '注册了 8 条路由（实际 ' + routes.length + '）')
+ok(routes.length === 9, '注册了 9 条路由（实际 ' + routes.length + '）')
 ok(routes.some((r) => r.path === ROUTE_STATE && r.kind === 'exact'), 'GET 路由 ' + ROUTE_STATE)
 ok(routes.some((r) => r.path === ROUTE_EVENT && r.kind === 'exact'), 'POST 路由 ' + ROUTE_EVENT)
 ok(routes.some((r) => r.path === ROUTE_EVENTS && r.kind === 'exact'), 'POST 路由 ' + ROUTE_EVENTS)
 ok(routes.some((r) => r.path === ROUTE_MAIL && r.kind === 'exact'), 'POST 路由 ' + ROUTE_MAIL)
 ok(routes.some((r) => r.path === ROUTE_TODAY && r.kind === 'exact'), 'GET 路由 ' + ROUTE_TODAY)
+ok(routes.some((r) => r.path === ROUTE_EXPORT && r.kind === 'exact'), 'GET 路由 ' + ROUTE_EXPORT)
 
 /* 路由表快照：路径、种类、顺序一起钉死。
  * 拆分 index.js 时这张表必须一字不差地保留；以后增删路由要显式改这里，不能悄悄变。 */
@@ -130,10 +131,11 @@ const ROUTE_TABLE = [
   { path: '/neuroloop/team', kind: 'exact' },
   { path: '/neuroloop/bus', kind: 'exact' },
   { path: '/neuroloop/room', kind: 'exact' },
+  { path: '/neuroloop/export', kind: 'exact' },
 ]
 ok(
   JSON.stringify(routes.map((r) => ({ path: r.path, kind: r.kind }))) === JSON.stringify(ROUTE_TABLE),
-  '路由表快照：8 条路径、kind 与注册顺序不变',
+  '路由表快照：9 条路径、kind 与注册顺序不变',
 )
 
 const getState = routes.find((r) => r.path === ROUTE_STATE).handler
@@ -443,6 +445,101 @@ const onToday = routes.find((r) => r.path === ROUTE_TODAY).handler
   ok(wrong.status === 405, '会议室：只接受 GET/POST')
 }
 
+/* ---------- 导出页（/neuroloop/export） ---------- */
+{
+  const { collect, ROW_CAP } = await import('../host/handlers/export.js')
+  const { escapeHtml } = await import('../host/reply.js')
+  const onExport = routes.find((r) => r.path === ROUTE_EXPORT).handler
+
+  // 造一条早该复习的记录：recall 成功 + at 在过去 → dueAt 已过期。
+  const seeded = await call(postEvent, makeReq({ method: 'POST', body: JSON.stringify({
+    kind: 'recall', node: 'math-deriv', ok: 1, at: '2026-01-01T00:00:00.000Z',
+  }) }))
+  ok(seeded.status === 200, '导出：预置一条到期记录成功')
+
+  const due = await call(onExport, makeReq({ url: ROUTE_EXPORT + '?what=due' }))
+  ok(due.status === 200, '导出：what=due → 200')
+  ok(String(due.res.headers['content-type']).startsWith('text/html'), '导出：content-type 是 text/html')
+  ok(due.res.body.startsWith('<!doctype html'), '导出：正文以 <!doctype html 开头')
+  ok(due.res.body.includes('data-id="math-deriv"'), '导出：到期清单里有刚种下的考点')
+  ok(due.res.headers['cache-control'] === 'no-store', '导出：不缓存')
+
+  const dueMath = await call(onExport, makeReq({ url: ROUTE_EXPORT + '?what=due&subject=math' }))
+  ok(dueMath.status === 200 && dueMath.res.body.includes('data-id="math-deriv"'), '导出：subject=math 命中本学科')
+  const duePhys = await call(onExport, makeReq({ url: ROUTE_EXPORT + '?what=due&subject=physics' }))
+  ok(duePhys.status === 200 && !duePhys.res.body.includes('data-id="math-deriv"'), '导出：subject=physics 不含数学条目')
+
+  for (const what of ['blind', 'fp']) {
+    const r = await call(onExport, makeReq({ url: ROUTE_EXPORT + '?what=' + what }))
+    ok(r.status === 200 && r.res.body.startsWith('<!doctype html'), '导出：what=' + what + ' → 200 HTML')
+  }
+
+  // 打印约束：A4 + 扁平（无渐变、无半透明大色块、无外部资源）。
+  const page = due.res.body
+  ok(page.includes('size: A4') && page.includes('@media print'), '导出：A4 与 @media print')
+  ok(!/linear-gradient|radial-gradient|rgba\(/.test(page), '导出：扁平（无渐变/半透明色块）')
+  ok(!/<img|https?:\/\//.test(page), '导出：不引外部资源')
+  ok(page.includes('<th class="chk">复</th>') && page.includes('<th class="chk">推</th>')
+    && page.includes('<th class="chk">错</th>'), '导出：三列勾选框')
+  ok((page.match(/&#9744;/g) || []).length === 3 * (page.match(/data-id=/g) || []).length,
+    '导出：每行三个勾选框')
+
+  // 参数边界
+  const badWhat = await call(onExport, makeReq({ url: ROUTE_EXPORT + '?what=holes' }))
+  ok(badWhat.status === 400 && badWhat.json.error === 'bad-what', '导出：未知 what → 400 bad-what')
+  const noWhat = await call(onExport, makeReq({ url: ROUTE_EXPORT }))
+  ok(noWhat.status === 400 && noWhat.json.error === 'bad-what', '导出：缺 what → 400 bad-what')
+  const badFmt = await call(onExport, makeReq({ url: ROUTE_EXPORT + '?what=due&format=pdf' }))
+  ok(badFmt.status === 400 && badFmt.json.error === 'bad-format', '导出：format=pdf → 400 bad-format')
+  const badSubject = await call(onExport, makeReq({ url: ROUTE_EXPORT + '?what=due&subject=nope' }))
+  ok(badSubject.status === 400 && badSubject.json.error === 'bad-subject', '导出：未知学科 → 400 bad-subject')
+  const post = await call(onExport, makeReq({ method: 'POST', url: ROUTE_EXPORT }))
+  ok(post.status === 405 && post.json.error === 'method-not-allowed', '导出：非 GET → 405')
+  const crossOrigin = await call(onExport, makeReq({
+    url: ROUTE_EXPORT + '?what=due', headers: { origin: 'https://evil.example' },
+  }))
+  ok(crossOrigin.status === 403 && crossOrigin.json.error === 'origin-mismatch', '导出：跨源 → 403')
+  const far = await call(onExport, makeReq({ url: ROUTE_EXPORT + '?what=due', remote: '10.0.0.9' }))
+  ok(far.status === 403 && far.json.error === 'not-loopback', '导出：非本机 → 403')
+
+  // collect() 的取数规则：纯函数，用假投影把三条清单各钉一遍。
+  const NOW = Date.parse('2026-11-13T00:00:00.000Z')
+  const past = '2026-01-01T00:00:00.000Z'
+  const future = '2027-01-01T00:00:00.000Z'
+  const bucket = (o = {}) => ({ attempts: 0, hits: 0, misses: 0, recon: 0, solveOk: 0, solveFail: 0, fp: 0,
+    streak: 0, durationMs: 0, lastAt: null, dueAt: null, ...o })
+  const fake = { rev: 1, nodes: {
+    'math-a': bucket({ attempts: 2, hits: 1, misses: 1, lastAt: past, dueAt: past }),
+    'math-b': bucket({ attempts: 1, hits: 1, solveFail: 1, fp: 1, lastAt: past, dueAt: future, streak: 1 }),
+    'math-c': bucket({ attempts: 1, hits: 0, misses: 1, lastAt: past, dueAt: future }),
+    'math-d': bucket(),
+    'chem-a': bucket(),
+  } }
+  const ids = (list) => list.rows.map((r) => r.id)
+  // 传空目录 = 关掉"补未测考点"那一步，只钉取数与排序规则本身。
+  const noCatalog = { nodes: {} }
+  ok(JSON.stringify(ids(collect(fake, 'due', '', NOW, noCatalog))) === '["math-a"]', '导出：due 只收已过期的（按到期升序）')
+  ok(JSON.stringify(ids(collect(fake, 'fp', '', NOW, noCatalog))) === '["math-b"]', '导出：fp 只收命中过但实做失败的')
+  ok(JSON.stringify(ids(collect(fake, 'blind', '', NOW, noCatalog))) === '["chem-a","math-d","math-c"]',
+    '导出：blind = 未测在前、不稳在后，且不重复计入 fp')
+  const blindRows = collect(fake, 'blind', '', NOW, noCatalog).rows
+  ok(blindRows[0].why === '未测' && blindRows[2].why === '不稳', '导出：blind 标注 未测/不稳')
+  ok(JSON.stringify(ids(collect(fake, 'blind', 'math', NOW, noCatalog))) === '["math-d","math-c"]', '导出：subject 过滤生效')
+  // 目录里没桶的考点要补进来（标记 未测），已测过的不能被补成第二条。
+  const catalog = { nodes: { 'math-z': {}, 'math-a': {}, 'chem-z': {} } }
+  ok(JSON.stringify(ids(collect(fake, 'blind', '', NOW, catalog))) === '["chem-a","chem-z","math-d","math-z","math-c"]',
+    '导出：blind 补上目录里从没测过的考点，且不重复')
+  ok(JSON.stringify(ids(collect(fake, 'blind', 'math', NOW, catalog))) === '["math-d","math-z","math-c"]',
+    '导出：补出来的未测考点也走 subject 过滤')
+  const many = { rev: 1, nodes: {} }
+  for (let i = 0; i < 45; i += 1) many.nodes['math-x' + i] = bucket()
+  const capped = collect(many, 'blind', '', NOW, noCatalog)
+  ok(capped.total === 45 && capped.rows.length === ROW_CAP, '导出：单页上限 ' + ROW_CAP + ' 条，total 仍报全量')
+  ok(JSON.stringify(collect(fake, 'blind', '', NOW, noCatalog)) === JSON.stringify(collect(fake, 'blind', '', NOW, noCatalog)),
+    '导出：同一投影导出顺序稳定')
+  ok(escapeHtml('<b>&"\'') === '&lt;b&gt;&amp;&quot;&#39;', '导出：HTML 转义覆盖 & < > " \'')
+}
+
 /* ---------- 批量导入（/neuroloop/events） ---------- */
 {
   // 200 条全部合法：accepted=200，ids 与 rev 都对得上。
@@ -703,19 +800,19 @@ const onToday = routes.find((r) => r.path === ROUTE_TODAY).handler
  * 3) 运行时电池：非法请求走一圈，status:code 集合必须与拆之前完全一致。 */
 {
   const ERROR_CODES = [
-    'already-claimed', 'bad-action', 'bad-body', 'bad-date', 'bad-from', 'bad-id', 'bad-idem-key', 'bad-json',
-    'bad-kind', 'bad-lane', 'bad-limit', 'bad-minutes', 'bad-node', 'bad-ok', 'bad-role', 'bad-shape',
-    'bad-shard', 'bad-subject', 'bad-tag', 'bad-title', 'bad-to', 'bad-wrong', 'batch-too-large',
+    'already-claimed', 'bad-action', 'bad-body', 'bad-date', 'bad-format', 'bad-from', 'bad-id', 'bad-idem-key',
+    'bad-json', 'bad-kind', 'bad-lane', 'bad-limit', 'bad-minutes', 'bad-node', 'bad-ok', 'bad-role', 'bad-shape',
+    'bad-shard', 'bad-subject', 'bad-tag', 'bad-title', 'bad-to', 'bad-what', 'bad-wrong', 'batch-too-large',
     'board-failed', 'body-too-large', 'body-too-long', 'bus-failed', 'deps-open', 'empty-body',
-    'empty-text', 'idem-key-conflict', 'method-not-allowed', 'no-ticket', 'not-loopback', 'note-required', 'origin-mismatch',
-    'read-error', 'read-failed', 'send-failed', 'state-failed', 'text-too-long', 'ticket-failed',
-    'today-failed', 'write-failed',
+    'empty-text', 'export-failed', 'idem-key-conflict', 'method-not-allowed', 'no-ticket', 'not-loopback',
+    'note-required', 'origin-mismatch', 'read-error', 'read-failed', 'send-failed', 'state-failed', 'text-too-long',
+    'ticket-failed', 'today-failed', 'write-failed',
   ]
   const snapshotUrl = new URL('../host/handlers/.error-codes.txt', import.meta.url)
   const onDisk = fs.readFileSync(snapshotUrl, 'utf8').trim().split(/\r?\n/)
   ok(
     onDisk.length === ERROR_CODES.length && onDisk.every((c, i) => c === ERROR_CODES[i]),
-    '错误码快照：.error-codes.txt 与 44 个码逐行一致（实际 ' + onDisk.length + '）',
+    '错误码快照：.error-codes.txt 与 47 个码逐行一致（实际 ' + onDisk.length + '）',
   )
 
   const codeFiles = ['../index.js', '../host/reply.js']
@@ -797,6 +894,12 @@ const onToday = routes.find((r) => r.path === ROUTE_TODAY).handler
   await probe(onToday, { method: 'POST', url: ROUTE_TODAY })
   await probe(onToday, { url: ROUTE_TODAY + '?date=11-10' })
   await probe(onToday, { url: ROUTE_TODAY, headers: { origin: 'https://evil.example' } })
+  const exportHandler = routes.find((r) => r.path === ROUTE_EXPORT).handler
+  await probe(exportHandler, { url: ROUTE_EXPORT })
+  await probe(exportHandler, { url: ROUTE_EXPORT + '?what=holes' })
+  await probe(exportHandler, { url: ROUTE_EXPORT + '?what=due&format=csv' })
+  await probe(exportHandler, { url: ROUTE_EXPORT + '?what=due&subject=nope' })
+  await probe(exportHandler, { method: 'PUT', url: ROUTE_EXPORT })
   await probe(teamHandler, { url: ROUTE_TEAM + '?limit=0' })
   await probe(teamHandler, { url: ROUTE_TEAM + '?limit=abc' })
   await probe(teamHandler, { method: 'POST', url: ROUTE_TEAM, body: JSON.stringify({ role: 'qa' }) })
@@ -815,9 +918,9 @@ const onToday = routes.find((r) => r.path === ROUTE_TODAY).handler
   await probe(busHandler, { method: 'PUT', url: ROUTE_BUS })
 
   const RUNTIME_SNAPSHOT = [
-    '400:bad-body', '400:bad-date', '400:bad-from', '400:bad-json', '400:bad-kind', '400:bad-lane',
+    '400:bad-body', '400:bad-date', '400:bad-format', '400:bad-from', '400:bad-json', '400:bad-kind', '400:bad-lane',
     '400:bad-limit', '400:bad-minutes', '400:bad-node', '400:bad-ok', '400:bad-role', '400:bad-shape',
-    '400:bad-shard', '400:bad-subject', '400:bad-tag', '400:bad-title', '400:bad-to', '400:bad-wrong',
+    '400:bad-shard', '400:bad-subject', '400:bad-tag', '400:bad-title', '400:bad-to', '400:bad-what', '400:bad-wrong',
     '400:batch-too-large', '400:body-too-large', '400:body-too-long', '400:empty-body', '400:empty-text',
     '400:text-too-long', '403:not-loopback', '403:origin-mismatch', '405:method-not-allowed',
   ]
