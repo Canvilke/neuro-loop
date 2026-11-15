@@ -1,0 +1,680 @@
+{
+  "no": 47,
+  "from": "2026-11-16",
+  "to": "2026-11-22",
+  "motto": "愿以微志既长策，岂因独怀废华章",
+  "books": {
+    "grammar": "白本",
+    "reading": "绿本"
+  },
+  "tasks": [
+    {
+      "item": "背词",
+      "content": "线上 100 词／天；线下 20 词／天",
+      "req": "按计划完成"
+    },
+    {
+      "item": "词组",
+      "content": "默写 20 条／天",
+      "req": "每日一页，写完即止"
+    },
+    {
+      "item": "语法",
+      "content": "每日一个语法点",
+      "req": "配合语法书与课内进度"
+    },
+    {
+      "item": "句子",
+      "content": "6 句／天",
+      "req": "中译英写整句；英译中写结构与含义"
+    },
+    {
+      "item": "阅读",
+      "content": "绿本 4 篇",
+      "req": "七选五、完形、阅读 A/B、阅读 C/D"
+    },
+    {
+      "item": "写作",
+      "content": "建议信 1 篇",
+      "req": "100 词，20 分钟"
+    },
+    {
+      "item": "记录",
+      "content": "词汇、笔记、其它事项",
+      "req": "按当周实际，记不认识的"
+    }
+  ],
+  "checkCols": [
+    {
+      "key": "words",
+      "label": "背词"
+    },
+    {
+      "key": "grammar",
+      "label": "语法"
+    },
+    {
+      "key": "sent",
+      "label": "句子"
+    },
+    {
+      "key": "read",
+      "label": "阅读写作"
+    }
+  ],
+  "check": [
+    {
+      "date": "11-16 周一"
+    },
+    {
+      "date": "11-17 周二"
+    },
+    {
+      "date": "11-18 周三"
+    },
+    {
+      "date": "11-19 周四"
+    },
+    {
+      "date": "11-20 周五"
+    },
+    {
+      "date": "11-21 周六"
+    },
+    {
+      "date": "11-22 周日"
+    }
+  ],
+  "days": [
+    {
+      "id": "mon",
+      "date": "11-16 周一",
+      "grammar": {
+        "point": "句子成分与五种基本句型",
+        "detail": "主谓、主系表、主谓宾、主谓双宾、主谓宾补。判断句子成分，先找谓语动词，再定主语与宾语。",
+        "watch": "主谓宾补与双宾易混；形式主语 it 不算真正主语；被动语态改写在翻译题里出现频繁。"
+      },
+      "sentences": [
+        {
+          "tag": "主谓宾补",
+          "dir": "zh2en",
+          "text": "老师让我们把这段话改写成被动语态。",
+          "hint": "",
+          "answer": "The teacher had us rewrite this paragraph in the passive voice.",
+          "struct": null,
+          "shint": "have sb do sth（使役动词 + 宾语 + 补语）"
+        },
+        {
+          "tag": "主谓双宾",
+          "dir": "zh2en",
+          "text": "学校给我们提供了一个可以安静读书的地方。",
+          "hint": "",
+          "answer": "The school provides us with a quiet place to read.",
+          "struct": null,
+          "shint": "provide sb with sth（双宾语的介词改写）"
+        },
+        {
+          "tag": "形式宾语",
+          "dir": "zh2en",
+          "text": "现代城市生活让人很难保持规律作息。",
+          "hint": "keep a regular schedule",
+          "answer": "Modern city life makes it hard for people to keep a regular schedule.",
+          "struct": null,
+          "shint": "make it + adj. + for sb to do（it 作形式宾语）"
+        },
+        {
+          "tag": "主语从句",
+          "dir": "en2zh",
+          "text": "What surprised the researchers was not the number of species they had found but how quickly the forest recovered after the fire.",
+          "hint": "species 物种；recover 恢复",
+          "answer": "研究人员感到意外的不是他们发现的物种数量，而是火灾之后森林恢复得有多快。",
+          "struct": "What 引导主语从句；not … but … 并列两个表语；how 引导表语从句",
+          "shint": "What 引导主语从句；not … but … 并列两个表语"
+        },
+        {
+          "tag": "强调句",
+          "dir": "en2zh",
+          "text": "It was not until the library closed that the students realised they had been reading for six hours.",
+          "hint": "realise 意识到",
+          "answer": "直到图书馆闭馆，学生们才意识到自己已经读了六个小时。",
+          "struct": "It was not until … that … 强调时间状语；had been reading 过去完成进行",
+          "shint": "It was not until … that …（强调时间状语）"
+        },
+        {
+          "tag": "非谓语",
+          "dir": "en2zh",
+          "text": "Having been warned about the heavy traffic, we left an hour earlier than planned.",
+          "hint": "warn 提醒",
+          "answer": "由于事先被提醒过交通拥堵，我们比原计划早出发了一小时。",
+          "struct": "Having been warned 完成式被动分词作原因状语；earlier than planned 比较",
+          "shint": "Having been done 作原因状语，逻辑主语与主句一致"
+        }
+      ],
+      "wcount": 20,
+      "grammarText": "句子成分与五种基本句型",
+      "slot": "阅读① 七选五"
+    },
+    {
+      "id": "tue",
+      "date": "11-17 周二",
+      "grammar": {
+        "point": "句子种类",
+        "detail": "陈述、疑问、祈使、感叹四类；反意疑问句与强调疑问句的构成。",
+        "watch": "反意疑问句的助动词要与前句一致；感叹句 what 修饰名词、how 修饰形容词或副词。"
+      },
+      "sentences": [
+        {
+          "tag": "一般疑问",
+          "dir": "zh2en",
+          "text": "你今天真的打算把整本白本翻完吗？",
+          "hint": "",
+          "answer": "Do you really plan to go through the whole book today?",
+          "struct": null,
+          "shint": "Do you really plan to do …?"
+        },
+        {
+          "tag": "祈使句",
+          "dir": "zh2en",
+          "text": "别指望临时抱佛脚能骗过这种题。",
+          "hint": "cram 临时抱佛脚",
+          "answer": "Don't expect to fool this kind of question by cramming at the last minute.",
+          "struct": null,
+          "shint": "Don't expect to do sth by doing sth"
+        },
+        {
+          "tag": "感叹句",
+          "dir": "zh2en",
+          "text": "要是早点明白这个道理该多好！",
+          "hint": "",
+          "answer": "How I wish I had understood this earlier!",
+          "struct": null,
+          "shint": "How I wish + 主语 + had done（对过去的虚拟）"
+        },
+        {
+          "tag": "反意疑问",
+          "dir": "en2zh",
+          "text": "You didn't think the exam would be that easy, did you?",
+          "hint": "that easy 口语中表示“那么”",
+          "answer": "你并不觉得这次考试有那么容易，是吧？",
+          "struct": "主句否定 + 反意部分用肯定 did you",
+          "shint": "否定主句 + 肯定反意部分"
+        },
+        {
+          "tag": "强调疑问",
+          "dir": "en2zh",
+          "text": "Why is it that some students can remember a word after seeing it once while others forget it within a day?",
+          "hint": "while 表对比",
+          "answer": "为什么有的学生看一眼就能记住一个单词，而另一些人一天之内就忘了？",
+          "struct": "Why is it that … 强调疑问；while 引导对比从句",
+          "shint": "Why is it that …?（强调疑问句型）"
+        },
+        {
+          "tag": "祈使+并列",
+          "dir": "en2zh",
+          "text": "Let it be a lesson, and never leave your revision until the night before again.",
+          "hint": "leave sth until 拖到",
+          "answer": "把它当成一个教训，以后不要再把复习拖到考试前一晚。",
+          "struct": "祈使句 + and + 祈使句；leave … until … 结构",
+          "shint": "祈使句 + and + 祈使句"
+        }
+      ],
+      "wcount": 20,
+      "grammarText": "句子种类",
+      "slot": ""
+    },
+    {
+      "id": "wed",
+      "date": "11-18 周三",
+      "grammar": {
+        "point": "主谓一致",
+        "detail": "语法一致、意义一致、就近一致。重点看 every、either…or、neither…nor、the number of。",
+        "watch": "the number of 谓语用单数，a number of 用复数；neither…nor 遵循就近原则。"
+      },
+      "sentences": [
+        {
+          "tag": "every+单数",
+          "dir": "zh2en",
+          "text": "我们班每个学生都有一本自己的错题本。",
+          "hint": "",
+          "answer": "Every student in our class keeps a notebook of their own mistakes.",
+          "struct": null,
+          "shint": "every + 单数名词作主语，谓语用单数；their 回指"
+        },
+        {
+          "tag": "就近一致",
+          "dir": "zh2en",
+          "text": "要么你，要么你的同桌，得为这次失误负责。",
+          "hint": "answer for 负责",
+          "answer": "Either you or your deskmate has to answer for this mistake.",
+          "struct": null,
+          "shint": "either A or B：谓语与最近的主语一致"
+        },
+        {
+          "tag": "并列主语",
+          "dir": "zh2en",
+          "text": "物理和化学都是需要动手做实验的学科。",
+          "hint": "hands-on 动手的",
+          "answer": "Physics and chemistry are both subjects that require hands-on experiments.",
+          "struct": null,
+          "shint": "A and B 作主语，谓语用复数"
+        },
+        {
+          "tag": "neither…nor",
+          "dir": "en2zh",
+          "text": "Neither the teacher nor the students were prepared for how quickly the discussion turned into an argument.",
+          "hint": "be prepared for 预料",
+          "answer": "老师和学生都没料到讨论会这么快变成争吵。",
+          "struct": "neither … nor … 就近一致，谓语用 were；how 引导宾语从句",
+          "shint": "neither … nor … 就近一致；how 引导宾语从句"
+        },
+        {
+          "tag": "the number of",
+          "dir": "en2zh",
+          "text": "The number of students who choose to study abroad has risen sharply over the past decade.",
+          "hint": "sharply 急剧地",
+          "answer": "过去十年里，选择出国留学的学生人数急剧上升。",
+          "struct": "the number of + 复数名词作主语，谓语用单数 has；who 引导定语从句",
+          "shint": "the number of + 复数名词，谓语用单数"
+        },
+        {
+          "tag": "what 从句",
+          "dir": "en2zh",
+          "text": "What matters most is not how much you read but how much you actually remember.",
+          "hint": "matter 要紧",
+          "answer": "最要紧的不是你读了多少，而是你真正记住了多少。",
+          "struct": "What 引导主语从句；not … but … 并列表语从句",
+          "shint": "What 引导主语从句；not … but … 并列表语从句"
+        }
+      ],
+      "wcount": 20,
+      "grammarText": "主谓一致",
+      "slot": "阅读② 完形"
+    },
+    {
+      "id": "thu",
+      "date": "11-19 周四",
+      "grammar": {
+        "point": "名词与冠词",
+        "detail": "可数与不可数、单复数、a/an/the 的基本用法与固定搭配。",
+        "watch": "抽象名词具体化时可加冠词；the + 形容词表示一类人；固定搭配里的冠词不能省。"
+      },
+      "sentences": [
+        {
+          "tag": "同位语从句",
+          "dir": "zh2en",
+          "text": "他提出的那个想法最终变成了学校的一项新规定。",
+          "hint": "",
+          "answer": "The idea that he put forward eventually became a new rule of the school.",
+          "struct": null,
+          "shint": "the idea that …（that 引导同位语从句）"
+        },
+        {
+          "tag": "不定冠词",
+          "dir": "zh2en",
+          "text": "在这么短的准备时间里通过考试，对他来说是个不小的挑战。",
+          "hint": "",
+          "answer": "Passing the exam in such a short time was quite a challenge for him.",
+          "struct": null,
+          "shint": "such a + adj. + n.；不定冠词表“一种”"
+        },
+        {
+          "tag": "most of",
+          "dir": "zh2en",
+          "text": "我们大多数人都低估了睡眠对记忆的重要性。",
+          "hint": "underestimate 低估",
+          "answer": "Most of us underestimate the importance of sleep to memory.",
+          "struct": null,
+          "shint": "Most of us 作主语，谓语用复数"
+        },
+        {
+          "tag": "the more…the less",
+          "dir": "en2zh",
+          "text": "As a rule, the more carefully you plan your revision, the less anxious you feel before an exam.",
+          "hint": "as a rule 通常",
+          "answer": "通常来说，复习计划做得越细，考前就越不焦虑。",
+          "struct": "the + 比较级 …, the + 比较级 …；as a rule 作状语",
+          "shint": "the + 比较级 …, the + 比较级 …"
+        },
+        {
+          "tag": "形式主语",
+          "dir": "en2zh",
+          "text": "It is said that a single cup of coffee can improve attention for about an hour, though the effect varies from person to person.",
+          "hint": "vary 不同",
+          "answer": "据说一杯咖啡能让注意力提高大约一小时，不过效果因人而异。",
+          "struct": "It is said that … 形式主语；though 引导让步状语从句",
+          "shint": "It is said that …（形式主语）；though 引导让步状语从句"
+        },
+        {
+          "tag": "what 从句+定语",
+          "dir": "en2zh",
+          "text": "What we call “talent” is often nothing more than a habit that has been repeated for years.",
+          "hint": "nothing more than 不过是",
+          "answer": "我们所谓的“天赋”，往往不过是一个重复了多年的习惯。",
+          "struct": "What 引导主语从句；nothing more than 表语；that 引导定语从句",
+          "shint": "What we call … is nothing more than …"
+        }
+      ],
+      "wcount": 20,
+      "grammarText": "名词与冠词",
+      "slot": "写作初稿"
+    },
+    {
+      "id": "fri",
+      "date": "11-20 周五",
+      "grammar": {
+        "point": "代词与数词",
+        "detail": "人称、物主、反身、指示、不定代词；基数词与序数词、分数与百分数。",
+        "watch": "one in three 谓语用单数；those who 指一类人；不定代词作主语时的单复数要看清。"
+      },
+      "sentences": [
+        {
+          "tag": "定语从句",
+          "dir": "zh2en",
+          "text": "我把笔记借给了几个同学，他们又转借给了别人。",
+          "hint": "",
+          "answer": "I lent my notes to a few classmates, who passed them on to others.",
+          "struct": null,
+          "shint": "…, who …（非限制性定语从句）"
+        },
+        {
+          "tag": "neither of",
+          "dir": "zh2en",
+          "text": "这两本参考书都不太适合初学者，你自己看着办吧。",
+          "hint": "reference book 参考书",
+          "answer": "Neither of these two reference books is really suitable for beginners, so it's up to you.",
+          "struct": null,
+          "shint": "Neither of + 复数名词，谓语用单数"
+        },
+        {
+          "tag": "分数表达",
+          "dir": "zh2en",
+          "text": "每三个人里就有一个人承认自己曾在考试前熬夜。",
+          "hint": "admit to 承认",
+          "answer": "One in three people admits to having stayed up late before an exam.",
+          "struct": null,
+          "shint": "One in three + 单数名词，谓语用单数"
+        },
+        {
+          "tag": "some/much of",
+          "dir": "en2zh",
+          "text": "Some of what he said was useful, but much of it had little to do with our actual problem.",
+          "hint": "have to do with 与…有关",
+          "answer": "他说的有些话有用，但大部分与我们真正的问题没什么关系。",
+          "struct": "Some of / much of + what 从句；but 并列分句",
+          "shint": "Some of / much of + what 从句"
+        },
+        {
+          "tag": "those who",
+          "dir": "en2zh",
+          "text": "Those who finish first are not necessarily those who understand best.",
+          "hint": "not necessarily 未必",
+          "answer": "最先做完的人未必是理解得最好的人。",
+          "struct": "Those who … 两个定语从句；not necessarily 部分否定",
+          "shint": "Those who … are not necessarily those who …"
+        },
+        {
+          "tag": "it takes",
+          "dir": "en2zh",
+          "text": "It takes one person to start a rumour and a hundred to spread it, yet almost no one bothers to check it.",
+          "hint": "rumour 谣言；bother 费心",
+          "answer": "造谣只需一个人，传谣却要一百个人，然而几乎没人愿意去核实。",
+          "struct": "It takes … to do …；yet 转折连词",
+          "shint": "It takes … to do …；yet 表转折"
+        }
+      ],
+      "wcount": 20,
+      "grammarText": "代词与数词",
+      "slot": ""
+    },
+    {
+      "id": "sat",
+      "date": "11-21 周六",
+      "grammar": {
+        "point": "形容词、副词与比较",
+        "detail": "比较级、最高级、倍数表达、as…as 与原级比较；修饰比较级的程度词。",
+        "watch": "much / far / no / even 可修饰比较级；not so much A as B 意为“与其说 A 不如说 B”。"
+      },
+      "sentences": [
+        {
+          "tag": "比较级修饰",
+          "dir": "zh2en",
+          "text": "这次考试比上次难得多，但我的发挥反而更稳定。",
+          "hint": "",
+          "answer": "This exam was much harder than the last one, yet I performed more steadily.",
+          "struct": null,
+          "shint": "much + 比较级；yet 表转折"
+        },
+        {
+          "tag": "the more…",
+          "dir": "zh2en",
+          "text": "他复习得越仔细，考试时就越不容易慌。",
+          "hint": "",
+          "answer": "The more carefully he revises, the less likely he is to panic in the exam.",
+          "struct": null,
+          "shint": "the more … the less likely …"
+        },
+        {
+          "tag": "not so much…as",
+          "dir": "zh2en",
+          "text": "与其说这是一次失败，不如说是一次提醒。",
+          "hint": "",
+          "answer": "It is not so much a failure as a reminder.",
+          "struct": null,
+          "shint": "not so much A as B"
+        },
+        {
+          "tag": "no better than",
+          "dir": "en2zh",
+          "text": "Her handwriting is no better than mine, but she organises her answers far more clearly.",
+          "hint": "organise 组织",
+          "answer": "她的字并不比我的好，但她把答案组织得清楚得多。",
+          "struct": "no better than 表示“和…一样不好”；far more clearly 修饰比较级",
+          "shint": "no better than（“和…一样不好”）；far more clearly"
+        },
+        {
+          "tag": "the more…",
+          "dir": "en2zh",
+          "text": "The harder the problem looks, the more important it is to read it twice before writing anything down.",
+          "hint": "write down 写下",
+          "answer": "题目看起来越难，动笔前读两遍就越重要。",
+          "struct": "the + 比较级 …, the more + 形容词 …；it 为形式主语",
+          "shint": "the more … the less likely …"
+        },
+        {
+          "tag": "as…as",
+          "dir": "en2zh",
+          "text": "Few things are as misleading as a familiar question that has been slightly changed.",
+          "hint": "misleading 误导的",
+          "answer": "很少有东西比一道稍作改动的熟题更容易误导人。",
+          "struct": "Few … as … as … 否定比较；that 引导定语从句",
+          "shint": "Few … as … as …；that 引导定语从句"
+        }
+      ],
+      "wcount": 20,
+      "grammarText": "形容词、副词与比较",
+      "slot": "阅读③ 阅读 A/B"
+    },
+    {
+      "id": "sun",
+      "date": "11-22 周日",
+      "grammar": {
+        "point": "本周复盘",
+        "detail": "把周一到周六出错的句子重写一遍，重点看当时漏掉的成分与搭配。",
+        "watch": "只重做错过的，不重抄全对；错因写在本页边缘。"
+      },
+      "sentences": [
+        {
+          "tag": "形式宾语",
+          "dir": "zh2en",
+          "text": "现代城市生活让人很难保持规律作息。",
+          "hint": "keep a regular schedule",
+          "answer": "Modern city life makes it hard for people to keep a regular schedule.",
+          "struct": null,
+          "shint": "make it + adj. + for sb to do（it 作形式宾语）"
+        },
+        {
+          "tag": "一般疑问",
+          "dir": "zh2en",
+          "text": "你今天真的打算把整本白本翻完吗？",
+          "hint": "",
+          "answer": "Do you really plan to go through the whole book today?",
+          "struct": null,
+          "shint": "Do you really plan to do …?"
+        },
+        {
+          "tag": "就近一致",
+          "dir": "zh2en",
+          "text": "要么你，要么你的同桌，得为这次失误负责。",
+          "hint": "answer for 负责",
+          "answer": "Either you or your deskmate has to answer for this mistake.",
+          "struct": null,
+          "shint": "either A or B：谓语与最近的主语一致"
+        },
+        {
+          "tag": "形式主语",
+          "dir": "en2zh",
+          "text": "It is said that a single cup of coffee can improve attention for about an hour, though the effect varies from person to person.",
+          "hint": "vary 不同",
+          "answer": "据说一杯咖啡能让注意力提高大约一小时，不过效果因人而异。",
+          "struct": "It is said that … 形式主语；though 引导让步状语从句",
+          "shint": "It is said that …（形式主语）；though 引导让步状语从句"
+        },
+        {
+          "tag": "分数表达",
+          "dir": "zh2en",
+          "text": "每三个人里就有一个人承认自己曾在考试前熬夜。",
+          "hint": "admit to 承认",
+          "answer": "One in three people admits to having stayed up late before an exam.",
+          "struct": null,
+          "shint": "One in three + 单数名词，谓语用单数"
+        },
+        {
+          "tag": "the more…",
+          "dir": "zh2en",
+          "text": "他复习得越仔细，考试时就越不容易慌。",
+          "hint": "",
+          "answer": "The more carefully he revises, the less likely he is to panic in the exam.",
+          "struct": null,
+          "shint": "the more … the less likely …"
+        }
+      ],
+      "wcount": 20,
+      "grammarText": "本周复盘",
+      "slot": "复盘 + 阅读④ 阅读 C/D"
+    }
+  ],
+  "sampleWriting": {
+    "type": "应用文 · 建议信",
+    "meta": "100 词　20 分钟",
+    "prompt": "假定你是李华，你的英国朋友 Chris 明年将来中国读大学，正在自学中文写作。他来信说自己写出来的东西“像小学生的作文”，请你回信：指出他目前最需要解决的问题，给出两条可以马上做的练习方法，并提议下个月互相批改一次作文。",
+    "emph": [
+      "最需要解决的问题",
+      "两条可以马上做的练习方法",
+      "互相批改一次作文"
+    ],
+    "gloss": [
+      "自学 teach oneself",
+      "像小学生的作文 read like a primary-school composition",
+      "互评 comment on each other's writing",
+      "下个月 early next month"
+    ],
+    "sentences": [
+      {
+        "tag": "开头",
+        "text": "I'm glad to hear that you're coming to China next year.",
+        "hint": "be glad to hear that"
+      },
+      {
+        "tag": "对照",
+        "text": "It is not that you lack ideas, but that you have not yet found a way to put them into written Chinese.",
+        "hint": "not that…but that…"
+      },
+      {
+        "tag": "主语从句",
+        "text": "What makes Chinese writing hard is the gap between what you can read and what you can produce.",
+        "hint": "What 主语从句"
+      },
+      {
+        "tag": "虚拟倒装",
+        "text": "Were I in your position, I would write three sentences a day rather than one long essay a week.",
+        "hint": "Were I…（倒装）"
+      },
+      {
+        "tag": "形式主语",
+        "text": "It also helps if you keep a journal in Chinese and ask a native speaker to mark it.",
+        "hint": "It helps if…"
+      },
+      {
+        "tag": "only 倒装",
+        "text": "Only when you revise your own writing will you see where the real problems are.",
+        "hint": "Only when…倒装"
+      },
+      {
+        "tag": "形式宾语",
+        "text": "I would appreciate it if you could send me a short passage next month.",
+        "hint": "appreciate it if…"
+      },
+      {
+        "tag": "结尾",
+        "text": "I'm looking forward to reading your first piece.",
+        "hint": "look forward to+doing"
+      }
+    ],
+    "words": [
+      {
+        "w": "accurate adj.",
+        "note": "accurate expression 准确表达"
+      },
+      {
+        "w": "revise v.",
+        "note": "revise one's draft 修改初稿"
+      },
+      {
+        "w": "awkward adj.",
+        "note": "an awkward sentence 别扭的句子"
+      },
+      {
+        "w": "fluent adj.",
+        "note": "fluent in Chinese 中文流利"
+      },
+      {
+        "w": "structure n.",
+        "note": "sentence structure 句子结构"
+      },
+      {
+        "w": "word order",
+        "note": "语序"
+      },
+      {
+        "w": "verb form",
+        "note": "动词形式"
+      },
+      {
+        "w": "model essay",
+        "note": "范文"
+      },
+      {
+        "w": "mark v.",
+        "note": "mark the paper 批改"
+      },
+      {
+        "w": "comment on",
+        "note": "评论；点评"
+      }
+    ],
+    "struct": [
+      [
+        "开头",
+        "I'm glad to hear that …；用现在完成时说明“一直在自学”。"
+      ],
+      [
+        "主体",
+        "两条做法各配一个结构：It also helps if + 从句（形式主语）；Only when … 倒装强调条件。"
+      ],
+      [
+        "结尾",
+        "I'd appreciate it if …（委婉请求）；look forward to 后接动名词。"
+      ]
+    ]
+  }
+}

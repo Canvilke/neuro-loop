@@ -20,3 +20,6 @@ daily/*.docx
 __pycache__/
 *.pyc
 room/
+weekly/
+_bg
+*.bak

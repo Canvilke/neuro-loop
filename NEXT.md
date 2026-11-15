@@ -1,19 +1,31 @@
-现在：13 日 02:15。真名已从全部 35 个提交清除并强推（远端 fd85f46），**等用户删库重建**后再推一次干净历史。
-夜间值守：T-0019/T-0020 已核收，T-0031 作废并入 T-0029，T-0032（ADR-0003）已开；门禁当前 HEAD 16/16。
-周六 13:00 三件事：①前端留哪三屏 ②数据模型四问 ③DATA.md 归档例外（真源可移动）拍板。
+# NEXT —— 现在做什么
 
+## 现在到哪了（2026-11-15 14:50）
 
-- **T-0012 已修完**：`src/045-net.js` 逾期文案 `ceil`→`floor`，`test/net.cjs` 加边界断言（多出 2.5 秒仍是 2 天）；`node test/net.cjs` 连跑 10 次 0 失败，门禁 **14/14**。
-- 票单：`done 13`；待办 —— T-0013（core 归档压缩）、T-0014（host 导出路由）、T-0015（ui 审核页签，等 T-0012 已解阻）、T-0017（qa 边界回归，等 T-0013+T-0014）。
-- 昨夜六会话结果：T-0016（方法卡 16 张）、T-0018（STATUS 刷新）已交付并通过复核；T-0012/T-0013 停滞 20h 已按 6h 规则回收，T-0012 由我接手补完。
-- 值守 `schedule-73fcf77b` 仍每小时；07:00–23:00 有人在场时自动停手，不打印。
-- 网络：`git push` 时好时坏；若本轮没推上去，明早补推（本地提交在，不会丢）。
+**英语周包 W47 已定稿并交付**：桌面 `英语周包-W47-终稿.docx` 与 `.pdf`（18 页，双面 9 张）。
+本周不再改版式；下周只改 `plan/english/W47-2026.json`（日期 / 语法点 / 句子 / 词组区间），重跑：
 
----
+```
+python tools/week_docx.py plan/english/W47-2026.json -o weekly/W47/英语周包-W47-终稿.docx --bg weekly/bg-chibi.png
+```
 
-## 恢复现场
+再用 Word 导出 PDF 即得新的一包。
 
-1. `node tools/ticket.mjs list`
-2. `node tools/bus.mjs pending`
-3. `powershell -NoProfile -ExecutionPolicy Bypass -File tools/check_all.ps1`（14 项）
-4. `docs/HANDBOOK.md` §8 通讯、§9 执行范围
+## 项目已清理（可安全接手）
+
+- 删掉：`weekly/W47/` 下 v1–v19 截图与中间稿、`_check*.pdf`、`pack.html`、`sample.*`、`.tmp/` 全部补丁脚本、`__pycache__`、`daily/` 里重复的 `pol-2026-11-10-v2.*`。
+- 归档：桌面 4 份旧稿与旧 PDF → `致远/桌面归档-2026-11-15/英语周包-旧稿/`。
+- `.gitignore` 增 `weekly/`（生成产物，不入库）。
+- 保留：`plan/english/W47-2026.json`、`tools/en_week.py`（HTML 版）、`tools/week_docx.py`（Word 版，正式链路）、`weekly/bg-chibi.png`（背景图）。
+
+## 晚些时候可以做的三件（未开工）
+
+1. 前端信息架构（今天 / 星图 / 控制台三者关系）——周六 13:00 议程第一条。
+2. 数据模型四问（`docs/RESEARCH-PLAN.pdf` §8）。
+3. T-0025：`TASKS.md:92` 与 `test/boot.cjs:282` 的历史真名已清，但仓库仍需你决定「删库重建 / 转私有」。
+
+## 三条不能碰的线
+
+- 不清 `%USERPROFILE%\.dsh\neuro-loop\`（真源事件流）。
+- 不删 `学习资料/`、`墨鸦/`、桌面归档。
+- 不为过测试改断言。
