@@ -102,6 +102,7 @@ def heading(doc, text):
     p.paragraph_format.space_after = Pt(7)
     p.paragraph_format.left_indent = Cm(0.34)
     left_bar(p)
+    p.paragraph_format.keep_with_next = True
     r = p.add_run(text)
     r.bold = True
     r.font.size = Pt(12.5)
@@ -155,7 +156,100 @@ def footer(doc, text):
     cn_font(r)
 
 
-def build(src, out):
+def add_table(doc, rows):
+    if not rows:
+        return
+    ncol = max(len(r) for r in rows)
+    t = doc.add_table(rows=0, cols=ncol)
+    t.autofit = True
+    t.style = "Table Grid"
+    for ri, row in enumerate(rows):
+        cells = t.add_row().cells
+        for ci in range(ncol):
+            txt = row[ci] if ci < len(row) else ""
+            p = cells[ci].paragraphs[0]
+            p.paragraph_format.space_before = Pt(2)
+            p.paragraph_format.space_after = Pt(2)
+            p.paragraph_format.line_spacing = 1.25
+            add_runs(p, txt, size=9.3, color=INK if ri else RGBColor(0x14, 0x14, 0x14))
+            if ri == 0:
+                for r in p.runs:
+                    r.bold = True
+                trPr = t.rows[0]._tr.get_or_add_trPr()
+                hdr = OxmlElement("w:tblHeader")
+                hdr.set(qn("w:val"), "true")
+                trPr.append(hdr)
+    for r_ in t.rows:
+        for c in r_.cells:
+            for p0 in c.paragraphs:
+                for run in p0.runs:
+                    cn_font(run)
+    p_after = doc.add_paragraph()
+    p_after.paragraph_format.space_after = Pt(2)
+    p_after.paragraph_format.line_spacing = 1.0
+    for run in p_after.runs:
+        run.font.size = Pt(2)
+
+
+def add_background(doc, png):
+    """把图放进页眉并锚定到页面背后。子节点顺序必须符合 OOXML：
+    simplePos, positionH, positionV, extent, effectExtent, wrapNone, docPr, graphic。"""
+    if not os.path.exists(png):
+        return
+    sec = doc.sections[0]
+    hdr_p = sec.header.paragraphs[0]
+    run = hdr_p.add_run()
+    run.add_picture(png, width=sec.page_width, height=sec.page_height)
+
+    drawing = run._element.find(qn("w:drawing"))
+    inline = drawing[0]
+    extent = inline.find(qn("wp:extent"))
+
+    anchor = OxmlElement("wp:anchor")
+    for k, v in (("distT", "0"), ("distB", "0"), ("distL", "0"), ("distR", "0"),
+                 ("simplePos", "0"), ("relativeHeight", "0"), ("behindDoc", "1"),
+                 ("locked", "0"), ("layoutInCell", "1"), ("allowOverlap", "1")):
+        anchor.set(k, v)
+
+    simple = OxmlElement("wp:simplePos")
+    simple.set("x", "0")
+    simple.set("y", "0")
+    anchor.append(simple)
+
+    for tag in ("wp:positionH", "wp:positionV"):
+        pos = OxmlElement(tag)
+        pos.set("relativeFrom", "page")
+        off = OxmlElement("wp:posOffset")
+        off.text = "0"
+        pos.append(off)
+        anchor.append(pos)
+
+    ext = OxmlElement("wp:extent")
+    ext.set("cx", extent.get("cx"))
+    ext.set("cy", extent.get("cy"))
+    anchor.append(ext)
+
+    eff = OxmlElement("wp:effectExtent")
+    for k in ("l", "t", "r", "b"):
+        eff.set(k, "0")
+    anchor.append(eff)
+
+    anchor.append(OxmlElement("wp:wrapNone"))
+
+    docpr = OxmlElement("wp:docPr")
+    docpr.set("id", "1")
+    docpr.set("name", "Picture 1")
+    anchor.append(docpr)
+
+    graphic = inline.find(qn("a:graphic"))
+    if graphic is not None:
+        anchor.append(graphic)
+
+    drawing.remove(inline)
+    drawing.append(anchor)
+
+
+def build(src, out, bg=None):
     lines = io.open(src, encoding="utf-8").read().splitlines()
     doc = Document()
     setup(doc)
@@ -175,6 +269,16 @@ def build(src, out):
             continue
         elif ln.startswith("## "):
             body.append(("h", ln[3:].strip()))
+        elif ln.startswith("|"):
+            rows = []
+            while i < len(lines) and lines[i].startswith("|"):
+                raw = lines[i].strip().strip("|")
+                cells = [c.strip() for c in raw.split("|")]
+                if not all(set(c) <= set("-: ") and c for c in cells):
+                    rows.append(cells)
+                i += 1
+            body.append(("table", rows))
+            continue
         elif ln.startswith("---"):
             body.append(("hr", ""))
         elif ln.strip() == "":
@@ -211,8 +315,13 @@ def build(src, out):
             p.paragraph_format.first_line_indent = Cm(-0.45)
             p.paragraph_format.space_after = Pt(4)
             add_runs(p, text)
+        elif kind == "table":
+            add_table(doc, text)
         else:
             para(doc, text)
+
+    if bg:
+        add_background(doc, bg)
 
     footer(doc, "NEURO-LOOP · 写给刚接触 DSH 的你 · 2026-11-18")
     doc.core_properties.title = title
@@ -227,4 +336,8 @@ if __name__ == "__main__":
         os.path.dirname(root), "给同学的一封信-DSH.md")
     out = sys.argv[2] if len(sys.argv) > 2 else os.path.join(
         os.path.dirname(root), "给同学的一封信-DSH.docx")
-    print("docx:", build(src, out))
+    bg = None
+    for i, a in enumerate(sys.argv):
+        if a == "--bg" and i + 1 < len(sys.argv):
+            bg = sys.argv[i + 1]
+    print("docx:", build(src, out, bg))
