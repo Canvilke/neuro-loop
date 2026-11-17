@@ -15,8 +15,9 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
 
-FONT = "Microsoft YaHei"
-BODY = 10.5
+import os
+FONT = os.environ.get("LETTER_FONT", "Microsoft YaHei")
+BODY = float(os.environ.get("LETTER_BODY", "10.5"))
 INK = RGBColor(0x1A, 0x1A, 0x1A)
 GREY = RGBColor(0x5A, 0x5A, 0x5A)
 
@@ -122,11 +123,11 @@ def quote(doc, text):
     return p
 
 
-def cover(doc, title, sub):
+def cover(doc, title, sub, kicker="NEURO-LOOP  ·  一封信"):
     p = doc.add_paragraph()
     p.paragraph_format.space_before = Pt(40)
     p.paragraph_format.space_after = Pt(4)
-    r = p.add_run("NEURO-LOOP  ·  一封信")
+    r = p.add_run(kicker)
     r.font.size = Pt(8)
     r.font.color.rgb = GREY
     cn_font(r)
@@ -251,6 +252,16 @@ def add_background(doc, png):
 
 def build(src, out, bg=None):
     lines = io.open(src, encoding="utf-8").read().splitlines()
+    kicker = "NEURO-LOOP  ·  一封信"
+    foot = "NEURO-LOOP · 写给刚接触 DSH 的你 · 2026-11-18"
+    for ln in lines:
+        m = re.match(r"<!--\s*kicker:\s*(.+?)\s*-->", ln)
+        if m:
+            kicker = m.group(1)
+        m = re.match(r"<!--\s*footer:\s*(.+?)\s*-->", ln)
+        if m:
+            foot = m.group(1)
+    lines = [l for l in lines if not l.strip().startswith("<!--")]
     doc = Document()
     setup(doc)
 
@@ -265,7 +276,7 @@ def build(src, out, bg=None):
             while i < len(lines) and lines[i].startswith(">"):
                 quotes.append(lines[i].lstrip("> ").strip())
                 i += 1
-            sub = "\n".join(q for q in quotes if q)
+            sub = "\n".join(q for q in quotes if q).replace("**", "")
             continue
         elif ln.startswith("## "):
             body.append(("h", ln[3:].strip()))
@@ -286,14 +297,14 @@ def build(src, out, bg=None):
         elif re.match(r"^\d+\.\s", ln):
             body.append(("li", ln.strip()))
         elif ln.startswith("- "):
-            body.append(("li", "· " + ln[2:].strip()))
+            body.append(("li", "- " + ln[2:].strip()))
         elif ln.startswith("**") and ln.endswith("**") and len(ln) > 4:
             body.append(("b", ln[2:-2].strip()))
         else:
             body.append(("p", ln.strip()))
         i += 1
 
-    cover(doc, title, sub)
+    cover(doc, title, sub, kicker)
 
     for kind, text in body:
         if kind == "h":
@@ -323,7 +334,7 @@ def build(src, out, bg=None):
     if bg:
         add_background(doc, bg)
 
-    footer(doc, "NEURO-LOOP · 写给刚接触 DSH 的你 · 2026-11-18")
+    footer(doc, foot)
     doc.core_properties.title = title
     doc.core_properties.author = "d 老师（墨鸦）"
     doc.save(out)
